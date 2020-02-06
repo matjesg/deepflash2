@@ -1,7 +1,12 @@
 {
   "deepflash2": {
     "Overview": "/",
-    "Deepflash2": "/core",
-    "Metrics": "/metrics"
+    "Learner": "/learner",
+    "Models": "/models",
+    "Data": "/data",
+    "Metrics": "/metrics",
+    "Callbacks": "/callbacks",
+    "Learning Rate Finder": "/lrfinder",
+    "Tuturial to Deepflash2": "/turorial"
   }
 }

@@ -10,11 +10,26 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Deepflash2
-      url: /core
+      title: Learner
+      url: /learner
+    - output: web,pdf
+      title: Models
+      url: /models
+    - output: web,pdf
+      title: Data
+      url: /data
     - output: web,pdf
       title: Metrics
       url: /metrics
+    - output: web,pdf
+      title: Callbacks
+      url: /callbacks
+    - output: web,pdf
+      title: Learning Rate Finder
+      url: /lrfinder
+    - output: web,pdf
+      title: Tuturial to Deepflash2
+      url: /turorial
     output: web
     title: deepflash2
   output: web
