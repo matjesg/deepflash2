@@ -568,6 +568,7 @@ class TileGenerator(tf.keras.utils.Sequence):
         if self.hasLabels:
             Y[0, ...] = self.labels[idx]
             W[0, ...] = self.weights[idx]
-
-        Y = tf.keras.utils.to_categorical(Y, num_classes=self.n_classes)
-        return  (X,{'conv_u0d-score': np.append(Y, np.expand_dims(W, axis=-1), axis=-1), 'softmax': Y}, {})
+            Y = tf.keras.utils.to_categorical(Y, num_classes=self.n_classes)
+            return  (X,{'conv_u0d-score': np.append(Y, np.expand_dims(W, axis=-1), axis=-1), 'softmax': Y}, {})
+        else:
+            return  X
