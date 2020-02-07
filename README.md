@@ -1,5 +1,5 @@
 # DeepFLaSH2
-> Official repository of DeepFLasH - a deep learning pipeline for segmentation of fluorescent labels in microscopy images..
+> Official repository of DeepFLasH - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.
 
 
 This file will become your README and also the index of your documentation.
@@ -10,24 +10,17 @@ This file will become your README and also the index of your documentation.
 
 ## How to use
 
-Fill me in please! Don't forget code examples:
-
 ```python
-unet = Unet2D()
+learn = Unet_Learner(train_generator, valid_generator)
 ```
 
 ```python
-losses = {'conv_u0d-score':weighted_softmax_cross_entropy, 
-          'softmax':zero_loss}
-metrics = {'softmax': [tf.keras.metrics.Recall(class_id=1), 
-                       tf.keras.metrics.Precision(class_id=1),
-                       tf.keras.metrics.BinaryAccuracy(),
-                       IoU(num_classes=2, class_id=1, name='IoU')
-                      ]}
+learn.lr_find()
+learn.plot_loss()
+```
 
-opt = tf.keras.optimizers.Adam(learning_rate=1e-5)
-
-unet.model.compile(optimizer=opt, loss=losses, metrics=metrics)
+```python
+learn.fit_one_cycle(100, validation_freq=5, max_lr=5e-4)
 ```
 
 ## Model Library
