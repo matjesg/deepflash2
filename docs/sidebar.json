@@ -7,6 +7,8 @@
     "Metrics": "/metrics",
     "Callbacks": "/callbacks",
     "Learning Rate Finder": "/lrfinder",
-    "Tuturial to Deepflash2": "/turorial"
+    "Utility functions": "/utils",
+    "Title": "/colab_test",
+    "Tuturial to Deepflash2": "/tutorial"
   }
 }

@@ -28,8 +28,14 @@ entries:
       title: Learning Rate Finder
       url: /lrfinder
     - output: web,pdf
+      title: Utility functions
+      url: /utils
+    - output: web,pdf
+      title: Title
+      url: /colab_test
+    - output: web,pdf
       title: Tuturial to Deepflash2
-      url: /turorial
+      url: /tutorial
     output: web
     title: deepflash2
   output: web

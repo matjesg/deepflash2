@@ -5,7 +5,7 @@ title: DeepFLaSH2
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Official repository of DeepFLasH - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.."
+summary: "Official repository of DeepFLasH - a deep learning pipeline for segmentation of fluorescent labels in microscopy images."
 ---
 <!--
 
@@ -48,19 +48,12 @@ summary: "Official repository of DeepFLasH - a deep learning pipeline for segmen
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Fill me in please! Don't forget code examples:</p>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">unet</span> <span class="o">=</span> <span class="n">Unet2D</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span> <span class="o">=</span> <span class="n">Unet_Learner</span><span class="p">(</span><span class="n">train_generator</span><span class="p">,</span> <span class="n">valid_generator</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -73,17 +66,21 @@ summary: "Official repository of DeepFLasH - a deep learning pipeline for segmen
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">losses</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;conv_u0d-score&#39;</span><span class="p">:</span><span class="n">weighted_softmax_cross_entropy</span><span class="p">,</span> 
-          <span class="s1">&#39;softmax&#39;</span><span class="p">:</span><span class="n">zero_loss</span><span class="p">}</span>
-<span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;softmax&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Recall</span><span class="p">(</span><span class="n">class_id</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> 
-                       <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Precision</span><span class="p">(</span><span class="n">class_id</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-                       <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">BinaryAccuracy</span><span class="p">(),</span>
-                       <span class="n">IoU</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">class_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;IoU&#39;</span><span class="p">)</span>
-                      <span class="p">]}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
+<span class="n">learn</span><span class="o">.</span><span class="n">plot_loss</span><span class="p">()</span>
+</pre></div>
 
-<span class="n">opt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+    </div>
+</div>
+</div>
 
-<span class="n">unet</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">opt</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">losses</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">)</span>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">validation_freq</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">max_lr</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span>
 </pre></div>
 
     </div>

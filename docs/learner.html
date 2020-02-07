@@ -37,7 +37,7 @@ summary: "Learner class and traing loop."
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Unet_Learner" class="doc_header"><code>class</code> <code>Unet_Learner</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L16" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Unet_Learner</code>(<strong><code>model</code></strong>, <strong><code>train_generator</code></strong>, <strong><code>val_generator</code></strong>=<em><code>None</code></em>, <strong><code>opt</code></strong>=<em><code>None</code></em>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>metric</code></strong>=<em><code>None</code></em>, <strong><code>wd</code></strong>=<em><code>0.01</code></em>, <strong><code>lr</code></strong>=<em><code>1e-05</code></em>, <strong><code>workers</code></strong>=<em><code>1</code></em>, <strong><code>name</code></strong>=<em><code>'U-Net'</code></em>, <strong><code>use_multiprocessing</code></strong>=<em><code>False</code></em>)</p>
+<h2 id="Unet_Learner" class="doc_header"><code>class</code> <code>Unet_Learner</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L17" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Unet_Learner</code>(<strong><code>train_generator</code></strong>, <strong><code>val_generator</code></strong>=<em><code>None</code></em>, <strong><code>model</code></strong>=<em><code>None</code></em>, <strong><code>opt</code></strong>=<em><code>None</code></em>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>metric</code></strong>=<em><code>None</code></em>, <strong><code>lr</code></strong>=<em><code>1e-05</code></em>, <strong><code>wd</code></strong>=<em><code>0.0</code></em>, <strong><code>checkpoint_dir</code></strong>=<em><code>'checkpoints'</code></em>, <strong><code>workers</code></strong>=<em><code>1</code></em>, <strong><code>name</code></strong>=<em><code>'U-Net'</code></em>, <strong><code>use_multiprocessing</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 <p>Class used to train Keras models.</p>
 <p>model (Model): tf.keras.Model
@@ -64,7 +64,7 @@ val_data (Iterator):   Iterator instance for validation set</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="weighted_softmax_cross_entropy" class="doc_header"><code>weighted_softmax_cross_entropy</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L290" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>weighted_softmax_cross_entropy</code>(<strong><code>target_y</code></strong>, <strong><code>predicted_y</code></strong>)</p>
+<h4 id="weighted_softmax_cross_entropy" class="doc_header"><code>weighted_softmax_cross_entropy</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L308" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>weighted_softmax_cross_entropy</code>(<strong><code>target_y</code></strong>, <strong><code>predicted_y</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -87,30 +87,7 @@ val_data (Iterator):   Iterator instance for validation set</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="zero_loss" class="doc_header"><code>zero_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L299" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>zero_loss</code>(<strong><code>predicted_y</code></strong>, <strong><code>target_y</code></strong>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="nan_loss" class="doc_header"><code>nan_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L303" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>nan_loss</code>(<strong><code>predicted_y</code></strong>, <strong><code>target_y</code></strong>)</p>
+<h4 id="zero_loss" class="doc_header"><code>zero_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L317" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>zero_loss</code>(<strong><code>predicted_y</code></strong>, <strong><code>target_y</code></strong>)</p>
 </blockquote>
 
 </div>

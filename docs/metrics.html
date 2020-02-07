@@ -5,7 +5,7 @@ title: Metrics
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Definition of the metrics that can be used in training models in addition to the official [tensorflow metrics](https://www.tensorflow.org/api_docs/python/tf/keras)."
+summary: "Definition of the metrics that can be used in training models."
 ---
 <!--
 
@@ -27,7 +27,8 @@ summary: "Definition of the metrics that can be used in training models in addit
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Intersection-Over-Union">Intersection-Over-Union<a class="anchor-link" href="#Intersection-Over-Union">&#182;</a></h2>
+<h2 id="Intersection-Over-Union">Intersection-Over-Union<a class="anchor-link" href="#Intersection-Over-Union">&#182;</a></h2><p>In addition to the official tensorflow metrics (<a href="https://www.tensorflow.org/api_docs/python/tf/keras/metrics">https://www.tensorflow.org/api_docs/python/tf/keras/metrics</a>).</p>
+
 </div>
 </div>
 </div>
@@ -43,7 +44,7 @@ summary: "Definition of the metrics that can be used in training models in addit
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="IoU" class="doc_header"><code>class</code> <code>IoU</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/metrics.py#L11" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>IoU</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>MeanIoU</code></p>
+<h2 id="MeanIoU2" class="doc_header"><code>class</code> <code>MeanIoU2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/metrics.py#L11" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MeanIoU2</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>MeanIoU</code></p>
 </blockquote>
 <p>Computes the Intersection-Over-Union metric.
 Adjusted for probabilistic labels and different semantic classes from
@@ -56,7 +57,7 @@ IOU = true_positive / (true_positive + false_positive + false_negative).
 The predictions are accumulated in a confusion matrix, weighted by
 <code>sample_weight</code> and the metric is then calculated from it.</p>
 <p>If <code>class_id</code> is specified, we calculate the IoU by considering only the
-entries in the batch for which <code>class_id</code> is in the label</p>
+entries in the batch for which <code>class_id</code> is in the label.</p>
 
 </div>
 
@@ -77,8 +78,8 @@ entries in the batch for which <code>class_id</code> is in the label</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">IoU</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">update_state</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">MeanIoU2</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">update_state</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">])</span>
 </pre></div>
 
     </div>
@@ -93,9 +94,9 @@ entries in the batch for which <code>class_id</code> is in the label</p>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;tf.Tensor: id=864, shape=(2, 2), dtype=float64, numpy=
-array([[1., 1.],
-       [0., 2.]])&gt;</pre>
+<pre>&lt;tf.Tensor: shape=(2, 2), dtype=float64, numpy=
+array([[1., 0.],
+       [0., 3.]])&gt;</pre>
 </div>
 
 </div>
@@ -153,7 +154,7 @@ array([[1., 1.],
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">MeanIoU</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">update_state</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">])</span>
+<span class="n">m</span><span class="o">.</span><span class="n">update_state</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">])</span>
 </pre></div>
 
     </div>
@@ -169,8 +170,8 @@ array([[1., 1.],
 
 <div class="output_text output_subarea output_execute_result">
 <pre>&lt;tf.Variable &#39;UnreadVariable&#39; shape=(2, 2) dtype=float64, numpy=
-array([[2., 0.],
-       [2., 0.]])&gt;</pre>
+array([[1., 0.],
+       [3., 0.]])&gt;</pre>
 </div>
 
 </div>
@@ -206,7 +207,7 @@ array([[2., 0.],
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>0.25</pre>
+<pre>0.125</pre>
 </div>
 
 </div>
