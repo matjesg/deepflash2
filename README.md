@@ -2,24 +2,22 @@
 > Official repository of DeepFLasH - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.
 
 
-This file will become your README and also the index of your documentation.
-
 ## Install
 
 `pip install deepflash2`
 
 ## How to use
 
-```python
+```
 learn = Unet_Learner(train_generator, valid_generator)
 ```
 
-```python
+```
 learn.lr_find()
 learn.plot_loss()
 ```
 
-```python
+```
 learn.fit_one_cycle(100, validation_freq=5, max_lr=5e-4)
 ```
 

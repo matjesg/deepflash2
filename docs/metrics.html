@@ -5,7 +5,8 @@ title: Metrics
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Definition of the metrics that can be used in training models."
+summary: "Definition of the metrics that can be used in training models. See <a href='https://dev.fast.ai/metrics'>fastai2 docs</a> for more information."
+description: "Definition of the metrics that can be used in training models. See <a href='https://dev.fast.ai/metrics'>fastai2 docs</a> for more information."
 ---
 <!--
 
@@ -18,23 +19,37 @@ summary: "Definition of the metrics that can be used in training models."
 -->
 
 <div class="container" id="notebook-container">
+        
+    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Intersection-Over-Union">Intersection-Over-Union<a class="anchor-link" href="#Intersection-Over-Union">&#182;</a></h2><p>In addition to the official tensorflow metrics (<a href="https://www.tensorflow.org/api_docs/python/tf/keras/metrics">https://www.tensorflow.org/api_docs/python/tf/keras/metrics</a>).</p>
+<h2 id="Dice-coefficient-/-F1-score-wrapper-class">Dice coefficient / F1 score wrapper class<a class="anchor-link" href="#Dice-coefficient-/-F1-score-wrapper-class"> </a></h2><p>see <a href="https://stats.stackexchange.com/questions/273537/f1-dice-score-vs-iou">here</a> for F1/Dice score discussion.</p>
 
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
@@ -44,20 +59,9 @@ summary: "Definition of the metrics that can be used in training models."
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="MeanIoU2" class="doc_header"><code>class</code> <code>MeanIoU2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/metrics.py#L11" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MeanIoU2</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwargs</code></strong>) :: <code>MeanIoU</code></p>
+<h2 id="Dice_f1" class="doc_header"><code>class</code> <code>Dice_f1</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/metrics.py#L9" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Dice_f1</code>(<strong><code>axis</code></strong>=<em><code>1</code></em>) :: <code>Dice</code></p>
 </blockquote>
-<p>Computes the Intersection-Over-Union metric.
-Adjusted for probabilistic labels and different semantic classes from
-tf.keras.metrics.MeanIoU
-(<a href="https://www.tensorflow.org/api_docs/python/tf/keras/metrics/MeanIoU">https://www.tensorflow.org/api_docs/python/tf/keras/metrics/MeanIoU</a>)</p>
-<p>Mean Intersection-Over-Union is a common evaluation metric for semantic image
-segmentation, which first computes the IOU for each semantic class and then
-computes the average over classes. IOU is defined as follows:
-IOU = true_positive / (true_positive + false_positive + false_negative).
-The predictions are accumulated in a confusion matrix, weighted by
-<code>sample_weight</code> and the metric is then calculated from it.</p>
-<p>If <code>class_id</code> is specified, we calculate the IoU by considering only the
-entries in the batch for which <code>class_id</code> is in the label.</p>
+<p>Dice coefficient metric for binary target in segmentation</p>
 
 </div>
 
@@ -67,24 +71,24 @@ entries in the batch for which <code>class_id</code> is in the label.</p>
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Example">Example<a class="anchor-link" href="#Example">&#182;</a></h3>
+<h2 id="Intersection-Over-Union-wrapper-class">Intersection-Over-Union wrapper class<a class="anchor-link" href="#Intersection-Over-Union-wrapper-class"> </a></h2>
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">MeanIoU2</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">update_state</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">])</span>
-</pre></div>
+</div>
+    {% endraw %}
 
-    </div>
-</div>
-</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
 <div class="output">
@@ -92,130 +96,44 @@ entries in the batch for which <code>class_id</code> is in the label.</p>
 <div class="output_area">
 
 
-
-<div class="output_text output_subarea output_execute_result">
-<pre>&lt;tf.Tensor: shape=(2, 2), dtype=float64, numpy=
-array([[1., 0.],
-       [0., 3.]])&gt;</pre>
-</div>
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="Iou" class="doc_header"><code>class</code> <code>Iou</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/metrics.py#L17" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Iou</code>(<strong><code>axis</code></strong>=<em><code>1</code></em>) :: <a href="/deepflash2/metrics#Dice_f1"><code>Dice_f1</code></a></p>
+</blockquote>
+<p>Implemetation of the IoU (jaccard coefficient) that is lighter in RAM</p>
 
 </div>
 
 </div>
+
+</div>
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Show result</p>
-
+<h3 id="Example">Example<a class="anchor-link" href="#Example"> </a></h3>
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span> <span class="o">=</span> <span class="n">Learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">Iou</span><span class="p">,</span> <span class="n">Dice_f1</span><span class="p">])</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.0</pre>
 </div>
+    {% endraw %}
 
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>tf.keras.metrics.MeanIoU shows a different behaviour</strong></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">MeanIoU</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">update_state</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.56</span><span class="p">])</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>&lt;tf.Variable &#39;UnreadVariable&#39; shape=(2, 2) dtype=float64, numpy=
-array([[1., 0.],
-       [3., 0.]])&gt;</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Show result</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>0.125</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
 </div>
  
 

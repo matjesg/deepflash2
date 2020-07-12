@@ -5,7 +5,8 @@ title: Callbacks
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Implements utilities called at certain points during model training in addition to the official tensorflow callbacks (https://www.tensorflow.org/api_docs/python/tf/keras/callbacks)."
+summary: "Implements utilities called at certain points during model training. See the <a href='https://dev.fast.ai/callback.core#Callback'>fastai2 docs</a> for more information."
+description: "Implements utilities called at certain points during model training. See the <a href='https://dev.fast.ai/callback.core#Callback'>fastai2 docs</a> for more information."
 ---
 <!--
 
@@ -18,22 +19,36 @@ summary: "Implements utilities called at certain points during model training in
 -->
 
 <div class="container" id="notebook-container">
+        
+    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Cyclical-learning-rate-policy-(CLR)">Cyclical learning rate policy (CLR)<a class="anchor-link" href="#Cyclical-learning-rate-policy-(CLR)">&#182;</a></h2>
+<h2 id="Recomputes-elastic-deformations-after-each-epoch">Recomputes elastic deformations after each epoch<a class="anchor-link" href="#Recomputes-elastic-deformations-after-each-epoch"> </a></h2>
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
@@ -43,62 +58,9 @@ summary: "Implements utilities called at certain points during model training in
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="CyclicLR" class="doc_header"><code>class</code> <code>CyclicLR</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/callbacks.py#L11" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>CyclicLR</code>(<strong><code>base_lr</code></strong>=<em><code>0.001</code></em>, <strong><code>max_lr</code></strong>=<em><code>0.006</code></em>, <strong><code>step_size</code></strong>=<em><code>2000.0</code></em>, <strong><code>mode</code></strong>=<em><code>'triangular'</code></em>, <strong><code>gamma</code></strong>=<em><code>1.0</code></em>, <strong><code>scale_fn</code></strong>=<em><code>None</code></em>, <strong><code>scale_mode</code></strong>=<em><code>'cycle'</code></em>, <strong><code>reduce_on_plateau</code></strong>=<em><code>0</code></em>, <strong><code>monitor</code></strong>=<em><code>'val_loss'</code></em>, <strong><code>reduce_factor</code></strong>=<em><code>2</code></em>, <strong><code>max_momentum</code></strong>=<em><code>0.95</code></em>, <strong><code>min_momentum</code></strong>=<em><code>0.85</code></em>, <strong><code>verbose</code></strong>=<em><code>1</code></em>) :: <code>Callback</code></p>
+<h2 id="ElasticDeformCallback" class="doc_header"><code>class</code> <code>ElasticDeformCallback</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/callbacks.py#L9" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ElasticDeformCallback</code>() :: <code>Callback</code></p>
 </blockquote>
-<p>This callback implements a cyclical learning rate policy (CLR).
-The method cycles the learning rate between two boundaries with
-some constant frequency, as detailed in this paper (<a href="https://arxiv.org/abs/1506.01186">https://arxiv.org/abs/1506.01186</a>).
-The amplitude of the cycle can be scaled on a per-iteration or
-per-cycle basis.
-This class has three built-in policies, as put forth in the paper.
-"triangular":
-    A basic triangular cycle w/ no amplitude scaling.
-"triangular2":
-    A basic triangular cycle that scales initial amplitude by half each cycle.
-"exp_range":
-    A cycle that scales initial amplitude by gamma**(cycle iterations) at each
-    cycle iteration.
-For more detail, please see paper.</p>
-<h1 id="Arguments">Arguments<a class="anchor-link" href="#Arguments">&#182;</a></h1>
-<pre><code>base_lr: initial learning rate which is the
-    lower boundary in the cycle.
-max_lr: upper boundary in the cycle. Functionally,
-    it defines the cycle amplitude (max_lr - base_lr).
-    The lr at any cycle is the sum of base_lr
-    and some scaling of the amplitude; therefore
-    max_lr may not actually be reached depending on
-    scaling function.
-step_size: number of training iterations per
-    half cycle. Authors suggest setting step_size
-    2-8 x training iterations in epoch.
-mode: one of {triangular, triangular2, exp_range}.
-    Default 'triangular'.
-    Values correspond to policies detailed above.
-    If scale_fn is not None, this argument is ignored.
-gamma: constant in 'exp_range' scaling function:
-    gamma**(cycle iterations)
-scale_fn: Custom scaling policy defined by a single
-    argument lambda function, where
-    0 &lt;= scale_fn(x) &lt;= 1 for all x &gt;= 0.
-    mode paramater is ignored
-scale_mode: {'cycle', 'iterations'}.
-    Defines whether scale_fn is evaluated on
-    cycle number or cycle iterations (training
-    iterations since start of cycle). Default is 'cycle'.
-max_momentum(float):     maximum momentum when momentum is cycled
-                         If both max_momentum and min_momentum is None,
-                         default momentum for Adam is used.
-                         (only used if optimizer is Adam)
-min_momentum(float):     minimum momentum when momentum is cycled
-                         If both max_momentum and min_momentum is None,
-                         default momentum for Adam is used.
-                         (only used if optimizer is Adam)
-
-</code></pre>
-<p>References:
-    Original Paper: <a href="https://arxiv.org/abs/1803.09820">https://arxiv.org/abs/1803.09820</a>
-    Blog Post: <a href="https://sgugger.github.io/the-1cycle-policy.html">https://sgugger.github.io/the-1cycle-policy.html</a>
-    Code Reference: <a href="https://github.com/bckenstler/CLR">https://github.com/bckenstler/CLR</a> and <a href="https://github.com/amaiya/ktrain">https://github.com/amaiya/ktrain</a></p>
+<p><code>Callback</code> that recomputes elastic deformations after each epoch</p>
 
 </div>
 
@@ -108,23 +70,22 @@ min_momentum(float):     minimum momentum when momentum is cycled
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Example">Example<a class="anchor-link" href="#Example">&#182;</a></h3>
+<h3 id="Example">Example<a class="anchor-link" href="#Example"> </a></h3>
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">clr</span> <span class="o">=</span> <span class="n">CyclicLR</span><span class="p">(</span><span class="n">base_lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> 
-               <span class="n">max_lr</span><span class="o">=</span><span class="mf">0.006</span><span class="p">,</span>
-               <span class="n">step_size</span><span class="o">=</span><span class="mf">2000.</span><span class="p">,</span>
-               <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;triangular&#39;</span><span class="p">)</span>
-
-<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">clr</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span> <span class="o">=</span> <span class="n">Learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="n">ElasticDeformCallback</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -132,34 +93,8 @@ min_momentum(float):     minimum momentum when momentum is cycled
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Class also supports custom scaling functions:</p>
+    {% endraw %}
 
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">clr_fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.</span><span class="p">))</span>
-
-<span class="n">clr</span> <span class="o">=</span> <span class="n">CyclicLR</span><span class="p">(</span><span class="n">base_lr</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> 
-               <span class="n">max_lr</span><span class="o">=</span><span class="mf">0.006</span><span class="p">,</span>
-               <span class="n">step_size</span><span class="o">=</span><span class="mf">2000.</span><span class="p">,</span> 
-               <span class="n">scale_fn</span><span class="o">=</span><span class="n">clr_fn</span><span class="p">,</span>
-               <span class="n">scale_mode</span><span class="o">=</span><span class="s1">&#39;cycle&#39;</span><span class="p">)</span>
-
-<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">clr</span><span class="p">])</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
 </div>
  
 

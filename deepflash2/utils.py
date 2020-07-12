@@ -70,7 +70,6 @@ def get_candidates(labels_a, labels_b):
     cadidates = cadidates[np.prod(cadidates, axis=1) > 0]
     return(cadidates)
 
-
 # Cell
 def iou_mapping(labels_a, labels_b, min_roi_size=30):
     '''Compare masks using ROI-wise analysis'''

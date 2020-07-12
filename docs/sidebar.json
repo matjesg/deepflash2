@@ -1,14 +1,10 @@
 {
   "deepflash2": {
     "Overview": "/",
-    "Learner": "/learner",
     "Models": "/models",
     "Data": "/data",
     "Metrics": "/metrics",
     "Callbacks": "/callbacks",
-    "Learning Rate Finder": "/lrfinder",
-    "Utility functions": "/utils",
-    "Title": "/colab_test",
-    "Tuturial to Deepflash2": "/tutorial"
+    "Utility functions": "/utils"
   }
 }
