@@ -11,4 +11,4 @@ class ElasticDeformCallback(Callback):
     run_valid = False
     def after_epoch(self):
         "Randomly recompute elastic deformations"
-        learn.dls.train.on_epoch_end()
+        self.learn.dls.train.on_epoch_end()

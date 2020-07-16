@@ -2,25 +2,30 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"UNetConvBlock": "01_models.ipynb",
+index = {"SegmentationLearner": "00_learner.ipynb",
+         "UNetConvBlock": "01_models.ipynb",
          "UNetUpBlock": "01_models.ipynb",
          "UNet2D": "01_models.ipynb",
          "DeformationField": "02_data.ipynb",
          "DataPreProcessor": "02_data.ipynb",
+         "BaseTileDataset": "02_data.ipynb",
          "RandomTileDataset": "02_data.ipynb",
          "TileDataset": "02_data.ipynb",
          "Dice_f1": "03_metrics.ipynb",
          "Iou": "03_metrics.ipynb",
          "ElasticDeformCallback": "04_callbacks.ipynb",
+         "WeightedSoftmaxCrossEntropy": "05_losses.ipynb",
          "iou": "06_utils.ipynb",
          "label_mask": "06_utils.ipynb",
          "get_candidates": "06_utils.ipynb",
          "iou_mapping": "06_utils.ipynb"}
 
-modules = ["models.py",
+modules = ["learner.py",
+           "models.py",
            "data.py",
            "metrics.py",
            "callbacks.py",
+           "losses.py",
            "utils.py"]
 
 doc_url = "https://matjesg.github.io/deepflash2/"

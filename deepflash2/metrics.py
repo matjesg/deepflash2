@@ -4,6 +4,7 @@ __all__ = ['Dice_f1', 'Iou']
 
 # Cell
 from fastai2.metrics import Dice
+from fastai2.torch_core import flatten_check
 
 # Cell
 class Dice_f1(Dice):

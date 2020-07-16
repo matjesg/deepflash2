@@ -9,10 +9,13 @@ import torch.nn.functional as F
 
 # Cell
 class UNetConvBlock(nn.Module):
-    def __init__(self, in_size, out_size, padding, batch_norm, neg_slope=0.1):
+    def __init__(self, in_size, out_size, padding, batch_norm,
+                 dropout=0., neg_slope=0.1):
         super(UNetConvBlock, self).__init__()
         block = []
 
+        if dropout>0.:
+            block.append(nn.Dropout(p=dropout))
         block.append(nn.Conv2d(in_size, out_size, kernel_size=3, padding=int(padding)))
         if batch_norm:
             block.append(nn.BatchNorm2d(out_size))
@@ -32,9 +35,12 @@ class UNetConvBlock(nn.Module):
 
 # Cell
 class UNetUpBlock(nn.Module):
-    def __init__(self, in_size, out_size, up_mode, padding, batch_norm, neg_slope=0.1):
+    def __init__(self, in_size, out_size, up_mode, padding, batch_norm,
+                 dropout=0., neg_slope=0.1):
         super(UNetUpBlock, self).__init__()
         up_block = []
+        if dropout>0.:
+            up_block.append(nn.Dropout(p=dropout))
         if up_mode == 'upconv':
             up_block.append(nn.ConvTranspose2d(in_size, out_size, kernel_size=2, stride=2))
         elif up_mode == 'upsample':
@@ -72,7 +78,9 @@ class UNet2D(nn.Module):
         depth=5,
         wf=6,
         padding=False,
+        init_weights=True,
         batch_norm=False,
+        dropout = 0.,
         up_mode='upconv',
     ):
         """
@@ -97,26 +105,39 @@ class UNet2D(nn.Module):
                            learned upsampling.
                            'upsample' will use bilinear upsampling.
         """
-        super(UNet, self).__init__()
+        super().__init__()
         assert up_mode in ('upconv', 'upsample')
         self.padding = padding
         self.depth = depth
         prev_channels = in_channels
         self.down_path = nn.ModuleList()
         for i in range(depth):
+            bn = True if i>0 else False
+            do = dropout if i>2 else 0.
             self.down_path.append(
-                UNetConvBlock(prev_channels, 2 ** (wf + i), padding, batch_norm if i>0 else False)
+                UNetConvBlock(prev_channels, 2 ** (wf + i), padding, batch_norm = bn, dropout = do)
             )
             prev_channels = 2 ** (wf + i)
 
         self.up_path = nn.ModuleList()
         for i in reversed(range(depth - 1)):
+            bn = True if i>0 else False
+            do = dropout if i>2 else 0.
             self.up_path.append(
-                UNetUpBlock(prev_channels, 2 ** (wf + i), up_mode, padding, batch_norm if i>0 else False)
+                UNetUpBlock(prev_channels, 2 ** (wf + i), up_mode, padding, batch_norm = bn, dropout = do)
             )
             prev_channels = 2 ** (wf + i)
 
         self.last = nn.Conv2d(prev_channels, n_classes, kernel_size=1)
+
+        if init_weights:
+            self._initialize_weights()
+
+    def _initialize_weights(self):
+        """Initialize layer weights"""
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='leaky_relu')
 
     def forward(self, x):
         blocks = []
