@@ -1,10 +1,12 @@
 {
   "deepflash2": {
     "Overview": "/",
+    "Learner for bioimgage segmentation": "/learner",
     "Models": "/models",
     "Data": "/data",
     "Metrics": "/metrics",
     "Callbacks": "/callbacks",
+    "Losses": "/losses",
     "Utility functions": "/utils"
   }
 }

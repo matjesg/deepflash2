@@ -4,7 +4,10 @@ __all__ = ['Dice_f1', 'Iou']
 
 # Cell
 from fastai2.metrics import Dice
-from fastai2.torch_core import flatten_check
+from fastai2.torch_core import *
+from fastai2.imports import *
+from fastai2.learner import *
+from fastcore.foundation import patch
 
 # Cell
 class Dice_f1(Dice):
@@ -19,3 +22,25 @@ class Iou(Dice_f1):
     "Implemetation of the IoU (jaccard coefficient) that is lighter in RAM"
     @property
     def value(self): return self.inter/(self.union-self.inter) if self.union > 0 else None
+
+# Cell
+#from https://forums.fast.ai/t/plotting-metrics-after-learning/69937
+@patch
+@delegates(subplots)
+def plot_metrics(self: Recorder, nrows=None, ncols=None, figsize=None, **kwargs):
+    metrics = np.stack(self.values)
+    names = self.metric_names[1:-1]
+    n = len(names) - 1
+    if nrows is None and ncols is None:
+        nrows = int(math.sqrt(n))
+        ncols = int(np.ceil(n / nrows))
+    elif nrows is None: nrows = int(np.ceil(n / ncols))
+    elif ncols is None: ncols = int(np.ceil(n / nrows))
+    figsize = figsize or (ncols * 6, nrows * 4)
+    fig, axs = subplots(nrows, ncols, figsize=figsize, **kwargs)
+    axs = [ax if i < n else ax.set_axis_off() for i, ax in enumerate(axs.flatten())][:n]
+    for i, (name, ax) in enumerate(zip(names, [axs[0]] + axs)):
+        ax.plot(metrics[:, i], color='#1f77b4' if i == 0 else '#ff7f0e', label='valid' if i > 0 else 'train')
+        ax.set_title(name if i > 1 else 'losses')
+        ax.legend(loc='best')
+    plt.show()

@@ -10,6 +10,9 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
+      title: Learner for bioimgage segmentation
+      url: /learner
+    - output: web,pdf
       title: Models
       url: /models
     - output: web,pdf
@@ -21,6 +24,9 @@ entries:
     - output: web,pdf
       title: Callbacks
       url: /callbacks
+    - output: web,pdf
+      title: Losses
+      url: /losses
     - output: web,pdf
       title: Utility functions
       url: /utils

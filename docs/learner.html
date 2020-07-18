@@ -1,11 +1,12 @@
 ---
 
-title: Learner
+title: Learner for bioimgage segmentation
 
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Learner class and traing loop."
+summary: "Imlements functions necessary to build `Learner` suitable for transfer learning in bioimgage segmentation"
+description: "Imlements functions necessary to build `Learner` suitable for transfer learning in bioimgage segmentation"
 ---
 <!--
 
@@ -18,43 +19,30 @@ summary: "Learner class and traing loop."
 -->
 
 <div class="container" id="notebook-container">
+        
+    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+    {% endraw %}
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="Unet_Learner" class="doc_header"><code>class</code> <code>Unet_Learner</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L17" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Unet_Learner</code>(<strong><code>train_generator</code></strong>, <strong><code>val_generator</code></strong>=<em><code>None</code></em>, <strong><code>model</code></strong>=<em><code>None</code></em>, <strong><code>opt</code></strong>=<em><code>None</code></em>, <strong><code>loss</code></strong>=<em><code>None</code></em>, <strong><code>metric</code></strong>=<em><code>None</code></em>, <strong><code>lr</code></strong>=<em><code>1e-05</code></em>, <strong><code>wd</code></strong>=<em><code>0.0</code></em>, <strong><code>checkpoint_dir</code></strong>=<em><code>'checkpoints'</code></em>, <strong><code>workers</code></strong>=<em><code>1</code></em>, <strong><code>name</code></strong>=<em><code>'U-Net'</code></em>, <strong><code>use_multiprocessing</code></strong>=<em><code>False</code></em>)</p>
-</blockquote>
-<p>Class used to train Keras models.</p>
-<p>model (Model): tf.keras.Model
-train_data (Iterator): Iterator instance for training set
-val_data (Iterator):   Iterator instance for validation set</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
@@ -64,8 +52,9 @@ val_data (Iterator):   Iterator instance for validation set</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="weighted_softmax_cross_entropy" class="doc_header"><code>weighted_softmax_cross_entropy</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L308" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>weighted_softmax_cross_entropy</code>(<strong><code>target_y</code></strong>, <strong><code>predicted_y</code></strong>)</p>
+<h2 id="SegmentationLearner" class="doc_header"><code>class</code> <code>SegmentationLearner</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L14" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SegmentationLearner</code>(<strong><code>dls</code></strong>, <strong><code>model</code></strong>, <strong><code>loss_func</code></strong>=<em><code>None</code></em>, <strong><code>opt_func</code></strong>=<em><code>'Adam'</code></em>, <strong><code>lr</code></strong>=<em><code>0.001</code></em>, <strong><code>splitter</code></strong>=<em><code>'trainable_params'</code></em>, <strong><code>cbs</code></strong>=<em><code>None</code></em>, <strong><code>metrics</code></strong>=<em><code>None</code></em>, <strong><code>path</code></strong>=<em><code>None</code></em>, <strong><code>model_dir</code></strong>=<em><code>'models'</code></em>, <strong><code>wd</code></strong>=<em><code>None</code></em>, <strong><code>wd_bn_bias</code></strong>=<em><code>False</code></em>, <strong><code>train_bn</code></strong>=<em><code>True</code></em>, <strong><code>moms</code></strong>=<em><code>(0.95, 0.85, 0.95)</code></em>) :: <code>Learner</code></p>
 </blockquote>
+<p>Group together a <code>model</code>, some <code>dls</code> and a <code>loss_func</code> to handle training</p>
 
 </div>
 
@@ -75,29 +64,8 @@ val_data (Iterator):   Iterator instance for validation set</p>
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
+    {% endraw %}
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="zero_loss" class="doc_header"><code>zero_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L317" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>zero_loss</code>(<strong><code>predicted_y</code></strong>, <strong><code>target_y</code></strong>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
 </div>
  
 

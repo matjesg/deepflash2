@@ -78,7 +78,6 @@ class UNet2D(nn.Module):
         depth=5,
         wf=6,
         padding=False,
-        init_weights=True,
         batch_norm=False,
         dropout = 0.,
         up_mode='upconv',
@@ -130,8 +129,8 @@ class UNet2D(nn.Module):
 
         self.last = nn.Conv2d(prev_channels, n_classes, kernel_size=1)
 
-        if init_weights:
-            self._initialize_weights()
+        #if init_weights:
+        #    self._initialize_weights()
 
     def _initialize_weights(self):
         """Initialize layer weights"""

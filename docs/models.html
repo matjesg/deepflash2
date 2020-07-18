@@ -6,7 +6,6 @@ keywords: fastai
 sidebar: home_sidebar
 
 summary: "Unet models."
-description: "Unet models."
 ---
 <!--
 
@@ -19,30 +18,16 @@ description: "Unet models."
 -->
 
 <div class="container" id="notebook-container">
-        
-    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
@@ -52,7 +37,7 @@ description: "Unet models."
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetConvBlock" class="doc_header"><code>class</code> <code>UNetConvBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L11" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetConvBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
+<h2 id="UNetConvBlock" class="doc_header"><code>class</code> <code>UNetConvBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L11" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetConvBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -84,17 +69,9 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
@@ -104,7 +81,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetUpBlock" class="doc_header"><code>class</code> <code>UNetUpBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L34" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetUpBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>up_mode</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
+<h2 id="UNetUpBlock" class="doc_header"><code>class</code> <code>UNetUpBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L37" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetUpBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>up_mode</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -136,23 +113,25 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Unet-class">Unet class<a class="anchor-link" href="#Unet-class"> </a></h2>
+<h2 id="Unet-class">Unet class<a class="anchor-link" href="#Unet-class">&#182;</a></h2>
 </div>
 </div>
 </div>
-    {% raw %}
-    
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Dropout according to "Bayesian SegNet: Model Uncertainty in Deep Convolutional Encoder-Decoder Architectures for Scene Understanding" <a href="https://arxiv.org/pdf/1511.02680.pdf">https://arxiv.org/pdf/1511.02680.pdf</a></p>
+<ul>
+<li>Dropout Central Enc-Dec </li>
+</ul>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
@@ -162,7 +141,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNet2D" class="doc_header"><code>class</code> <code>UNet2D</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L67" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNet2D</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>depth</code></strong>=<em><code>5</code></em>, <strong><code>wf</code></strong>=<em><code>6</code></em>, <strong><code>padding</code></strong>=<em><code>False</code></em>, <strong><code>batch_norm</code></strong>=<em><code>False</code></em>, <strong><code>up_mode</code></strong>=<em><code>'upconv'</code></em>) :: <code>Module</code></p>
+<h2 id="UNet2D" class="doc_header"><code>class</code> <code>UNet2D</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L73" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNet2D</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>depth</code></strong>=<em><code>5</code></em>, <strong><code>wf</code></strong>=<em><code>6</code></em>, <strong><code>padding</code></strong>=<em><code>False</code></em>, <strong><code>init_weights</code></strong>=<em><code>True</code></em>, <strong><code>batch_norm</code></strong>=<em><code>False</code></em>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>up_mode</code></strong>=<em><code>'upconv'</code></em>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -194,8 +173,6 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
 
 </div>
-    {% endraw %}
-
 </div>
  
 
