@@ -50,7 +50,7 @@ def predict_tiles_with_mc_dropout(self:Learner, dl=None, tile_ds=None, n_times=2
     mean_list = []
     std_list = []
     for data in progress_bar(dl):
-        images, _ = data
+        images, _, _ = data
         out_list = []
         for t in range(n_times):
             with torch.no_grad():

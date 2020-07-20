@@ -3,40 +3,31 @@
 __all__ = ['WeightedSoftmaxCrossEntropy']
 
 # Cell
-from fastai2.vision.all import *
-#import torch
-#import torch.nn.functional as F
+#from fastai2.vision.all import *
+import torch
+import torch.nn.functional as F
 
 # Cell
 class WeightedSoftmaxCrossEntropy(torch.nn.Module):
     "Weighted Softmax Cross Entropy loss functions"
-    def __init__(self, axis=-1, *args, reduction = 'mean'):
+    def __init__(self, *args, axis=-1, reduction = 'mean'):
         super().__init__()
         self.reduction = reduction
         self.axis = axis
 
-    def decodes(self, x):
-        return x.argmax(dim=self.axis)
-
-    def activation(self, x):
-        return F.softmax(x, dim=self.axis)
-
-    def forward(self, inputs, targ_weights):
-
-        # Unpack targets and weights tuple
-        targets = targ_weights[0]
-        weights = targ_weights[1]
+    def forward(self, inputs, targets, weights):
 
         # Weighted soft-max cross-entropy loss
-        log_smx = F.log_softmax(inputs, dim=1)*targets
-        # Broadcasting weights a axis 1 instead?
-        loss_wce = -log_smx.min(dim=1).values*weights
-
+        loss = F.cross_entropy(inputs, targets, reduction='none')
+        loss = loss * weights
         if  self.reduction == 'mean':
-            return loss_wce.mean()
+            return loss.mean()
 
         elif self.reduction == 'sum':
-            return loss_wce.sum()
+            return loss.sum()
 
         else:
-            return loss_wce
+            return loss
+
+    def decodes(self, x): return x.argmax(dim=self.axis)
+    def activation(self, x): return F.softmax(x, dim=self.axis)
