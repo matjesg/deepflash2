@@ -3,26 +3,22 @@
 __all__ = []
 
 # Cell
-from fastai2.vision.all import *
+from fastai.vision.all import *
 from fastcore.foundation import patch
 from .data import TileDataset
 from scipy.stats import entropy
 
 # Cell
 @patch
-def predict_from_tiles(self:Learner, dl=None, tile_ds:TileDataset=None):
+def predict_from_tiles(self:Learner, ds_idx=1, dl=None):
         "Predict and reconstruct images from tile dataset."
 
-        if dl is None:
-            dl = self.dls.valid
-        if tile_ds is None:
-            tile_ds = self.dls.valid_ds
-
+        if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
         softmax_score, _ = self.get_preds(dl=dl)
-        softmax_score = softmax_score.cpu().numpy()
-        softmax_score = np.moveaxis(softmax_score, 1,-1)
+        softmax_score = softmax_score.permute(0,2,3,1)
+        tile_list = [x for x in softmax_score.cpu().numpy()]
 
-        smxcores = tile_ds.reconstruct_from_tiles(softmax_score)
+        smxcores = dl.reconstruct_from_tiles(tile_list)
         segmentations = [np.argmax(x, axis=-1) for x in smxcores]
 
         return smxcores, segmentations
@@ -32,17 +28,15 @@ def predict_from_tiles(self:Learner, dl=None, tile_ds:TileDataset=None):
 def apply_dropout(self:Learner):
     "If a module contains 'dropout', it will be switched to .train() mode."
     for m in self.model.modules():
-        if isinstance(m, nn.Dropout):  m.train()
+        if isinstance(m, nn.Dropout):
+            m.train()
 
 # Cell
 @patch
-def predict_tiles_with_mc_dropout(self:Learner, dl=None, tile_ds=None, n_times=20):
+def predict_tiles_with_mc_dropout(self:Learner, ds_idx=1, dl=None, n_times=20):
     "Make predictions with dropout applied."
 
-    if dl is None:
-        dl = self.dls.valid
-    if tile_ds is None:
-        tile_ds = self.dls.valid_ds
+    if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
 
     self.model.eval()
     self.apply_dropout()
@@ -65,13 +59,14 @@ def predict_tiles_with_mc_dropout(self:Learner, dl=None, tile_ds=None, n_times=2
         out_sdts = torch.std(out_stack, dim=0)
         std_list.append(out_sdts)
 
-    softmax_score = torch.cat(mean_list).cpu().numpy()
-    softmax_score = np.moveaxis(softmax_score, 1,-1)
+    softmax_pred = torch.cat(mean_list).permute(0,2,3,1)
+    smx_tiles = [x for x in softmax_pred.cpu().numpy()]
 
-    std_scores = torch.cat(std_list).cpu().numpy()
-    std_scores = np.moveaxis(std_scores, 1,-1)
-    smxcores = tile_ds.reconstruct_from_tiles(softmax_score)
+    std_pred = torch.cat(std_list).permute(0,2,3,1)
+    std_tiles = [x for x in std_pred.cpu().numpy()]
+
+    smxcores = dl.reconstruct_from_tiles(smx_tiles)
     segmentations = [np.argmax(x, axis=-1) for x in smxcores]
-    std_deviations = tile_ds.reconstruct_from_tiles(std_scores)
+    std_deviations = dl.reconstruct_from_tiles(std_tiles)
 
     return smxcores, segmentations, std_deviations

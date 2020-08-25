@@ -1,7 +1,7 @@
 {
   "deepflash2": {
     "Overview": "/",
-    "Learner for bioimgage segmentation": "/learner",
+    "Patches for the `fastai` Learner": "/learner",
     "Models": "/models",
     "Data": "/data",
     "Metrics": "/metrics",

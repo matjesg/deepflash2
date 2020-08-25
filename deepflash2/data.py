@@ -21,10 +21,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
-from fastai2.vision.all import *
+from fastai.vision.all import *
 
 # Cell
-def show(*obj, file_name=None, overlay=False, pred=False, figsize=(10,10), cmap=None, **kwargs):
+def show(*obj, file_name=None, overlay=False, pred=False,
+         show_bbox=True, figsize=(10,10), cmap=None, **kwargs):
 
     if isinstance(obj[1], tuple):
         img,msk,weight = obj[0], obj[1][0], obj[1][1]
@@ -38,16 +39,16 @@ def show(*obj, file_name=None, overlay=False, pred=False, figsize=(10,10), cmap=
     img = np.array(img)
     msk = np.array(msk)
 
+    # Swap axis to channels last
+    if img.shape[0]<10: img=np.moveaxis(img,0,-1)
     # One channel images
     if img.shape[-1]==1: img=img[...,0]
-    if img.shape[0]==1: img=img[0,...]
-    if img.shape[1]==1: img=img[...,0,...]
 
     # Remove background class from masks
     if msk.shape[0]==2: msk=msk[1,...]
-
     # Create bbox
-    pad = (np.array(img.shape)-np.array(msk.shape))//2
+
+    pad = (np.array(img.shape[:2])-np.array(msk.shape))//2
     bbox = Rectangle((pad[0]-1,pad[1]-1),img.shape[0]-2*pad[0]+1,img.shape[0]-2*pad[0]+1,
              edgecolor='r',linewidth=1,facecolor='none')
 
@@ -79,7 +80,7 @@ def show(*obj, file_name=None, overlay=False, pred=False, figsize=(10,10), cmap=
     else:
         ax[1].imshow(msk, cmap=cmap)
         ax[1].set_title('Mask')
-    ax[1].add_patch(copy(bbox))
+    if show_bbox: ax[1].add_patch(copy(bbox))
 
     ax[1].set_axis_off()
 
@@ -92,7 +93,7 @@ def show(*obj, file_name=None, overlay=False, pred=False, figsize=(10,10), cmap=
             ax[2].set_title('Prediction')
         else:
             ax[2].set_title('Weights (max value: {:.{p}f})'.format(max_w, p=1))
-        ax[2].add_patch(copy(bbox))
+        if show_bbox: ax[2].add_patch(copy(bbox))
         ax[2].set_axis_off()
 
     #ax.set_axis_off()
@@ -121,26 +122,26 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
 
     assert not (clabels is None and instlabels is None), "Provide either clabels or instlabels"
 
-    # If no instance labels are given, generate them now
-    if instlabels is None:
-        # Creating instance labels from mask
-        instlabels = np.zeros_like(clabels)
-        classes = np.unique(clabels)[1:]
-        nextInstance = 1
-        for c in classes:
-            comps, nInstances = ndimage.measurements.label(clabels == c)
-            instlabels[comps > 0] = comps[comps > 0] + nextInstance
-            nextInstance += nInstances
-
     # If no classlabels are given treat the problem as binary segmentation
     # ==> Create a new array assigning class 1 (foreground) to each instance
     if clabels is None:
-        clabels = instlabels > 0
+        clabels = (instlabels > 0).astype(int)
 
     # Initialize label and weights arrays with background
     labels = np.zeros_like(clabels)
     wghts = foreground_background_ratio * np.ones_like(clabels)
     frgrd_dist = np.zeros_like(clabels, dtype='float32')
+    classes = np.unique(clabels)[1:]
+
+    # If no instance labels are given, generate them now
+    if instlabels is None:
+        # Creating instance labels from mask
+        instlabels = np.zeros_like(clabels)
+        nextInstance = 1
+        for c in classes:
+            comps, nInstances = ndimage.measurements.label(clabels == c)
+            instlabels[comps > 0] = comps[comps > 0] + nextInstance
+            nextInstance += nInstances
 
     for c in classes:
         # Extract all instance labels of class c
@@ -266,20 +267,24 @@ class DeformationField:
                 .astype(data.dtype))
 
 # Cell
-def _read_img(path, **kwargs):
+def _read_img(path, divide=None, **kwargs):
     "Read image and normalize to 0-1 range"
     img = imageio.imread(path, **kwargs)
-    img = img/np.iinfo(img.dtype).max
-    assert img.max()<=1. and img.max()>.1, 'Check image loading'
+    if divide is None and img.max()>0:
+        img = img/np.iinfo(img.dtype).max
+    if divide is not None:
+        img = img/divide
+    assert img.max()<=1. and img.max()>.04, f'Check image loading, dividing by {divide}, max value is {img.max()}'
     return img
 
-def _read_msk(path, n_classes, **kwargs):
+def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
     "Read image and check classes"
     msk = imageio.imread(path, **kwargs)
-    if np.max(msk)>n_classes:
-        msk = msk//np.iinfo(msk.dtype).max
-    # Mask check
-    assert len(np.unique(msk))==n_classes, 'Check n_classes and provided mask'
+    if not instance_labels:
+        if np.max(msk)>n_classes:
+            msk = msk//np.iinfo(msk.dtype).max
+        # Mask check
+        assert len(np.unique(msk))==n_classes, 'Check n_classes and provided mask'
     return msk
 
 # Cell
@@ -289,6 +294,8 @@ class RandomTileDataset(Dataset):
     def __init__(self,
                  files,
                  label_fn,
+                 instance_labels = False,
+                 divide=None,
                  n_classes=2,
                  lbl_wgt_pdf={},
                  ignore={},
@@ -296,7 +303,7 @@ class RandomTileDataset(Dataset):
                  padding=(184,184),
                 sample_mult=None,
                 rotation_range_deg=(0, 360),
-                flip=False,
+                flip=True,
                 deformation_grid=(150, 150),
                 deformation_magnitude=(10, 10),
                 value_minimum_range=(0, 0),
@@ -338,7 +345,9 @@ class RandomTileDataset(Dataset):
         self.files = files
         self.label_fn = label_fn
         self.c = n_classes
+        self.instance_labels = instance_labels
         self.lbl_wgt_pdf = lbl_wgt_pdf
+        self.divide = divide
         self.ignore = ignore
         self.tile_shape = tile_shape
         self.padding = padding
@@ -354,10 +363,15 @@ class RandomTileDataset(Dataset):
         for path in progress_bar(files):
             if path.name not in self.lbl_wgt_pdf:
                 print('Creating weights for', path.name)
-                label_path =  label_fn(path)
-                msk = _read_msk(label_path, self.c)
+                label_path = label_fn(path)
+                if instance_labels:
+                    clabels = None
+                    instlabels = _read_msk(label_path, instance_labels=True)
+                else:
+                    clabels = _read_msk(label_path, self.c)
+                    instlabels = None
                 ign = ignore[path.name] if path.name in ignore else None
-                self.lbl_wgt_pdf[path.name] =  calculate_weights(clabels=msk, ignore=ign, n_dims=self.c, **kwargs)
+                self.lbl_wgt_pdf[path.name] =  calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, **kwargs)
 
         # Sample mulutiplier: Number of random samplings from augmented image
         self.sample_mult = sample_mult
@@ -377,7 +391,7 @@ class RandomTileDataset(Dataset):
             idx = idx.tolist()
 
         img_path = self.files[idx]
-        img = _read_img(img_path)
+        img = _read_img(img_path, divide=self.divide)
 
         if img.ndim == 2:
             img = np.expand_dims(img, axis=2)
@@ -408,7 +422,7 @@ class RandomTileDataset(Dataset):
         img_list = []
         for i in range(max_n):
             path = self.files[i]
-            img_list.append(_read_img(path))
+            img_list.append(_read_img(path, divide=self.divide))
         return img_list
 
     def show_data(self, max_n=6, ncols=1, figsize=None, **kwargs):
@@ -416,10 +430,9 @@ class RandomTileDataset(Dataset):
         if figsize is None: figsize = (ncols*12, max_n//ncols * 5)
         for i in range(max_n):
             path = self.files[i]
-            img = _read_img(path)
+            img = _read_img(path, divide=self.divide)
             labels, weights,_ = self.lbl_wgt_pdf[path.name]
-            show(img, labels, weights, file_name=path.name)
-
+            show(img, labels, weights, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
 
     def on_epoch_end(self, verbose=False):
 
@@ -461,7 +474,7 @@ class RandomTileDataset(Dataset):
         "Computes mean and std from files"
         mean_sum, var_sum = 0., 0.
         for i, f in enumerate(self.files, 1):
-            img = _read_img(f)
+            img = _read_img(f, divide=self.divide)
             mean_sum += img.mean((0,1))
             var_sum += img.var((0,1))
             if i==max_samples:
@@ -479,7 +492,9 @@ class TileDataset(Dataset):
     def __init__(self,
                  files,
                  label_fn=None,
+                 instance_labels = False,
                  n_classes=2,
+                 divide=None,
                  lbl_wgt_pdf={},
                  ignore={},
                  tile_shape=(540,540),
@@ -489,6 +504,8 @@ class TileDataset(Dataset):
         self.files = files
         self.label_fn = label_fn
         self.c = n_classes
+        self.divide = divide
+        self.instance_labels = instance_labels
         self.lbl_wgt_pdf = lbl_wgt_pdf
         self.ignore = ignore
         self.tile_shape = tile_shape
@@ -507,14 +524,18 @@ class TileDataset(Dataset):
         for i, path in enumerate(progress_bar(files)):
             if path.name not in self.lbl_wgt_pdf:
                 print('Creating weights for', path.name)
-                label_path =  label_fn(path)
-                msk = _read_msk(label_path, self.c)
+                label_path = label_fn(path)
+                if instance_labels:
+                    clabels = None
+                    instlabels = _read_msk(label_path, instance_labels=True)
+                else:
+                    clabels = _read_msk(label_path, self.c)
+                    instlabels = None
                 ign = ignore[path.name] if path.name in ignore else None
-
-                self.lbl_wgt_pdf[path.name] =  calculate_weights(clabels=msk, ignore=ign, n_dims=self.c, **kwargs)
+                self.lbl_wgt_pdf[path.name] =  calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, **kwargs)
 
             labels, weights,_ = self.lbl_wgt_pdf[path.name]
-            img = _read_img(path)
+            img = _read_img(path, divide=self.divide)
 
             if img.ndim == 2:
                 img = np.expand_dims(img, axis=2)
@@ -569,7 +590,7 @@ class TileDataset(Dataset):
         img_list = []
         for i in range(max_n):
             path = self.files[i]
-            img_list.append(_read_img(path))
+            img_list.append(_read_img(path, divide=self.divide))
         return img_list
 
     def show_data(self, max_n=6, ncols=1, figsize=None, **kwargs):
@@ -577,16 +598,17 @@ class TileDataset(Dataset):
         if figsize is None: figsize = (ncols*12, max_n//ncols * 5)
         for i in range(max_n):
             path = self.files[i]
-            img = _read_img(path)
+            img = _read_img(path, divide=self.divide)
             labels, weights,_ = self.lbl_wgt_pdf[path.name]
-            show(img, labels, weights, file_name=path.name)
+            show(img, labels, weights, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
 
 
     def reconstruct_from_tiles(self, tiles):
-        "Reconstruct masks or predictions from tiles"
-        tiles = np.array([np.array(t) for t in tiles])
-        if tiles.shape[-1]>20:
-            tiles = np.moveaxis(tiles, 1, -1)
+        "Reconstruct masks or predictions from list of tiles"
+
+        assert isinstance(tiles, list), "You need to pass a list"
+        assert len(tiles) == len(self), f"Tile list must have length{len(self)}"
+
         out_ll = []
         for idx in range(len(self)):
             outIdx = self.image_indices[idx]
@@ -594,7 +616,7 @@ class TileDataset(Dataset):
             outSlice = self.out_slices[idx]
             inSlice = self.in_slices[idx]
             if len(out_ll) < outIdx + 1:
-                if len(tiles.shape)>3:
+                if len(tiles[0].shape)>2:
                     out_ll.append(np.empty((*outShape, self.c)))
                 else:
                     out_ll.append(np.empty(outShape))

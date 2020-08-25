@@ -10,7 +10,7 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Learner for bioimgage segmentation
+      title: Patches for the `fastai` Learner
       url: /learner
     - output: web,pdf
       title: Models

@@ -3,7 +3,7 @@
 __all__ = ['ElasticDeformCallback']
 
 # Cell
-from fastai2.callback.core import Callback
+from fastai.callback.core import Callback
 
 # Cell
 class ElasticDeformCallback(Callback):
