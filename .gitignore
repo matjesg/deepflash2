@@ -4,6 +4,7 @@ _data/
 fastai2/
 _df_old/
 _nbs_old/
+docs/_site
 
 *.bak
 .gitattributes

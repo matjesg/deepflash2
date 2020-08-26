@@ -60,5 +60,8 @@ sidebars:
 - home_sidebar
 permalink: pretty
 
+default_badges:
+  colab: true
+
 theme: jekyll-theme-cayman
 baseurl: /deepflash2/

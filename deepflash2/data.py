@@ -26,20 +26,7 @@ from fastai.vision.all import *
 # Cell
 def show(*obj, file_name=None, overlay=False, pred=False,
          show_bbox=True, figsize=(10,10), cmap=None, **kwargs):
-    """
-    Read text from clipboard and pass to read_csv.
-    Parameters
-    ----------
-    sep : str, default '\s+'
-        A string or regex delimiter. The default of '\s+' denotes
-        one or more whitespace characters.
-    **kwargs
-        See read_csv for the full argument list.
-    Returns
-    -------
-    DataFrame
-        A parsed DataFrame object.
-    """
+    "Show image, mask, and weight (optional)"
     if isinstance(obj[1], tuple):
         img,msk,weight = obj[0], obj[1][0], obj[1][1]
     elif len(obj)>2:
@@ -116,6 +103,7 @@ def show(*obj, file_name=None, overlay=False, pred=False,
 # Cell
 @typedispatch
 def show_batch(x:TensorImage, y:tuple, samples, max_n=6, figsize=None, **kwargs):
+    "Show one batch (image, mask, and weights) from a `DataLoader`"
     max_n = np.min((max_n, len(x)))
     if figsize is None: figsize = (12, max_n * 5)
     for i in range(max_n): show(x[i], y[0][i], y[1][i], figsize=figsize, **kwargs)
@@ -123,6 +111,7 @@ def show_batch(x:TensorImage, y:tuple, samples, max_n=6, figsize=None, **kwargs)
 # Cell
 @typedispatch
 def show_results(x:TensorImage, y:tuple, samples, outs, max_n=4, figsize=None, **kwargs):
+    "Show image, mask, and weights from `max_n` items"
     max_n = np.min((max_n, len(x)))
     if figsize is None: figsize = (12, max_n * 5)
     for i in range(max_n): show(x[i], y[0][i], outs[i][0], pred=True, figsize=figsize, **kwargs)
@@ -132,10 +121,7 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
                       n_dims = 2, border_weight_sigma_px=6, foreground_dist_sigma_px=1,
                       border_weight_factor=50, foreground_background_ratio=.1):
     """
-    Monospace Test
-
-    Calculate weights and pdf from classlabels (masks) or instancelabels
-
+    Calculates the weights from the given mask (classlabels `clabels` or `instlabels`).
     """
 
     assert not (clabels is None and instlabels is None), "Provide either clabels or instlabels"
@@ -308,37 +294,7 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
 # Cell
 class RandomTileDataset(Dataset):
     """
-    Random Tile dataset.
-
-    Args:
-            csv_file (string): Path to the csv file with annotations.
-            root_dir (string): Directory with all the images.
-            tile_shape - The tile shape the network expects as input
-            padding - The padding (input shape - output shape)
-            classlabels - A list containing the corresponding class labels.
-                          0 = ignore, 1 = background, 2-n foreground classes
-                          If None, the problem will be treated as binary segmentation
-            n_classes - The number of classes including background
-            ignore - A list containing the corresponding ignore regions.
-            weights - A list containing the corresponding weights.
-            element_size_um - The target pixel size in micrometers
-            batch_size - The number of tiles to generate per batch
-            rotation_range_deg - (alpha_min, alpha_max): The range of rotation angles.
-                                 A random rotation is drawn from a uniform distribution
-                                 in the given range
-            flip - If true, a coin flip decides whether a mirrored tile will be
-                   generated
-            deformation_grid - (dx, dy): The distance of neighboring grid points in
-                               pixels for which random deformation vectors are drawn
-            deformation_magnitude - (sx, sy): The standard deviations of the
-                                    Gaussians, the components of the deformation
-                                    vector are drawn from
-            value_minimum_range - (v_min, v_max): Input intensity zero will be mapped
-                                  to a random value in the given range
-            value_maximum_range - (v_min, v_max): Input intensity one will be mapped
-                                  to a random value within the given range
-            value_slope_range - (s_min, s_max): The slope at control points is drawn
-                                from a uniform distribution in the given range
+    Pytorch Dataset that creates random tiles with augmentations from the input images.
     """
     n_inp = 1
     def __init__(self,
@@ -506,7 +462,7 @@ class RandomTileDataset(Dataset):
 
 # Cell
 class TileDataset(Dataset):
-    "Tile Dataset for validation and test"
+    "Pytorch Dataset that creates random tiles for validation and prediction on new data."
     n_inp = 1
     def __init__(self,
                  files,
