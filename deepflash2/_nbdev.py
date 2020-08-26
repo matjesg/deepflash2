@@ -32,6 +32,6 @@ modules = ["learner.py",
 
 doc_url = "https://matjesg.github.io/deepflash2/"
 
-git_url = "https://github.com/matjesg/deepflash2/tree/main/"
+git_url = "https://github.com/matjesg/deepflash2/tree/master/"
 
 def custom_doc_links(name): return None
