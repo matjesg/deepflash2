@@ -10,41 +10,21 @@ from scipy.stats import entropy
 
 # Cell
 @patch
-def predict_from_tiles(self:Learner, ds_idx=1, dl=None):
-        "Predict and reconstruct images from tile dataset."
-
-        if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
-        softmax_score, _ = self.get_preds(dl=dl)
-        softmax_score = softmax_score.permute(0,2,3,1)
-        tile_list = [x for x in softmax_score.cpu().numpy()]
-
-        smxcores = dl.reconstruct_from_tiles(tile_list)
-        segmentations = [np.argmax(x, axis=-1) for x in smxcores]
-
-        return smxcores, segmentations
-
-# Cell
-@patch
-def apply_dropout(self:Learner):
-    "If a module contains 'dropout', it will be switched to .train() mode."
-    for m in self.model.modules():
-        if isinstance(m, nn.Dropout):
-            m.train()
-
-# Cell
-@patch
-def predict_tiles_with_mc_dropout(self:Learner, ds_idx=1, dl=None, n_times=20):
+def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1):
     "Make predictions with dropout applied."
 
     if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
 
     self.model.eval()
-    self.apply_dropout()
+    if mc_dropout: self.apply_dropout()
 
     mean_list = []
     std_list = []
     for data in progress_bar(dl):
-        images, _, _ = data
+        if isinstance(data, TensorImage):
+            images = data
+        else:
+            images, _, _ = data
         out_list = []
         for t in range(n_times):
             with torch.no_grad():
@@ -70,3 +50,11 @@ def predict_tiles_with_mc_dropout(self:Learner, ds_idx=1, dl=None, n_times=20):
     std_deviations = dl.reconstruct_from_tiles(std_tiles)
 
     return smxcores, segmentations, std_deviations
+
+# Cell
+@patch
+def apply_dropout(self:Learner):
+    "If a module contains 'dropout', it will be switched to .train() mode."
+    for m in self.model.modules():
+        if isinstance(m, nn.Dropout):
+            m.train()

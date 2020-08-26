@@ -118,7 +118,12 @@ def show_results(x:TensorImage, y:tuple, samples, outs, max_n=4, figsize=None, *
 def calculate_weights(clabels=None, instlabels=None, ignore=None,
                       n_dims = 2, border_weight_sigma_px=6, foreground_dist_sigma_px=1,
                       border_weight_factor=50, foreground_background_ratio=.1):
-    "Calculate weights and pdf from classlabels (masks) or instancelabels"
+    """
+    Calculate weights and pdf from classlabels (masks) or instancelabels
+
+    Monospace Test
+
+    """
 
     assert not (clabels is None and instlabels is None), "Provide either clabels or instlabels"
 
@@ -289,29 +294,10 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
 
 # Cell
 class RandomTileDataset(Dataset):
-    """Random Tile dataset."""
-    n_inp = 1
-    def __init__(self,
-                 files,
-                 label_fn,
-                 instance_labels = False,
-                 divide=None,
-                 n_classes=2,
-                 lbl_wgt_pdf={},
-                 ignore={},
-                 tile_shape=(540,540),
-                 padding=(184,184),
-                sample_mult=None,
-                rotation_range_deg=(0, 360),
-                flip=True,
-                deformation_grid=(150, 150),
-                deformation_magnitude=(10, 10),
-                value_minimum_range=(0, 0),
-                value_maximum_range=(1, 1),
-                value_slope_range=(1, 1),
-                **kwargs):
-        """
-        Args:
+    """
+    Random Tile dataset.
+
+    Args:
             csv_file (string): Path to the csv file with annotations.
             root_dir (string): Directory with all the images.
             tile_shape - The tile shape the network expects as input
@@ -340,8 +326,28 @@ class RandomTileDataset(Dataset):
                                   to a random value within the given range
             value_slope_range - (s_min, s_max): The slope at control points is drawn
                                 from a uniform distribution in the given range
+    """
+    n_inp = 1
+    def __init__(self,
+                 files,
+                 label_fn,
+                 instance_labels = False,
+                 divide=None,
+                 n_classes=2,
+                 lbl_wgt_pdf={},
+                 ignore={},
+                 tile_shape=(540,540),
+                 padding=(184,184),
+                sample_mult=None,
+                rotation_range_deg=(0, 360),
+                flip=True,
+                deformation_grid=(150, 150),
+                deformation_magnitude=(10, 10),
+                value_minimum_range=(0, 0),
+                value_maximum_range=(1, 1),
+                value_slope_range=(1, 1),
+                **kwargs):
 
-        """
         self.files = files
         self.label_fn = label_fn
         self.c = n_classes
@@ -522,7 +528,7 @@ class TileDataset(Dataset):
         self.out_slices = []
 
         for i, path in enumerate(progress_bar(files)):
-            if path.name not in self.lbl_wgt_pdf:
+            if path.name not in self.lbl_wgt_pdf and self.label_fn is not None:
                 print('Creating weights for', path.name)
                 label_path = label_fn(path)
                 if instance_labels:
@@ -532,9 +538,12 @@ class TileDataset(Dataset):
                     clabels = _read_msk(label_path, self.c)
                     instlabels = None
                 ign = ignore[path.name] if path.name in ignore else None
-                self.lbl_wgt_pdf[path.name] =  calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, **kwargs)
+                labels, weights, pdf =  calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, **kwargs)
+                self.lbl_wgt_pdf[path.name] = labels, weights, pdf
 
-            labels, weights,_ = self.lbl_wgt_pdf[path.name]
+            if path.name in self.lbl_wgt_pdf and self.label_fn is not None:
+                labels, weights, pdf = self.lbl_wgt_pdf[path.name]
+
             img = _read_img(path, divide=self.divide)
 
             if img.ndim == 2:
@@ -573,14 +582,16 @@ class TileDataset(Dataset):
         return len(self.tile_data)
 
     def __getitem__(self, idx):
-
         if torch.is_tensor(idx):
             idx = idx.tolist()
         X = np.moveaxis(self.tile_data[idx] , -1, 0).astype('float32')
-        Y = self.tile_labels[idx].astype('int64') if self.label_fn is not None else None
-        W = self.tile_weights[idx].astype('float32') if self.label_fn is not None else None
 
-        return  TensorImage(X), TensorMask(Y), W
+        if self.label_fn is not None:
+            Y = self.tile_labels[idx].astype('int64')
+            W = self.tile_weights[idx].astype('float32')
+            return TensorImage(X), TensorMask(Y), W
+        else:
+            return TensorImage(X)
 
     def get_images(self, max_n=None):
         if max_n is not None:
@@ -599,8 +610,13 @@ class TileDataset(Dataset):
         for i in range(max_n):
             path = self.files[i]
             img = _read_img(path, divide=self.divide)
-            labels, weights,_ = self.lbl_wgt_pdf[path.name]
-            show(img, labels, weights, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+            if self.label_fn is not None:
+                labels, weights,_ = self.lbl_wgt_pdf[path.name]
+                show(img, labels, weights, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+            else:
+                labels= np.zeros_like(img)
+                show(img, labels, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+
 
 
     def reconstruct_from_tiles(self, tiles):
