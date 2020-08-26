@@ -26,7 +26,20 @@ from fastai.vision.all import *
 # Cell
 def show(*obj, file_name=None, overlay=False, pred=False,
          show_bbox=True, figsize=(10,10), cmap=None, **kwargs):
-
+    """
+    Read text from clipboard and pass to read_csv.
+    Parameters
+    ----------
+    sep : str, default '\s+'
+        A string or regex delimiter. The default of '\s+' denotes
+        one or more whitespace characters.
+    **kwargs
+        See read_csv for the full argument list.
+    Returns
+    -------
+    DataFrame
+        A parsed DataFrame object.
+    """
     if isinstance(obj[1], tuple):
         img,msk,weight = obj[0], obj[1][0], obj[1][1]
     elif len(obj)>2:

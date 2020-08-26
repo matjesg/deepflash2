@@ -8,18 +8,7 @@
 
 ## How to use
 
-```
-learn = Unet_Learner(train_generator, valid_generator)
-```
-
-```
-learn.lr_find()
-learn.plot_loss()
-```
-
-```
-learn.fit_one_cycle(100, validation_freq=5, max_lr=5e-4)
-```
+Links to tutorial Notebooks
 
 ## Model Library
 
