@@ -119,9 +119,9 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
                       n_dims = 2, border_weight_sigma_px=6, foreground_dist_sigma_px=1,
                       border_weight_factor=50, foreground_background_ratio=.1):
     """
-    Calculate weights and pdf from classlabels (masks) or instancelabels
-
     Monospace Test
+
+    Calculate weights and pdf from classlabels (masks) or instancelabels
 
     """
 
