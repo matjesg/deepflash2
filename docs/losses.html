@@ -6,6 +6,8 @@ keywords: fastai
 sidebar: home_sidebar
 
 summary: "Implements custom loss functions."
+description: "Implements custom loss functions."
+nb_path: "nbs/05_losses.ipynb"
 ---
 <!--
 
@@ -18,16 +20,31 @@ summary: "Implements custom loss functions."
 -->
 
 <div class="container" id="notebook-container">
+        
+    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Weighted-Softmax-Cross-Entropy-Loss">Weighted Softmax Cross Entropy Loss<a class="anchor-link" href="#Weighted-Softmax-Cross-Entropy-Loss">&#182;</a></h2><p>as described by Falk, Thorsten, et al. "U-Net: deep learning for cell counting, detection, and morphometry." Nature methods 16.1 (2019): 67-70.</p>
+<h2 id="Weighted-Softmax-Cross-Entropy-Loss">Weighted Softmax Cross Entropy Loss<a class="anchor-link" href="#Weighted-Softmax-Cross-Entropy-Loss"> </a></h2><p>as described by Falk, Thorsten, et al. "U-Net: deep learning for cell counting, detection, and morphometry." Nature methods 16.1 (2019): 67-70.</p>
 <ul>
 <li><code>axis</code> for softmax calculations. Defaulted at 1 (channel dimension).</li>
 <li><code>reduction</code> will be used when we call <code>Learner.get_preds</code></li>
@@ -38,9 +55,15 @@ summary: "Implements custom loss functions."
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
@@ -62,6 +85,8 @@ summary: "Implements custom loss functions."
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>In a segmentation task, we want to take the softmax over the channel dimension</p>
@@ -69,6 +94,8 @@ summary: "Implements custom loss functions."
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -89,9 +116,11 @@ summary: "Implements custom loss functions."
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Export">Export<a class="anchor-link" href="#Export">&#182;</a></h2>
+<h2 id="Export">Export<a class="anchor-link" href="#Export"> </a></h2>
 </div>
 </div>
 </div>

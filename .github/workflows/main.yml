@@ -11,8 +11,7 @@ jobs:
         architecture: 'x64'
     - name: Install the library
       run: |
-        pip install nbdev jupyter
-        # pip install tensorflow==2.1.0 tensorflow_addons==0.7.0 scikit-image matplotlib
+        pip install fastai nbdev jupyter
         pip install -e .
     - name: Read all notebooks
       run: |
