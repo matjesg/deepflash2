@@ -3,7 +3,6 @@
 __all__ = ['WeightedSoftmaxCrossEntropy']
 
 # Cell
-#from fastai2.vision.all import *
 import torch
 import torch.nn.functional as F
 
