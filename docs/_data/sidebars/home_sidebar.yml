@@ -30,6 +30,9 @@ entries:
     - output: web,pdf
       title: Utility functions
       url: utils.html
+    - output: web,pdf
+      title: Ground Truth Estimation
+      url: gt_estimation.html
     output: web
     title: deepflash2
   output: web

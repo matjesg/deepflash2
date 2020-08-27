@@ -52,35 +52,6 @@ from fastprogress.fastprogress import progress_bar</p>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@patch</span>
-<span class="k">def</span> <span class="nf">predict_from_tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Learner</span><span class="p">,</span> <span class="n">ds_idx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="s2">&quot;Predict and reconstruct images from tile dataset.&quot;</span>
-        
-        <span class="k">if</span> <span class="n">dl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">dl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dls</span><span class="p">[</span><span class="n">ds_idx</span><span class="p">]</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">shuffled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">softmax_score</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_preds</span><span class="p">(</span><span class="n">dl</span><span class="o">=</span><span class="n">dl</span><span class="p">)</span>
-        <span class="n">softmax_score</span> <span class="o">=</span> <span class="n">softmax_score</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">tile_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">softmax_score</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()]</span>
-
-        <span class="n">smxcores</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">reconstruct_from_tiles</span><span class="p">(</span><span class="n">tile_list</span><span class="p">)</span>
-        <span class="n">segmentations</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">smxcores</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">smxcores</span><span class="p">,</span> <span class="n">segmentations</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -150,60 +121,6 @@ from fastprogress.fastprogress import progress_bar</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@patch</span>
-<span class="k">def</span> <span class="nf">predict_tiles_with_mc_dropout</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Learner</span><span class="p">,</span> <span class="n">ds_idx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_times</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
-    <span class="s2">&quot;Make predictions with dropout applied.&quot;</span>
-
-    <span class="k">if</span> <span class="n">dl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">dl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dls</span><span class="p">[</span><span class="n">ds_idx</span><span class="p">]</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">shuffled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">apply_dropout</span><span class="p">()</span>
-
-    <span class="n">mean_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">std_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">progress_bar</span><span class="p">(</span><span class="n">dl</span><span class="p">):</span>
-        <span class="n">images</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="n">out_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_times</span><span class="p">):</span>
-            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">out_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="n">out_stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">out_list</span><span class="p">)</span>
-
-        <span class="n">out_means</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">out_stack</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">mean_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_means</span><span class="p">)</span>
-
-        <span class="n">out_sdts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">out_stack</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">std_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_sdts</span><span class="p">)</span>
-
-    <span class="n">softmax_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">mean_list</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">smx_tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">softmax_pred</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()]</span>
-
-    <span class="n">std_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">std_list</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">std_tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">std_pred</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()]</span>
-    
-    <span class="n">smxcores</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">reconstruct_from_tiles</span><span class="p">(</span><span class="n">smx_tiles</span><span class="p">)</span>
-    <span class="n">segmentations</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">smxcores</span><span class="p">]</span>
-    <span class="n">std_deviations</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">reconstruct_from_tiles</span><span class="p">(</span><span class="n">std_tiles</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">smxcores</span><span class="p">,</span> <span class="n">segmentations</span><span class="p">,</span> <span class="n">std_deviations</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@patch</span>
 <span class="k">def</span> <span class="nf">get_mc_dropout_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_ds</span><span class="p">:</span><span class="n">TileDataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                            <span class="n">max_n</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">n_times</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="s2">&quot;Get results with MC Dropout enabled. Plot results is enabled by default.&quot;</span>
@@ -239,53 +156,6 @@ from fastprogress.fastprogress import progress_bar</p>
             <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Std (</span><span class="si">{}</span><span class="s1"> Entropy)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">entrop</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
     
     <span class="k">return</span> <span class="n">smxs</span><span class="p">,</span> <span class="n">segs</span><span class="p">,</span> <span class="n">std_devs</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">test_results</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Learner</span><span class="p">,</span> <span class="n">ds_idx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_n</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">dl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">dl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dls</span><span class="p">[</span><span class="n">ds_idx</span><span class="p">]</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">)</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">one_batch</span><span class="p">()</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">preds</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_preds</span><span class="p">(</span><span class="n">dl</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">with_decoded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">dls</span><span class="o">.</span><span class="n">show_results</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">max_n</span><span class="o">=</span><span class="n">max_n</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@patch</span>
-<span class="k">def</span> <span class="nf">siampredict</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Learner</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">rm_type_tfms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_input</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">rm_type_tfms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_input</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
-        <span class="n">SiameseImage</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;Prediction: Not similar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">SiameseImage</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;Prediction: Similar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">res</span>
 </pre></div>
 
     </div>

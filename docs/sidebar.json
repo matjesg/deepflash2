@@ -1,6 +1,11 @@
 {
-  "deepflash2": {
+  "Notebooks": {
     "Overview": "/",
+    "Model Training": "/",
+    "Prediction on new Data": "/",
+    "Ground Truth Estimation": "gt_estimation.html"
+  },
+  "deepflash2 API": {
     "Patches for the `fastai` Learner": "learner.html",
     "Models": "models.html",
     "Data": "data.html",
