@@ -1,12 +1,12 @@
 {
   "deepflash2": {
     "Overview": "/",
-    "Patches for the `fastai` Learner": "/learner",
-    "Models": "/models",
-    "Data": "/data",
-    "Metrics": "/metrics",
-    "Callbacks": "/callbacks",
-    "Losses": "/losses",
-    "Utility functions": "/utils"
+    "Patches for the `fastai` Learner": "learner.html",
+    "Models": "models.html",
+    "Data": "data.html",
+    "Metrics": "metrics.html",
+    "Callbacks": "callbacks.html",
+    "Losses": "losses.html",
+    "Utility functions": "utils.html"
   }
 }

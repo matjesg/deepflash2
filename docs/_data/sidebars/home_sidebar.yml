@@ -11,25 +11,25 @@ entries:
       url: /
     - output: web,pdf
       title: Patches for the `fastai` Learner
-      url: /learner
+      url: learner.html
     - output: web,pdf
       title: Models
-      url: /models
+      url: models.html
     - output: web,pdf
       title: Data
-      url: /data
+      url: data.html
     - output: web,pdf
       title: Metrics
-      url: /metrics
+      url: metrics.html
     - output: web,pdf
       title: Callbacks
-      url: /callbacks
+      url: callbacks.html
     - output: web,pdf
       title: Losses
-      url: /losses
+      url: losses.html
     - output: web,pdf
       title: Utility functions
-      url: /utils
+      url: utils.html
     output: web
     title: deepflash2
   output: web
