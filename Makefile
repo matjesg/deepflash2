@@ -1,10 +1,13 @@
+.ONESHELL:
+SHELL := /bin/bash
+
 SRC = $(wildcard nbs/*.ipynb)
 
-all: deepflash docs
+all: nbdev docs
 
-deepflash: $(SRC)
+nbdev: $(SRC)
 	nbdev_build_lib
-	touch deepflash
+	touch nbdev
 
 docs_serve: docs
 	cd docs && bundle exec jekyll serve
@@ -17,6 +20,7 @@ test:
 	nbdev_test_nbs
 
 release: pypi
+	nbdev_conda_package --upload_user matjesg
 	nbdev_bump_version
 
 pypi: dist
