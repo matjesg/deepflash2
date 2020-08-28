@@ -20,7 +20,9 @@ index = {"Learner.predict_tiles": "00_learner.ipynb",
          "iou": "06_utils.ipynb",
          "label_mask": "06_utils.ipynb",
          "get_candidates": "06_utils.ipynb",
-         "iou_mapping": "06_utils.ipynb"}
+         "iou_mapping": "06_utils.ipynb",
+         "staple": "06_utils.ipynb",
+         "mvoting": "06_utils.ipynb"}
 
 modules = ["learner.py",
            "models.py",
