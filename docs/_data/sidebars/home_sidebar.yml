@@ -7,24 +7,33 @@ entries:
 - folders:
   - folderitems:
     - output: web,pdf
-      title: Export to modules
-      url: /export
+      title: Overview
+      url: /
     - output: web,pdf
-      title: Convert to html
-      url: /export2html
+      title: Patches for the `fastai` Learner
+      url: learner.html
     - output: web,pdf
-      title: Show doc
-      url: /showdoc
+      title: Models
+      url: models.html
     - output: web,pdf
-      title: Test functions
-      url: /test
+      title: Data
+      url: data.html
     - output: web,pdf
-      title: Core functions
-      url: /core
+      title: Metrics
+      url: metrics.html
     - output: web,pdf
-      title: Command line functions
-      url: /cli
+      title: Callbacks
+      url: callbacks.html
+    - output: web,pdf
+      title: Losses
+      url: losses.html
+    - output: web,pdf
+      title: Utility functions
+      url: utils.html
+    - output: web,pdf
+      title: Ground Truth Estimation
+      url: gt_estimation.html
     output: web
-    title: Notebook
+    title: deepflash2
   output: web
   title: Sidebar
