@@ -1,7 +1,7 @@
 topnav:
 - title: Topnav
   items:
-    - title: github
+    - title: GitHub
       external_url: https://github.com/matjesg/deepflash2/tree/master/
 
 #Topnav dropdowns
