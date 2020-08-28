@@ -29,6 +29,54 @@ nb_path: "nbs/gt_estimation.ipynb"
 </div>
     {% endraw %}
 
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>UsageError: Line magic function `%nbdev_slow` not found.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbde</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>For more information on ground truth estimation methods see <em>Biancardi, Alberto M., Artit C. Jirapatnakul, and Anthony P. Reeves. "A comparison of ground truth estimation methods." International journal of computer assisted radiology and surgery 5.3 (2010): 295-305</em>.</p>
@@ -45,10 +93,11 @@ nb_path: "nbs/gt_estimation.ipynb"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Please run this cell to get started.</span>
 <span class="k">try</span><span class="p">:</span>
-  <span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">files</span><span class="p">,</span> <span class="n">drive</span>
-  <span class="o">!</span>pip install -q simpleITK deepflash2
+    <span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">files</span><span class="p">,</span> <span class="n">drive</span>
+    <span class="o">!</span>pip install -q simpleITK deepflash2
 <span class="k">except</span><span class="p">:</span>
-  <span class="k">pass</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This Notebook is optimized for Google Colab. You need to install dependencies manually.&quot;</span><span class="p">)</span>
+    <span class="k">pass</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">imageio</span>
 <span class="kn">import</span> <span class="nn">SimpleITK</span> <span class="k">as</span> <span class="nn">sitk</span>
@@ -70,6 +119,20 @@ nb_path: "nbs/gt_estimation.ipynb"
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>This Notebook is optimized for Google Colab. You need to install dependencies manually.
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -118,17 +181,35 @@ nb_path: "nbs/gt_estimation.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;expert_segmentations&#39;</span><span class="p">)</span>
-<span class="n">u_dict</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">u_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-  <span class="n">zip_ref</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-  <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-  <span class="n">zip_ref</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="n">masks</span> <span class="o">=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<span class="n">experts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You have uploaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span><span class="si">}</span><span class="s1"> files from the following experts: </span><span class="si">{</span><span class="n">experts</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">u_dict</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">u_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+          <span class="n">zip_ref</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+          <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+          <span class="n">zip_ref</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">masks</span> <span class="o">=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">experts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You have uploaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span><span class="si">}</span><span class="s1"> files from the following experts: </span><span class="si">{</span><span class="n">experts</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File upload only works on Google Colab.&quot;</span><span class="p">)</span>
+    <span class="k">pass</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Warning: File upload only works on Google Colab.
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -152,16 +233,34 @@ nb_path: "nbs/gt_estimation.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">drive</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;/content/drive&#39;</span><span class="p">)</span>
-<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/expert_segmentations&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<span class="c1">#@markdown Example: &quot;/content/drive/My Drive/expert_segmentations&quot;</span>
-<span class="n">masks</span> <span class="o">=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<span class="n">experts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You have provided </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span><span class="si">}</span><span class="s1"> files from the following experts: </span><span class="si">{</span><span class="n">experts</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">drive</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;/content/drive&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/expert_segmentations&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="c1">#@markdown Example: &quot;/content/drive/My Drive/expert_segmentations&quot;</span>
+    <span class="n">masks</span> <span class="o">=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">experts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;You have provided </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span><span class="si">}</span><span class="s1"> files from the following experts: </span><span class="si">{</span><span class="n">experts</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Connecting to Google Drive only works on Google Colab.&quot;</span><span class="p">)</span>
+    <span class="k">pass</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Warning: Connecting to Google Drive only works on Google Colab.
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -187,13 +286,44 @@ nb_path: "nbs/gt_estimation.ipynb"
 <span class="n">path_staple</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">unique_masks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">])</span>
 <span class="k">for</span> <span class="n">msk_name</span> <span class="ow">in</span> <span class="n">progress_bar</span><span class="p">(</span><span class="n">unique_masks</span><span class="p">):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Processing&#39;</span><span class="p">,</span> <span class="n">msk_name</span><span class="p">)</span>
-  <span class="n">segmentations</span> <span class="o">=</span> <span class="p">[</span><span class="n">_read_msk</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">msk_name</span><span class="p">]</span>
-  <span class="n">staple_segmentation</span> <span class="o">=</span> <span class="n">staple</span><span class="p">(</span><span class="n">segmentations</span><span class="p">)</span>
-  <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">path_staple</span><span class="o">/</span><span class="n">msk_name</span><span class="p">,</span> <span class="n">staple_segmentation</span><span class="o">*</span><span class="mi">255</span> <span class="k">if</span> <span class="n">staple_segmentation</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">staple_segmentation</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Processing&#39;</span><span class="p">,</span> <span class="n">msk_name</span><span class="p">)</span>
+    <span class="n">segmentations</span> <span class="o">=</span> <span class="p">[</span><span class="n">_read_msk</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">msk_name</span><span class="p">]</span>
+    <span class="n">staple_segmentation</span> <span class="o">=</span> <span class="n">staple</span><span class="p">(</span><span class="n">segmentations</span><span class="p">)</span>
+    <span class="n">out_mask</span> <span class="o">=</span> <span class="n">staple_segmentation</span><span class="o">*</span><span class="mi">255</span> <span class="k">if</span> <span class="n">staple_segmentation</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">staple_segmentation</span>
+    <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">path_staple</span><span class="o">/</span><span class="n">msk_name</span><span class="p">,</span> <span class="n">out_mask</span><span class="p">)</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">FileNotFoundError</span>                         Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-14-ed2d8c9d9fec&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span class="ansi-red-fg">#@markdown Run STAPLE</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> path_staple <span class="ansi-blue-fg">=</span> path<span class="ansi-blue-fg">/</span><span class="ansi-blue-fg">&#39;staple&#39;</span>
+<span class="ansi-green-fg">----&gt; 3</span><span class="ansi-red-fg"> </span>path_staple<span class="ansi-blue-fg">.</span>mkdir<span class="ansi-blue-fg">(</span>exist_ok<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">True</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> unique_masks <span class="ansi-blue-fg">=</span> set<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">[</span>m<span class="ansi-blue-fg">.</span>name <span class="ansi-green-fg">for</span> m <span class="ansi-green-fg">in</span> masks<span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span> <span class="ansi-green-fg">for</span> msk_name <span class="ansi-green-fg">in</span> progress_bar<span class="ansi-blue-fg">(</span>unique_masks<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-green-fg">~/anaconda3/envs/fastai/lib/python3.8/pathlib.py</span> in <span class="ansi-cyan-fg">mkdir</span><span class="ansi-blue-fg">(self, mode, parents, exist_ok)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1282</span>             self<span class="ansi-blue-fg">.</span>_raise_closed<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1283</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">-&gt; 1284</span><span class="ansi-red-fg">             </span>self<span class="ansi-blue-fg">.</span>_accessor<span class="ansi-blue-fg">.</span>mkdir<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> mode<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1285</span>         <span class="ansi-green-fg">except</span> FileNotFoundError<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">   1286</span>             <span class="ansi-green-fg">if</span> <span class="ansi-green-fg">not</span> parents <span class="ansi-green-fg">or</span> self<span class="ansi-blue-fg">.</span>parent <span class="ansi-blue-fg">==</span> self<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-red-fg">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;expert_segmentations/staple&#39;</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -214,15 +344,15 @@ nb_path: "nbs/gt_estimation.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># create a ZipFile object</span>
-<span class="n">zipObj</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="s1">&#39;staple_export.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-<span class="c1"># Add files to the zip</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">zipObj</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="s1">&#39;staple_export.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path_staple</span><span class="p">):</span>
-  <span class="n">zipObj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="c1"># close the Zip File</span>
+    <span class="n">zipObj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <span class="n">zipObj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="c1"># download files</span>
-<span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;staple_export.zip&#39;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;staple_export.zip&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File download only works on Google Colab.&quot;</span><span class="p">)</span>
+    <span class="k">pass</span>
 </pre></div>
 
     </div>
@@ -251,10 +381,10 @@ nb_path: "nbs/gt_estimation.ipynb"
 <span class="n">path_mv</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">unique_masks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">])</span>
 <span class="k">for</span> <span class="n">msk_name</span> <span class="ow">in</span> <span class="n">progress_bar</span><span class="p">(</span><span class="n">unique_masks</span><span class="p">):</span>
-  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Processing&#39;</span><span class="p">,</span> <span class="n">msk_name</span><span class="p">)</span>
-  <span class="n">segmentations</span> <span class="o">=</span> <span class="p">[</span><span class="n">_read_msk</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">msk_name</span><span class="p">]</span>
-  <span class="n">mv_segmentation</span> <span class="o">=</span> <span class="n">mvoting</span><span class="p">(</span><span class="n">segmentations</span><span class="p">,</span> <span class="n">labelForUndecidedPixels</span><span class="p">)</span>
-  <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">path_mv</span><span class="o">/</span><span class="n">msk_name</span><span class="p">,</span> <span class="n">mv_segmentation</span><span class="o">*</span><span class="mi">255</span> <span class="k">if</span> <span class="n">mv_segmentation</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">mv_segmentation</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Processing&#39;</span><span class="p">,</span> <span class="n">msk_name</span><span class="p">)</span>
+    <span class="n">segmentations</span> <span class="o">=</span> <span class="p">[</span><span class="n">_read_msk</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">msk_name</span><span class="p">]</span>
+    <span class="n">mv_segmentation</span> <span class="o">=</span> <span class="n">mvoting</span><span class="p">(</span><span class="n">segmentations</span><span class="p">,</span> <span class="n">labelForUndecidedPixels</span><span class="p">)</span>
+    <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">path_mv</span><span class="o">/</span><span class="n">msk_name</span><span class="p">,</span> <span class="n">mv_segmentation</span><span class="o">*</span><span class="mi">255</span> <span class="k">if</span> <span class="n">mv_segmentation</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">mv_segmentation</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -278,15 +408,15 @@ nb_path: "nbs/gt_estimation.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># create a ZipFile object</span>
-<span class="n">zipObj</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="s1">&#39;mv_export.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-<span class="c1"># Add files to the zip</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">zipObj</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="s1">&#39;mv_export.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path_mv</span><span class="p">):</span>
-  <span class="n">zipObj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="c1"># close the Zip File</span>
+      <span class="n">zipObj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <span class="n">zipObj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="c1"># download files</span>
-<span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;mv_export.zip&#39;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;mv_export.zip&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File download only works on Google Colab.&quot;</span><span class="p">)</span>
+    <span class="k">pass</span>
 </pre></div>
 
     </div>

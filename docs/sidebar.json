@@ -1,13 +1,10 @@
 {
-  "deepflash2": {
-    "Overview": "/",
-    "Patches for the `fastai` Learner": "learner.html",
-    "Models": "models.html",
-    "Data": "data.html",
-    "Metrics": "metrics.html",
-    "Callbacks": "callbacks.html",
-    "Losses": "losses.html",
-    "Utility functions": "utils.html",
-    "Ground Truth Estimation": "gt_estimation.html"
+  "Notebook": {
+    "Export to modules": "/export",
+    "Convert to html": "/export2html",
+    "Show doc": "/showdoc",
+    "Test functions": "/test",
+    "Core functions": "/core",
+    "Command line functions": "/cli"
   }
 }
