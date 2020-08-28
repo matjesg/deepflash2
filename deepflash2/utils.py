@@ -105,6 +105,7 @@ def iou_mapping(labels_a, labels_b, min_roi_size=30):
 # Cell
 def staple(segmentations, foregroundValue = 1, threshold = 0.5):
     'STAPLE: Simultaneous Truth and Performance Level Estimation with simple ITK'
+
     segmentations = [sitk.GetImageFromArray(x) for x in segmentations]
     STAPLE_probabilities = sitk.STAPLE(segmentations)
     STAPLE = STAPLE_probabilities > threshold
@@ -112,7 +113,8 @@ def staple(segmentations, foregroundValue = 1, threshold = 0.5):
 
 # Cell
 def mvoting(segmentations, labelForUndecidedPixels = 0):
-    'Majority Voting from sitk.LabelVoting'
+    'Majority Voting from  simple ITK Label Voting'
+
     segmentations = [sitk.GetImageFromArray(x) for x in segmentations]
     mv_segmentation = sitk.LabelVoting(segmentations, labelForUndecidedPixels)
     return sitk.GetArrayViewFromImage(mv_segmentation)
