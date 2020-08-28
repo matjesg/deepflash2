@@ -60,7 +60,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="iou" class="doc_header"><code>iou</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L17" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou</code>(<strong><code>a</code></strong>, <strong><code>b</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
+<h4 id="iou" class="doc_header"><code>iou</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou</code>(<strong><code>a</code></strong>, <strong><code>b</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
 </blockquote>
 <p>Computes the Intersection-Over-Union metric.</p>
 
@@ -98,7 +98,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="label_mask" class="doc_header"><code>label_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L26" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>label_mask</code>(<strong><code>mask</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>, <strong><code>min_pixel</code></strong>=<em><code>15</code></em>, <strong><code>do_watershed</code></strong>=<em><code>True</code></em>, <strong><code>exclude_border</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="label_mask" class="doc_header"><code>label_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L27" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>label_mask</code>(<strong><code>mask</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>, <strong><code>min_pixel</code></strong>=<em><code>15</code></em>, <strong><code>do_watershed</code></strong>=<em><code>True</code></em>, <strong><code>exclude_border</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 <p>Analyze regions and return labels</p>
 
@@ -130,7 +130,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_candidates" class="doc_header"><code>get_candidates</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L64" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_candidates</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>)</p>
+<h4 id="get_candidates" class="doc_header"><code>get_candidates</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L65" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_candidates</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>)</p>
 </blockquote>
 <p>Get candiate masks for ROI-wise analysis</p>
 
@@ -162,9 +162,91 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="iou_mapping" class="doc_header"><code>iou_mapping</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L74" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou_mapping</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>, <strong><code>min_roi_size</code></strong>=<em><code>30</code></em>)</p>
+<h4 id="iou_mapping" class="doc_header"><code>iou_mapping</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L75" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou_mapping</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>, <strong><code>min_roi_size</code></strong>=<em><code>30</code></em>)</p>
 </blockquote>
 <p>Compare masks using ROI-wise analysis</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Ground-Truth-Estimation">Ground Truth Estimation<a class="anchor-link" href="#Ground-Truth-Estimation"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="STAPLE:-Simultaneous-Truth-and-Performance-Level-Estimation">STAPLE: Simultaneous Truth and Performance Level Estimation<a class="anchor-link" href="#STAPLE:-Simultaneous-Truth-and-Performance-Level-Estimation"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="staple" class="doc_header"><code>staple</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L106" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>staple</code>(<strong><code>segmentations</code></strong>, <strong><code>foregroundValue</code></strong>=<em><code>1</code></em>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
+</blockquote>
+<p>STAPLE: Simultaneous Truth and Performance Level Estimation with simple ITK</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Majority-Voting">Majority Voting<a class="anchor-link" href="#Majority-Voting"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="mvoting" class="doc_header"><code>mvoting</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L115" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>mvoting</code>(<strong><code>segmentations</code></strong>, <strong><code>labelForUndecidedPixels</code></strong>=<em><code>0</code></em>)</p>
+</blockquote>
+<p>Majority Voting from  simple ITK Label Voting</p>
 
 </div>
 
