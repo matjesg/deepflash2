@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        build_type: [prod, dev]
+        build_type: [prod] #dev currently not in use
     steps:
 
     - uses: actions/setup-python@v2
@@ -59,7 +59,7 @@ jobs:
     - name: Build Dev Container (with editable install)
       if: matrix.build_type == 'dev'
       run: |
-        IMAGE_NAME="matjes/deepflash2"
+        IMAGE_NAME="matjes/deepflash2-dev"
         echo "current directory: ${PWD}"
         echo "::set-env name=IMAGE_NAME::${IMAGE_NAME}" 
         repo2docker --image-name "${IMAGE_NAME}:latest" --editable --push --user-id 1000 ${PWD}  echo "dev build completed"
