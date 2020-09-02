@@ -143,8 +143,8 @@ def _load_pretrained(model, dataset, progress):
         print(f"Error: No weights available for model trained on {dataset}.")
 
     if model.state_dict()['last.weight'].shape != state_dict['last.weight'].shape:
-        _ = state_dict.pop('last.bias')
-        _ = state_dict.pop('last.weight')
+        state_dict.pop('last.bias')
+        state_dict.pop('last.weight')
         print("Cannot load last layer. The pretrained weights were trained on 2 classes only.")
 
     # TODO Better handle different number of input channels

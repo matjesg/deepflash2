@@ -12,7 +12,7 @@ def unet_deepflash2(pretrained=False, dataset='wue1_cFOS', **kwargs):
     pretrained (bool): kwargs, load pretrained weights into the model
     dataset (string): specifies the dataset for pretrained weights (only applies if pretrained=True) 
     """
-    model = _unet_deepflash2(pretrained=pretrained, dataset='wue1_cFOS', **kwargs)
+    model = _unet_deepflash2(pretrained=pretrained, dataset=dataset, **kwargs)
     return model
 
 def unet_falk2019(pretrained=False, dataset='wue1_cFOS', **kwargs):
@@ -21,7 +21,7 @@ def unet_falk2019(pretrained=False, dataset='wue1_cFOS', **kwargs):
     pretrained (bool): kwargs, load pretrained weights into the model
     dataset (string): specifies the dataset for pretrained weights (only applies if pretrained=True) 
     """
-    model = _unet_falk2019(pretrained=pretrained, dataset='wue1_cFOS', **kwargs)
+    model = _unet_falk2019(pretrained=pretrained, dataset=dataset, **kwargs)
     return model
 
 def unet_ronneberger2015(pretrained=False, dataset='wue1_cFOS', **kwargs):
@@ -30,5 +30,5 @@ def unet_ronneberger2015(pretrained=False, dataset='wue1_cFOS', **kwargs):
     pretrained (bool): kwargs, load pretrained weights into the model
     dataset (string): specifies the dataset for pretrained weights (only applies if pretrained=True) 
     """
-    model = _unet_ronneberger2015(pretrained=pretrained, dataset='wue1_cFOS', **kwargs)
+    model = _unet_ronneberger2015(pretrained=pretrained, dataset=dataset, **kwargs)
     return model
