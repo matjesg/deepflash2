@@ -2,13 +2,10 @@
 
 title: Models
 
-
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Pytorch segmentation models."
-description: "Pytorch segmentation models."
-nb_path: "nbs/01_models.ipynb"
 ---
 <!--
 
@@ -21,24 +18,75 @@ nb_path: "nbs/01_models.ipynb"
 -->
 
 <div class="container" id="notebook-container">
-        
-    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">nbdev</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">nbdev_default_export</span> models
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Cells will be exported to deepflash2.models,
+unless a different module is specified after an export flag: `%nbdev_export special.module`
+</pre>
+</div>
+</div>
 
 </div>
-    {% endraw %}
+</div>
 
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_hide</span>
+<span class="kn">from</span> <span class="nn">nbdev.showdoc</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="U-Net-models">U-Net models<a class="anchor-link" href="#U-Net-models"> </a></h2>
+<h2 id="U-Net-models">U-Net models<a class="anchor-link" href="#U-Net-models">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -49,142 +97,163 @@ nb_path: "nbs/01_models.ipynb"
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="k">class</span> <span class="nc">UNetConvBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">batch_norm</span><span class="p">,</span>
+                 <span class="n">dropout</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">neg_slope</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UNetConvBlock</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">dropout</span><span class="o">&gt;</span><span class="mf">0.</span><span class="p">:</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">))</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">padding</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">batch_norm</span><span class="p">:</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_size</span><span class="p">))</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">negative_slope</span><span class="o">=</span><span class="n">neg_slope</span><span class="p">))</span>
+
+
+        <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">out_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">padding</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">batch_norm</span><span class="p">:</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_size</span><span class="p">))</span>
+        <span class="n">block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">negative_slope</span><span class="o">=</span><span class="n">neg_slope</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">block</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">block</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-<div class="output_wrapper">
-<div class="output">
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="k">class</span> <span class="nc">UNetUpBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">up_mode</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">batch_norm</span><span class="p">,</span>
+                 <span class="n">dropout</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">neg_slope</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UNetUpBlock</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">up_block</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">dropout</span><span class="o">&gt;</span><span class="mf">0.</span><span class="p">:</span>
+            <span class="n">up_block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">up_mode</span> <span class="o">==</span> <span class="s1">&#39;upconv&#39;</span><span class="p">:</span>
+            <span class="n">up_block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">up_mode</span> <span class="o">==</span> <span class="s1">&#39;upsample&#39;</span><span class="p">:</span>
+            <span class="n">up_block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Upsample</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">up_block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">batch_norm</span><span class="p">:</span>
+            <span class="n">up_block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span><span class="p">(</span><span class="n">out_size</span><span class="p">))</span>
+        <span class="n">up_block</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="n">negative_slope</span><span class="o">=</span><span class="n">neg_slope</span><span class="p">))</span>
 
-<div class="output_area">
+        <span class="bp">self</span><span class="o">.</span><span class="n">up</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">up_block</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv_block</span> <span class="o">=</span> <span class="n">UNetConvBlock</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">batch_norm</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">center_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="n">target_size</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">layer_height</span><span class="p">,</span> <span class="n">layer_width</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="n">diff_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">layer_height</span> <span class="o">-</span> <span class="n">target_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">diff_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">layer_width</span> <span class="o">-</span> <span class="n">target_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">layer</span><span class="p">[</span>
+            <span class="p">:,</span> <span class="p">:,</span> <span class="n">diff_y</span> <span class="p">:</span> <span class="p">(</span><span class="n">diff_y</span> <span class="o">+</span> <span class="n">target_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">diff_x</span> <span class="p">:</span> <span class="p">(</span><span class="n">diff_x</span> <span class="o">+</span> <span class="n">target_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">]</span>
 
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetConvBlock" class="doc_header"><code>class</code> <code>UNetConvBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetConvBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">bridge</span><span class="p">):</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">up</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">crop1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_crop</span><span class="p">(</span><span class="n">bridge</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">up</span><span class="p">,</span> <span class="n">crop1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_block</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
+        <span class="k">return</span> <span class="n">out</span>
+</pre></div>
 
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-
+    </div>
+</div>
 </div>
 
 </div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-</div>
-    {% endraw %}
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="k">class</span> <span class="nc">UNet2D</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="s2">&quot;Pytorch U-Net Implementation&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">wf</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">batch_norm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span>
+        <span class="n">neg_slope</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+        <span class="n">up_mode</span><span class="o">=</span><span class="s1">&#39;upconv&#39;</span><span class="p">,</span>
+    <span class="p">):</span>
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">up_mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;upconv&#39;</span><span class="p">,</span> <span class="s1">&#39;upsample&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="n">prev_channels</span> <span class="o">=</span> <span class="n">in_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">down_path</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="p">):</span>
+            <span class="n">bn</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+            <span class="n">do</span> <span class="o">=</span> <span class="n">dropout</span> <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">2</span> <span class="k">else</span> <span class="mf">0.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">down_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">UNetConvBlock</span><span class="p">(</span><span class="n">prev_channels</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">wf</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="n">padding</span><span class="p">,</span>
+                              <span class="n">batch_norm</span><span class="o">=</span><span class="n">bn</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">do</span><span class="p">,</span><span class="n">neg_slope</span><span class="o">=</span><span class="n">neg_slope</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">prev_channels</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">wf</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
 
-<div class="output_wrapper">
-<div class="output">
+        <span class="bp">self</span><span class="o">.</span><span class="n">up_path</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">bn</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span>
+            <span class="n">do</span> <span class="o">=</span> <span class="n">dropout</span> <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">2</span> <span class="k">else</span> <span class="mf">0.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">up_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">UNetUpBlock</span><span class="p">(</span><span class="n">prev_channels</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">wf</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="n">up_mode</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span>
+                            <span class="n">batch_norm</span><span class="o">=</span><span class="n">bn</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">do</span><span class="p">,</span> <span class="n">neg_slope</span><span class="o">=</span><span class="n">neg_slope</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">prev_channels</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">wf</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
 
-<div class="output_area">
+        <span class="bp">self</span><span class="o">.</span><span class="n">last</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="n">prev_channels</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_initialize_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize layer weights&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span><span class="p">):</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">kaiming_normal_</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;fan_in&#39;</span><span class="p">,</span> <span class="n">nonlinearity</span><span class="o">=</span><span class="s1">&#39;leaky_relu&#39;</span><span class="p">)</span>
 
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetUpBlock" class="doc_header"><code>class</code> <code>UNetUpBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L38" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetUpBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>up_mode</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">blocks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">down</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">down_path</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">down</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">down_path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">max_pool2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">up</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">up_path</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">up</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">blocks</span><span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
 
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">last</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
 
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNet2D" class="doc_header"><code>class</code> <code>UNet2D</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L74" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNet2D</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>depth</code></strong>=<em><code>5</code></em>, <strong><code>wf</code></strong>=<em><code>6</code></em>, <strong><code>padding</code></strong>=<em><code>False</code></em>, <strong><code>batch_norm</code></strong>=<em><code>False</code></em>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.0</code></em>, <strong><code>up_mode</code></strong>=<em><code>'upconv'</code></em>) :: <code>Module</code></p>
-</blockquote>
-<p>Pytorch U-Net Implementation</p>
-
-</div>
-
-</div>
-
+    </div>
 </div>
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Args</strong>:\
@@ -200,16 +269,41 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="n">_MODEL_BASE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/matjesg/deepflash2/releases/download/model_library/&#39;</span>
+<span class="k">def</span> <span class="nf">_load_pretrained</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+    <span class="s2">&quot;Loads pretrained model weights&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">_MODEL_BASE_URL</span><span class="o">+</span><span class="n">dataset</span><span class="o">+</span><span class="s1">&#39;.pth&#39;</span>
+    <span class="n">state_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">hub</span><span class="o">.</span><span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: No weights available for model trained on </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()[</span><span class="s1">&#39;last.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;last.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No pretrained weights for </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()[</span><span class="s1">&#39;last.weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> classes in final layer.&quot;</span><span class="p">)</span>
+        <span class="n">state_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;last.bias&#39;</span><span class="p">)</span>
+        <span class="n">state_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;last.weight&#39;</span><span class="p">)</span>
+        
+
+    <span class="c1"># TODO Better handle different number of input channels</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded model weights trained on </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="U-Net-architectures">U-Net architectures<a class="anchor-link" href="#U-Net-architectures"> </a></h3>
+<h3 id="U-Net-architectures">U-Net architectures<a class="anchor-link" href="#U-Net-architectures">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -220,38 +314,27 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-</div>
-    {% endraw %}
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="k">def</span> <span class="nf">unet_ronneberger2015</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span> <span class="p">,</span><span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;wue1_cFOS&#39;</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="s2">&quot;Original U-Net architecture based on Ronnberger et al. (2015)&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">UNet2D</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span>
+                   <span class="n">depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">wf</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_norm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">neg_slope</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">up_mode</span><span class="o">=</span><span class="s1">&#39;upconv&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="n">_load_pretrained</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_ronneberger2015" class="doc_header"><code>unet_ronneberger2015</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L155" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_ronneberger2015</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>False</code></em>, <strong><code>dataset</code></strong>=<em><code>'wue1_cFOS'</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>Original U-Net architecture based on Ronnberger et al. (2015)</p>
-
-</div>
-
-</div>
-
+    </div>
 </div>
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>U-Net architecture based on <em>Falk, Thorsten, et al. "U-Net: deep learning for cell counting, detection, and morphometry." Nature methods 16.1 (2019): 67-70.</em></p>
@@ -259,38 +342,27 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-</div>
-    {% endraw %}
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="k">def</span> <span class="nf">unet_falk2019</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span> <span class="p">,</span><span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;wue1_cFOS&#39;</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="s2">&quot;U-Net architecture based on Falk et al. (2019)&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">UNet2D</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span>
+               <span class="n">depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">wf</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_norm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">neg_slope</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">up_mode</span><span class="o">=</span><span class="s1">&#39;upconv&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="n">_load_pretrained</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_falk2019" class="doc_header"><code>unet_falk2019</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L165" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_falk2019</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>False</code></em>, <strong><code>dataset</code></strong>=<em><code>'wue1_cFOS'</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>U-Net architecture based on Falk et al. (2019)</p>
-
-</div>
-
-</div>
-
+    </div>
 </div>
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>U-Net model optimized for deepflash2</p>
@@ -298,40 +370,27 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-</div>
-    {% endraw %}
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="k">def</span> <span class="nf">unet_deepflash2</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span> <span class="p">,</span><span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;wue1_cFOS&#39;</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="s2">&quot;U-Net model optimized for deepflash2&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">UNet2D</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span>
+                   <span class="n">depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">wf</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">batch_norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">neg_slope</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">up_mode</span><span class="o">=</span><span class="s1">&#39;upconv&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pretrained</span><span class="p">:</span>
+        <span class="n">_load_pretrained</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
+</pre></div>
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_deepflash2" class="doc_header"><code>unet_deepflash2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L175" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_deepflash2</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>False</code></em>, <strong><code>dataset</code></strong>=<em><code>'wue1_cFOS'</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>U-Net model optimized for deepflash2</p>
-
-</div>
-
-</div>
-
+    </div>
 </div>
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -353,7 +412,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Loaded model weights trained on wue1_cFOS.
-Cannot load last layer. The pretrained weights were trained on 2 classes only.
+No pretrained weights for 3 classes in final layer.
 Loaded model weights trained on wue1_cFOS.
 </pre>
 </div>
@@ -363,8 +422,44 @@ Loaded model weights trained on wue1_cFOS.
 </div>
 
 </div>
-    {% endraw %}
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_hide</span>
+<span class="kn">from</span> <span class="nn">nbdev.export</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">notebook2script</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Converted 00_learner.ipynb.
+Converted 01_models.ipynb.
+Converted 02_data.ipynb.
+Converted 03_metrics.ipynb.
+Converted 04_callbacks.ipynb.
+Converted 05_losses.ipynb.
+Converted 06_utils.ipynb.
+Converted gt_estimation.ipynb.
+Converted index.ipynb.
+Converted train.ipynb.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
 </div>
  
 
