@@ -137,15 +137,17 @@ _MODEL_BASE_URL = 'https://github.com/matjesg/deepflash2/releases/download/model
 def _load_pretrained(model, dataset, progress):
     "Loads pretrained model weights"
     url = _MODEL_BASE_URL+dataset+'.pth'
+    state_dict = {}
     try:
         state_dict = torch.hub.load_state_dict_from_url(url, progress=progress)
     except:
         print(f"Error: No weights available for model trained on {dataset}.")
 
     if model.state_dict()['last.weight'].shape != state_dict['last.weight'].shape:
+        print(f"No pretrained weights for {model.state_dict()['last.weight'].shape[0]} classes in final layer.")
         state_dict.pop('last.bias')
         state_dict.pop('last.weight')
-        print("Cannot load last layer. The pretrained weights were trained on 2 classes only.")
+
 
     # TODO Better handle different number of input channels
     _ = model.load_state_dict(state_dict, strict=False)
