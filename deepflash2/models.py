@@ -137,9 +137,8 @@ _MODEL_BASE_URL = 'https://github.com/matjesg/deepflash2/releases/download/model
 def _load_pretrained(model, dataset, progress):
     "Loads pretrained model weights"
     url = _MODEL_BASE_URL+dataset+'.pth'
-    state_dict = {}
     try:
-        state_dict = torch.hub.load_state_dict_from_url(url, progress=progress)
+        state_dict = torch.hub.load_state_dict_from_url(url, map_location='cpu', progress=progress)
     except:
         print(f"Error: No weights available for model trained on {dataset}.")
 
