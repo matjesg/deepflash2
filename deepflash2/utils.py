@@ -14,6 +14,7 @@ from skimage.measure import label
 from skimage.segmentation import relabel_sequential
 from skimage.morphology import watershed
 from scipy.optimize import linear_sum_assignment
+import matplotlib.pyplot as plt
 import SimpleITK as sitk
 
 # Cell
@@ -24,22 +25,33 @@ def ensemble_results(res_dict, file, idx=0):
     return np.argmax(stack_tmp, axis=-1)
 
 # Cell
-def plot_results(*args, df):
-    "Plot images, masks, predictions and uncertainties side-by-side."
-    img, msk, pred, pred_std = args
-    fig, axs = plt.subplots(nrows=1, ncols=4, figsize=(20, 20))
+def plot_results(*args, df, figsize=(20, 20), **kwargs):
+    "Plot images, (masks), predictions and uncertainties side-by-side."
+    if len(args)==4:
+        img, msk, pred, pred_std = args
+    if len(args)==3:
+        img, pred, pred_std = args
+    fig, axs = plt.subplots(nrows=1, ncols=len(args), figsize=figsize, **kwargs)
     axs[0].imshow(img)
     axs[0].set_axis_off()
     axs[0].set_title(f'File {df.file}')
-    axs[1].imshow(msk)
-    axs[1].set_axis_off()
-    axs[1].set_title('Target')
-    axs[2].imshow(pred)
-    axs[2].set_axis_off()
-    axs[2].set_title(f'Prediction \n IoU: {df.iou:.2f}')
-    axs[3].imshow(pred_std)
-    axs[3].set_axis_off()
-    axs[3].set_title(f'Uncertainty \n Entropy: {df.entropy:.2f}')
+    if len(args)==4:
+        axs[1].imshow(msk)
+        axs[1].set_axis_off()
+        axs[1].set_title('Target')
+        axs[2].imshow(pred)
+        axs[2].set_axis_off()
+        axs[2].set_title(f'Prediction \n IoU: {df.iou:.2f}')
+        axs[3].imshow(pred_std)
+        axs[3].set_axis_off()
+        axs[3].set_title(f'Uncertainty \n Entropy: {df.entropy:.2f}')
+    if len(args)==3:
+        axs[1].imshow(pred)
+        axs[1].set_axis_off()
+        axs[1].set_title('Prediction')
+        axs[2].imshow(pred_std)
+        axs[2].set_axis_off()
+        axs[2].set_title(f'Uncertainty \n Entropy: {df.entropy:.2f}')
     plt.show()
 
 # Cell

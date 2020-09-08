@@ -20,7 +20,7 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1):
 
     mean_list = []
     std_list = []
-    for data in progress_bar(dl):
+    for data in progress_bar(dl, leave=False):
         if isinstance(data, TensorImage):
             images = data
         else:

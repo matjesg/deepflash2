@@ -28,62 +28,74 @@ from fastcore.utils import store_attr
 def show(*obj, file_name=None, overlay=False, pred=False,
          show_bbox=True, figsize=(10,10), cmap='binary_r', **kwargs):
     "Show image, mask, and weight (optional)"
-    if isinstance(obj[1], tuple):
-        img,msk,weight = obj[0], obj[1][0], obj[1][1]
-    elif len(obj)>2:
+    if len(obj)==3:
         img,msk,weight = obj
-    else:
+    elif len(obj)==2:
         img,msk = obj
         weight = None
+    elif len(obj)==1:
+        img = obj
+        msk, weight = None, None
 
-    # To numpy
+    else:
+        raise ValueError(f'Function not defined for {len(obj)} arguments.')
+
+
+    # Image preprocessing
     img = np.array(img)
-    msk = np.array(msk)
-
     # Swap axis to channels last
     if img.shape[0]<10: img=np.moveaxis(img,0,-1)
     # One channel images
     if img.shape[-1]==1: img=img[...,0]
 
-    # Remove background class from masks
-    if msk.shape[0]==2: msk=msk[1,...]
-    # Create bbox
+    # Mask preprocessing
+    if msk is not None:
+        msk = np.array(msk)
+        # Remove background class from masks
+        if msk.shape[0]==2: msk=msk[1,...]
+        # Create bbox
 
-    pad = (np.array(img.shape[:2])-np.array(msk.shape))//2
-    bbox = Rectangle((pad[0]-1,pad[1]-1),img.shape[0]-2*pad[0]+1,img.shape[0]-2*pad[0]+1,
-             edgecolor='r',linewidth=1,facecolor='none')
+        pad = (np.array(img.shape[:2])-np.array(msk.shape))//2
+        bbox = Rectangle((pad[0]-1,pad[1]-1),img.shape[0]-2*pad[0]+1,img.shape[0]-2*pad[0]+1,
+                 edgecolor='r',linewidth=1,facecolor='none')
 
-    # Padding mask and weights
-    msk = np.pad(msk, pad, 'constant', constant_values=(0))
+        # Padding mask and weights
+        msk = np.pad(msk, pad, 'constant', constant_values=(0))
+
+        if cmap is None:
+            cmap = 'binary_r' if msk.max()==1 else cmap
+
+    # Weights preprocessing
     if weight is not None:
         weight = np.array(weight)
         weight = np.pad(weight, pad, 'constant', constant_values=(0))
 
-    if cmap is None:
-        cmap = 'binary_r' if msk.max()==1 else cmap
-
-    ncol=2 if weight is None else 3
+    ncol=1 if msk is None else 2
+    ncol=ncol if weight is None else ncol+1
     fig, ax = plt.subplots(1,ncol,figsize=figsize)
+    img_ax = ax[0] if ncol>1 else ax
+
     # Plot img
-    ax[0].imshow(img, cmap=cmap)
+    img_ax.imshow(img, cmap=cmap)
     if file_name is not None:
-        ax[0].set_title('Image {}'.format(file_name))
+        img_ax.set_title('Image {}'.format(file_name))
     else:
-        ax[0].set_title('Image')
-    ax[0].set_axis_off()
+        img_ax.set_title('Image')
+    img_ax.set_axis_off()
 
     # Plot img and mask
-    if overlay:
-        label_image = label(msk)
-        img_l2o = label2rgb(label_image, image=img, bg_label=0, alpha=.8, image_alpha=1)
-        ax[1].set_title('Image + Mask (#ROIs: {})'.format(label_image.max()))
-        ax[1].imshow(img_l2o)
-    else:
-        ax[1].imshow(msk, cmap=cmap)
-        ax[1].set_title('Mask')
-    if show_bbox: ax[1].add_patch(copy(bbox))
+    if msk is not None:
+        if overlay:
+            label_image = label(msk)
+            img_l2o = label2rgb(label_image, image=img, bg_label=0, alpha=.8, image_alpha=1)
+            ax[1].set_title('Image + Mask (#ROIs: {})'.format(label_image.max()))
+            ax[1].imshow(img_l2o)
+        else:
+            ax[1].imshow(msk, cmap=cmap)
+            ax[1].set_title('Mask')
+        if show_bbox: ax[1].add_patch(copy(bbox))
 
-    ax[1].set_axis_off()
+        ax[1].set_axis_off()
 
     # Plot weights
     if weight is not None:
@@ -406,14 +418,19 @@ class RandomTileDataset(Dataset):
             data_list.append(d)
         return data_list
 
-    def show_data(self, max_n=6, ncols=1, figsize=None, **kwargs):
-        max_n = np.min((max_n, len(self.files)))
+    def show_data(self, files=None, max_n=6, ncols=1, figsize=None, **kwargs):
+        if files is not None:
+            files = L(files)
+            max_n = len(files)
+        else:
+            max_n = np.min((max_n, len(self.files)))
+            files = self.files[:max_n]
         if figsize is None: figsize = (ncols*12, max_n//ncols * 5)
-        for i in range(max_n):
-            path = self.files[i]
-            img = _read_img(path, divide=self.divide)
-            lbl, wgt, _ = _get_cached_data(_cache_fn(self, path.name))
-            show(img, lbl, wgt, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+        for f in files:
+            img = _read_img(f, divide=self.divide)
+            lbl, wgt, _ = _get_cached_data(_cache_fn(self, f.name))
+            show(img, lbl, wgt, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
+
 
     def on_epoch_end(self, verbose=False):
 
@@ -561,31 +578,36 @@ class TileDataset(Dataset):
         else:
             return TensorImage(X)
 
-    def get_images(self, max_n=None):
-        if max_n is not None:
+    def get_data(self, files=None, max_n=None, mask=False):
+        if files is not None:
+            files = L(files)
+        elif max_n is not None:
             max_n = np.min((max_n, len(self.files)))
+            files = self.files[:max_n]
         else:
-            max_n = len(self.files)
-        img_list = []
-        for i in range(max_n):
-            path = self.files[i]
-            img_list.append(_read_img(path, divide=self.divide))
-        return img_list
+            files = self.files
+        data_list = L()
+        for f in files:
+            if mask: d, _, _ = _get_cached_data(_cache_fn(self, f.name))
+            else: d = _read_img(f, divide=self.divide)
+            data_list.append(d)
+        return data_list
 
-    def show_data(self, max_n=6, ncols=1, figsize=None, **kwargs):
-        max_n = np.min((max_n, len(self.files)))
+    def show_data(self, files=None, max_n=6, ncols=1, figsize=None, **kwargs):
+        if files is not None:
+            files = L(files)
+            max_n = len(files)
+        else:
+            max_n = np.min((max_n, len(self.files)))
+            files = self.files[:max_n]
         if figsize is None: figsize = (ncols*12, max_n//ncols * 5)
-        for i in range(max_n):
-            path = self.files[i]
-            img = _read_img(path, divide=self.divide)
+        for f in files:
+            img = _read_img(f, divide=self.divide)
             if self.label_fn is not None:
-                lbl, wgt, _ = _get_cached_data(_cache_fn(self, path.name))
-                show(img, lbl, wgt, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+                lbl, wgt, _ = _get_cached_data(_cache_fn(self, f.name))
+                show(img, lbl, wgt, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
             else:
-                lbl= np.zeros_like(img)
-                show(img, lbl, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
-
-
+                show(img, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
 
     def reconstruct_from_tiles(self, tiles):
         "Reconstruct masks or predictions from list of tiles"
