@@ -22,6 +22,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
 from fastai.vision.all import *
+from fastcore.utils import store_attr
 
 # Cell
 def show(*obj, file_name=None, overlay=False, pred=False,
@@ -118,8 +119,7 @@ def show_results(x:TensorImage, y:tuple, samples, outs, max_n=4, figsize=None, *
 
 # Cell
 def calculate_weights(clabels=None, instlabels=None, ignore=None,
-                      n_dims = 2, border_weight_sigma_px=6, foreground_dist_sigma_px=1,
-                      border_weight_factor=50, foreground_background_ratio=.1):
+                      n_dims = 2, bws=6, fds=1, bwf=50, fbr=.1):
     """
     Calculates the weights from the given mask (classlabels `clabels` or `instlabels`).
     """
@@ -133,7 +133,7 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
 
     # Initialize label and weights arrays with background
     labels = np.zeros_like(clabels)
-    wghts = foreground_background_ratio * np.ones_like(clabels)
+    wghts = fbr * np.ones_like(clabels)
     frgrd_dist = np.zeros_like(clabels, dtype='float32')
     classes = np.unique(clabels)[1:]
 
@@ -164,20 +164,20 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
         for instance in instances:
             dt = ndimage.morphology.distance_transform_edt(instlabels != instance)
 
-            frgrd_dist += np.exp(-dt ** 2 / (2*foreground_dist_sigma_px ** 2))
+            frgrd_dist += np.exp(-dt ** 2 / (2*fds ** 2))
             min2dist = np.minimum(min2dist, dt)
             newMin1 = np.minimum(min1dist, min2dist)
             newMin2 = np.maximum(min1dist, min2dist)
             min1dist = newMin1
             min2dist = newMin2
-        wghts += border_weight_factor * np.exp(
-            -(min1dist + min2dist) ** 2 / (2*border_weight_sigma_px ** 2))
+        wghts += bwf * np.exp(
+            -(min1dist + min2dist) ** 2 / (2*bws ** 2))
 
     # Set weight for distance to the closest foreground object
-    wghts[labels == 0] += (1-foreground_background_ratio)*frgrd_dist[labels == 0]
+    wghts[labels == 0] += (1-fbr)*frgrd_dist[labels == 0]
     # Set foreground weights to 1
     wghts[labels > 0] = 1
-    pdf = (labels > 0) + (labels == 0) * foreground_background_ratio
+    pdf = (labels > 0) + (labels == 0) * fbr
 
     # Set weight and sampling probability for ignored regions to 0
     if ignore is not None:
@@ -279,8 +279,11 @@ def _read_img(path, divide=None, **kwargs):
     if divide is not None:
         img = img/divide
     assert img.max()<=1. and img.max()>.04, f'Check image loading, dividing by {divide}, max value is {img.max()}'
+    if img.ndim == 2:
+        img = np.expand_dims(img, axis=2)
     return img
 
+# Cell
 def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
     "Read image and check classes"
     msk = imageio.imread(path, **kwargs)
@@ -290,6 +293,18 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
         # Mask check
         assert len(np.unique(msk))==n_classes, 'Check n_classes and provided mask'
     return msk
+
+# Cell
+def _get_cached_data(path):
+    "Loads preprocessed and compressed label (mask), weight, and pdf data."
+    with open(path, 'rb') as f:
+        tmp = np.load(f)
+        return tmp['lbl'], tmp['wgt'], tmp['pdf']
+
+# Cell
+def _cache_fn(ds, o):
+    "Creates path to preprocessed and compressed data."
+    return Path(ds.preproc_dir)/f'{o}_{ds.bws}_{ds.fds}_{ds.bwf}_{ds.fbr}.npz'
 
 # Cell
 class RandomTileDataset(Dataset):
@@ -303,56 +318,46 @@ class RandomTileDataset(Dataset):
                  instance_labels = False,
                  divide=None,
                  n_classes=2,
-                 lbl_wgt_pdf={},
                  ignore={},
                  tile_shape=(540,540),
                  padding=(184,184),
-                sample_mult=None,
-                rotation_range_deg=(0, 360),
-                flip=True,
-                deformation_grid=(150, 150),
-                deformation_magnitude=(10, 10),
-                value_minimum_range=(0, 0),
-                value_maximum_range=(1, 1),
-                value_slope_range=(1, 1),
-                **kwargs):
+                 sample_mult=None,
+                 rotation_range_deg=(0, 360),
+                 flip=True,
+                 deformation_grid=(150, 150),
+                 deformation_magnitude=(10, 10),
+                 value_minimum_range=(0, 0),
+                 value_maximum_range=(1, 1),
+                 value_slope_range=(1, 1),
+                 bws=6, fds=1, bwf=50, fbr=.1,
+                 preproc_dir='.preproc_data'):
 
-        self.files = files
-        self.label_fn = label_fn
+        store_attr()
         self.c = n_classes
-        self.instance_labels = instance_labels
-        self.lbl_wgt_pdf = lbl_wgt_pdf
-        self.divide = divide
-        self.ignore = ignore
-        self.tile_shape = tile_shape
-        self.padding = padding
-        self.rotation_range_deg = rotation_range_deg
-        self.flip = flip
-        self.deformation_grid = deformation_grid
-        self.deformation_magnitude = deformation_magnitude
-        self.value_minimum_range = value_minimum_range
-        self.value_maximum_range = value_maximum_range
-        self.value_slope_range = value_slope_range
+        Path(preproc_dir).mkdir(exist_ok=True)
 
-        # Calculate weights (if not given)
-        for path in progress_bar(files):
-            if path.name not in self.lbl_wgt_pdf:
-                print('Creating weights for', path.name)
-                label_path = label_fn(path)
+        for file in progress_bar(files, leave=False):
+            try:
+                lbl, wgt, pdf = _get_cached_data(_cache_fn(self, file.name))
+            except:
+                print('Creating weights for', file.name)
+                label_path = label_fn(file)
                 if instance_labels:
                     clabels = None
                     instlabels = _read_msk(label_path, instance_labels=True)
                 else:
                     clabels = _read_msk(label_path, self.c)
                     instlabels = None
-                ign = ignore[path.name] if path.name in ignore else None
-                self.lbl_wgt_pdf[path.name] =  calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, **kwargs)
+                ign = ignore[file.name] if file.name in ignore else None
+                lbl, wgt, pdf = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c,
+                                                  bws=bws, fds=fds, bwf=bwf, fbr=fbr)
+                np.savez_compressed(_cache_fn(self, file.name), lbl=lbl, wgt=wgt, pdf=pdf)
 
         # Sample mulutiplier: Number of random samplings from augmented image
         self.sample_mult = sample_mult
         if self.sample_mult is None:
             tile_shape = np.array(self.tile_shape)-np.array(self.padding)
-            msk_shape = np.array(self.lbl_wgt_pdf[path.name][0].shape[-2:])
+            msk_shape = np.array(lbl.shape[-2:])
             self.sample_mult = int(np.product(np.floor(msk_shape/tile_shape)))
 
         self.on_epoch_end()
@@ -367,12 +372,9 @@ class RandomTileDataset(Dataset):
 
         img_path = self.files[idx]
         img = _read_img(img_path, divide=self.divide)
-
-        if img.ndim == 2:
-            img = np.expand_dims(img, axis=2)
         n_channels = img.shape[-1]
 
-        labels, weights, pdf = self.lbl_wgt_pdf[img_path.name]
+        labels, weights, pdf = _get_cached_data(_cache_fn(self, img_path.name))
 
         cumulatedPdf = np.cumsum(pdf/np.sum(pdf))
         # Random center
@@ -389,16 +391,20 @@ class RandomTileDataset(Dataset):
 
         return  TensorImage(X), TensorMask(Y), W
 
-    def get_images(self, max_n=None):
-        if max_n is not None:
+    def get_data(self, files=None, max_n=None, mask=False):
+        if files is not None:
+            files = L(files)
+        elif max_n is not None:
             max_n = np.min((max_n, len(self.files)))
+            files = self.files[:max_n]
         else:
-            max_n = len(self.files)
-        img_list = []
-        for i in range(max_n):
-            path = self.files[i]
-            img_list.append(_read_img(path, divide=self.divide))
-        return img_list
+            files = self.files
+        data_list = L()
+        for f in files:
+            if mask: d, _, _ = _get_cached_data(_cache_fn(self, f.name))
+            else: d = _read_img(f, divide=self.divide)
+            data_list.append(d)
+        return data_list
 
     def show_data(self, max_n=6, ncols=1, figsize=None, **kwargs):
         max_n = np.min((max_n, len(self.files)))
@@ -406,8 +412,8 @@ class RandomTileDataset(Dataset):
         for i in range(max_n):
             path = self.files[i]
             img = _read_img(path, divide=self.divide)
-            labels, weights,_ = self.lbl_wgt_pdf[path.name]
-            show(img, labels, weights, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+            lbl, wgt, _ = _get_cached_data(_cache_fn(self, path.name))
+            show(img, lbl, wgt, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
 
     def on_epoch_end(self, verbose=False):
 
@@ -470,21 +476,15 @@ class TileDataset(Dataset):
                  instance_labels = False,
                  n_classes=2,
                  divide=None,
-                 lbl_wgt_pdf={},
                  ignore={},
                  tile_shape=(540,540),
                  padding=(184,184),
-                 **kwargs):
+                 bws=6, fds=1, bwf=50, fbr=.1,
+                 preproc_dir='.preproc_data'):
 
-        self.files = files
-        self.label_fn = label_fn
+        store_attr()
         self.c = n_classes
-        self.divide = divide
-        self.instance_labels = instance_labels
-        self.lbl_wgt_pdf = lbl_wgt_pdf
-        self.ignore = ignore
-        self.tile_shape = tile_shape
-        self.padding = padding
+        Path(preproc_dir).mkdir(exist_ok=True)
         self.output_shape = tuple(int(t - p) for (t, p) in zip(tile_shape, padding))
 
         tiler = DeformationField(tile_shape)
@@ -496,27 +496,26 @@ class TileDataset(Dataset):
         self.in_slices = []
         self.out_slices = []
 
-        for i, path in enumerate(progress_bar(files)):
-            if path.name not in self.lbl_wgt_pdf and self.label_fn is not None:
-                print('Creating weights for', path.name)
-                label_path = label_fn(path)
-                if instance_labels:
-                    clabels = None
-                    instlabels = _read_msk(label_path, instance_labels=True)
-                else:
-                    clabels = _read_msk(label_path, self.c)
-                    instlabels = None
-                ign = ignore[path.name] if path.name in ignore else None
-                labels, weights, pdf =  calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, **kwargs)
-                self.lbl_wgt_pdf[path.name] = labels, weights, pdf
 
-            if path.name in self.lbl_wgt_pdf and self.label_fn is not None:
-                labels, weights, pdf = self.lbl_wgt_pdf[path.name]
+        for i, file in enumerate(progress_bar(files, leave=False)):
+            if self.label_fn is not None:
+                try:
+                    lbl, wgt, pdf = _get_cached_data(_cache_fn(self, file.name))
+                except:
+                    print('Creating weights for', file.name)
+                    label_path = label_fn(file)
+                    if instance_labels:
+                        clabels = None
+                        instlabels = _read_msk(label_path, instance_labels=True)
+                    else:
+                        clabels = _read_msk(label_path, self.c)
+                        instlabels = None
+                    ign = ignore[path.name] if file.name in ignore else None
+                    lbl, wgt, pdf = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c,
+                                                      bws=bws, fds=fds, bwf=bwf, fbr=fbr)
+                    np.savez_compressed(_cache_fn(self, file.name), lbl=lbl, wgt=wgt, pdf=pdf)
 
-            img = _read_img(path, divide=self.divide)
-
-            if img.ndim == 2:
-                img = np.expand_dims(img, axis=2)
+            img = _read_img(file, divide=self.divide)
 
             # Tiling
             data_shape = img.shape[:-1]
@@ -529,10 +528,10 @@ class TileDataset(Dataset):
                     self.tile_data.append(tiler.apply(img, centerPos))
                     if self.label_fn is not None:
                         self.tile_labels.append(
-                            tiler.apply(labels, centerPos, padding, order=0)
+                            tiler.apply(lbl, centerPos, padding, order=0)
                         )
                         self.tile_weights.append(
-                            tiler.apply(weights, centerPos, padding, order=1)
+                            tiler.apply(wgt, centerPos, padding, order=1)
                         )
                     self.image_indices.append(i)
                     self.image_shapes.append(data_shape)
@@ -580,11 +579,11 @@ class TileDataset(Dataset):
             path = self.files[i]
             img = _read_img(path, divide=self.divide)
             if self.label_fn is not None:
-                labels, weights,_ = self.lbl_wgt_pdf[path.name]
-                show(img, labels, weights, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+                lbl, wgt, _ = _get_cached_data(_cache_fn(self, path.name))
+                show(img, lbl, wgt, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
             else:
-                labels= np.zeros_like(img)
-                show(img, labels, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
+                lbl= np.zeros_like(img)
+                show(img, lbl, file_name=path.name, figsize=figsize, show_bbox=False, **kwargs)
 
 
 

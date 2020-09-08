@@ -8,10 +8,13 @@ entries:
   - folderitems:
     - output: web,pdf
       title: Model Training
-      url: /
+      url: train.html
     - output: web,pdf
       title: Prediction on new Data
       url: /
+    - output: web,pdf
+      title: Model Library
+      url: model_library.html
     - output: web,pdf
       title: Ground Truth Estimation
       url: gt_estimation.html

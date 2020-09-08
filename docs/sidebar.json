@@ -1,7 +1,8 @@
 {
   "Notebooks": {
-    "Model Training": "/",
+    "Model Training": "train.html",
     "Prediction on new Data": "/",
+    "Model Library": "model_library.html",
     "Ground Truth Estimation": "gt_estimation.html"
   },
   "deepflash2 API": {

@@ -31,6 +31,18 @@ nb_path: "nbs/gt_estimation.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>This notebook is optmizied to be executed on Google Colab (<a href="https://colab.research.google.com">https://colab.research.google.com</a>).</p>
+<ul>
+<li>Please read the instructions carefully.</li>
+<li>Press the the <em>play</em> butten to execute the cells. It will show up between [     ] on the left side of the code cells. </li>
+<li>Run the cells consecutively. Skip cells that do not apply for your case.</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>For more information on ground truth estimation methods see <em>Biancardi, Alberto M., Artit C. Jirapatnakul, and Anthony P. Reeves. "A comparison of ground truth estimation methods." International journal of computer assisted radiology and surgery 5.3 (2010): 295-305</em>.</p>
 
 </div>
@@ -46,10 +58,12 @@ nb_path: "nbs/gt_estimation.ipynb"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Please run this cell to get started.</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">files</span><span class="p">,</span> <span class="n">drive</span>
-    <span class="o">!</span>pip install -q deepflash2
-<span class="k">except</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This Notebook is optimized for Google Colab. You need to install dependencies manually.&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="k">pass</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">deepflash2</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="o">!</span>pip install -q deepflash2
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">imageio</span>
 <span class="kn">import</span> <span class="nn">SimpleITK</span> <span class="k">as</span> <span class="nn">sitk</span>
@@ -59,20 +73,6 @@ nb_path: "nbs/gt_estimation.ipynb"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>This Notebook is optimized for Google Colab. You need to install dependencies manually.
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -182,6 +182,7 @@ nb_path: "nbs/gt_estimation.ipynb"
 <ul>
 <li>The folder in your drive must contain all segmentations and correct folder structure. </li>
 <li>See <a href="https://support.google.com/drive/answer/2375091?co=GENIE.Platform%3DDesktop&amp;hl=en">here</a> how to organize your files in <em>Google Drive</em>.</li>
+<li>See this <a href="https://stackoverflow.com/questions/46986398/import-data-into-google-colaboratory">stackoverflow post</a> for browsing files with the file browser</li>
 </ul>
 
 </div>
