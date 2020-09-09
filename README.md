@@ -2,7 +2,7 @@
 > Official repository of DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.
 
 
-![CI](nbs/https:/github.com/matjesg/deepflash2/workflows/CI/badge.svg) [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) [![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2) [![Build fastai images](https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg)](https://github.com/matjesg/deepflash2)
+![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) [![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2) [![Build fastai images](https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg)](https://github.com/matjesg/deepflash2)
 
 ## Why using deepflash2?
 
@@ -54,10 +54,10 @@ If you install with pip, you should install PyTorch first by following the PyTor
 Docker images for __deepflash2__ are built on top of [the latest pytorch image](https://hub.docker.com/r/pytorch/pytorch/) and [fastai](https://github.com/fastai/docker-containers) images. **You must install [Nvidia-Docker](https://github.com/NVIDIA/nvidia-docker) to enable gpu compatibility with these containers.**
 
 - CPU only
-> `docker run -p 8888: 8888 matjesg/deepflash`
+> `docker run -p 8888:8888 matjesg/deepflash`
 - With GPU support ([Nvidia-Docker](https://github.com/NVIDIA/nvidia-docker) must be installed.)
 has an editable install of fastai and fastcore.
-> `docker run --gpus all -p 8888: 8888 matjesg/deepflash`
+> `docker run --gpus all -p 8888:8888 matjesg/deepflash`
 All docker containers are configured to start a jupyter server. **deepflash2** notebooks are available in the `deepflash2_notebooks` folder.
 
 For more information on how to run docker see [docker orientation and setup](https://docs.docker.com/get-started/) and [fastai docker](https://github.com/fastai/docker-containers).
