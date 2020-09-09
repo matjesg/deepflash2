@@ -302,6 +302,10 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
     if not instance_labels:
         if np.max(msk)>n_classes:
             msk = msk//np.iinfo(msk.dtype).max
+        # Remove channels if no extra information given
+        if len(msk.shape)==3:
+            if np.array_equal(msk[...,0], msk[...,1]):
+                msk = msk[...,0]
         # Mask check
         assert len(np.unique(msk))==n_classes, 'Check n_classes and provided mask'
     return msk
