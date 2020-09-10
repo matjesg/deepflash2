@@ -2,13 +2,10 @@
 
 title: deepflash2
 
-
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Official repository of DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images."
-description: "Official repository of DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images."
-nb_path: "nbs/index.ipynb"
 ---
 <!--
 
@@ -21,14 +18,10 @@ nb_path: "nbs/index.ipynb"
 -->
 
 <div class="container" id="notebook-container">
-        
-    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><img src="https://github.com/matjesg/deepflash2/workflows/CI/badge.svg" alt="CI"> <a href="https://pypi.org/project/deepflash2/#description"><img src="https://img.shields.io/pypi/v/deepflash2?color=blue&amp;label=pypi%20version" alt="PyPI"></a> <a href="https://anaconda.org/matjesg/deepflash2"><img src="https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&amp;label=conda%20version" alt="Conda (channel only)"></a> <a href="https://github.com/matjesg/deepflash2"><img src="https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg" alt="Build fastai images"></a></p>
@@ -38,7 +31,7 @@ nb_path: "nbs/index.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Why-using-deepflash2?">Why using deepflash2?<a class="anchor-link" href="#Why-using-deepflash2?"> </a></h2>
+<h2 id="Why-using-deepflash2?">Why using deepflash2?<a class="anchor-link" href="#Why-using-deepflash2?">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -47,29 +40,25 @@ nb_path: "nbs/index.ipynb"
 <p><strong>The best of two worlds:</strong>
 Combining state of the art deep learning with a barrier free environment for life science researchers.</p>
 <ul>
-<li><p>End-to-end process for life science researchers</p>
-<ul>
+<li>End-to-end process for life science researchers<ul>
 <li>no coding skills required</li>
 <li>free usage on <em>Google Colab</em> at no costs</li>
 <li>easy deployment on own hardware</li>
 </ul>
 </li>
-<li><p>Rigorously evaluated deep learning models</p>
-<ul>
+<li>Rigorously evaluated deep learning models<ul>
 <li>Model Library</li>
 <li>easy integration new (pytorch) models</li>
 </ul>
 </li>
-<li><p>Best practices model training</p>
-<ul>
+<li>Best practices model training<ul>
 <li>leveraging the <em>fastai</em> library</li>
 <li>mixed precision training</li>
 <li>learning rate finder and fit one cycle policy </li>
-<li>advanced augementation</li>
+<li>advanced augementation </li>
 </ul>
 </li>
-<li><p>Reliable prediction on new data</p>
-<ul>
+<li>Reliable prediction on new data<ul>
 <li>Leveraging Baysian Uncertainties</li>
 </ul>
 </li>
@@ -80,7 +69,7 @@ Combining state of the art deep learning with a barrier free environment for lif
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Installing">Installing<a class="anchor-link" href="#Installing"> </a></h2><p>You can use <strong>deepflash2</strong> by using <a href="colab.research.google.com">Google Colab</a>. You can run every page of the <a href="matjesg.github.io/deepflash2/">documentation</a> as an interactive notebook - click "Open in Colab" at the top of any page to open it.</p>
+<h2 id="Installing">Installing<a class="anchor-link" href="#Installing">&#182;</a></h2><p>You can use <strong>deepflash2</strong> by using <a href="colab.research.google.com">Google Colab</a>. You can run every page of the <a href="matjesg.github.io/deepflash2/">documentation</a> as an interactive notebook - click "Open in Colab" at the top of any page to open it.</p>
 <ul>
 <li>Be sure to change the Colab runtime to "GPU" to have it run fast!</li>
 <li>Use Firefox or Google Chrome if you want to upload your images.</li>
@@ -98,13 +87,13 @@ Combining state of the art deep learning with a barrier free environment for lif
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Using-Docker">Using Docker<a class="anchor-link" href="#Using-Docker"> </a></h2><p>Docker images for <strong>deepflash2</strong> are built on top of <a href="https://hub.docker.com/r/pytorch/pytorch/">the latest pytorch image</a> and <a href="https://github.com/fastai/docker-containers">fastai</a> images. <strong>You must install <a href="https://github.com/NVIDIA/nvidia-docker">Nvidia-Docker</a> to enable gpu compatibility with these containers.</strong></p>
+<h2 id="Using-Docker">Using Docker<a class="anchor-link" href="#Using-Docker">&#182;</a></h2><p>Docker images for <strong>deepflash2</strong> are built on top of <a href="https://hub.docker.com/r/pytorch/pytorch/">the latest pytorch image</a> and <a href="https://github.com/fastai/docker-containers">fastai</a> images. <strong>You must install <a href="https://github.com/NVIDIA/nvidia-docker">Nvidia-Docker</a> to enable gpu compatibility with these containers.</strong></p>
 <ul>
-<li>CPU only<blockquote><p><code>docker run -p 8888:8888 matjesg/deepflash</code></p>
+<li>CPU only<blockquote><p><code>docker run -p 8888: 8888 matjesg/deepflash</code></p>
 </blockquote>
 </li>
 <li>With GPU support (<a href="https://github.com/NVIDIA/nvidia-docker">Nvidia-Docker</a> must be installed.)
-has an editable install of fastai and fastcore.<blockquote><p><code>docker run --gpus all -p 8888:8888 matjesg/deepflash</code>
+has an editable install of fastai and fastcore.<blockquote><p><code>docker run --gpus all -p 8888: 8888 matjesg/deepflash</code>
 All docker containers are configured to start a jupyter server. <strong>deepflash2</strong> notebooks are available in the <code>deepflash2_notebooks</code> folder.</p>
 </blockquote>
 </li>
@@ -116,14 +105,14 @@ All docker containers are configured to start a jupyter server. <strong>deepflas
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Model-Library">Model Library<a class="anchor-link" href="#Model-Library"> </a></h2><p>We provide a model library with pretrained model weights. Visit our <a href="https://matjesg.github.io/deepflash2/model_library.html">model library documentation</a> for information on the datasets of the pretrained models.</p>
+<h2 id="Model-Library">Model Library<a class="anchor-link" href="#Model-Library">&#182;</a></h2><p>We provide a model library with pretrained model weights. Visit our <a href="https://matjesg.github.io/deepflash2/model_library.html">model library documentation</a> for information on the datasets of the pretrained models.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Creating-segmentation-masks-with-Fiji/ImageJ">Creating segmentation masks with Fiji/ImageJ<a class="anchor-link" href="#Creating-segmentation-masks-with-Fiji/ImageJ"> </a></h2><p>If you don't have labelled training data available, you can use this <a href="https://github.com/matjesg/DeepFLaSH/raw/master/ImageJ/create_maps_howto.pdf">instruction manual</a> for creating segmentation maps.
+<h2 id="Creating-segmentation-masks-with-Fiji/ImageJ">Creating segmentation masks with Fiji/ImageJ<a class="anchor-link" href="#Creating-segmentation-masks-with-Fiji/ImageJ">&#182;</a></h2><p>If you don't have labelled training data available, you can use this <a href="https://github.com/matjesg/DeepFLaSH/raw/master/ImageJ/create_maps_howto.pdf">instruction manual</a> for creating segmentation maps.
 The ImagJ-Macro is available <a href="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/ImageJ/Macro_create_maps.ijm">here</a>.</p>
 
 </div>
@@ -131,7 +120,7 @@ The ImagJ-Macro is available <a href="https://raw.githubusercontent.com/matjesg/
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Acronym">Acronym<a class="anchor-link" href="#Acronym"> </a></h2><p>A Deep-learning pipeline for Fluorescent Label Segmentation that learns from Human experts</p>
+<h2 id="Acronym">Acronym<a class="anchor-link" href="#Acronym">&#182;</a></h2><p>A Deep-learning pipeline for Fluorescent Label Segmentation that learns from Human experts</p>
 
 </div>
 </div>

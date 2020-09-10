@@ -2,13 +2,10 @@
 
 title: Training
 
-
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Notebook to train deep learning models or ensembles for segmentation of fluorescent labels in microscopy images."
-description: "Notebook to train deep learning models or ensembles for segmentation of fluorescent labels in microscopy images."
-nb_path: "nbs/train.ipynb"
 ---
 <!--
 
@@ -21,22 +18,17 @@ nb_path: "nbs/train.ipynb"
 -->
 
 <div class="container" id="notebook-container">
-        
-    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Please run this cell to get started.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@title Set up environment</span>
+<span class="c1">#@markdown Please run this cell to get started.</span>
 <span class="o">%</span><span class="k">load_ext</span> autoreload
 <span class="o">%</span><span class="k">autoreload</span> 2
 <span class="k">try</span><span class="p">:</span>
@@ -48,6 +40,7 @@ nb_path: "nbs/train.ipynb"
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="o">!</span>pip install -q deepflash2
 <span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">imageio</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">fastai.vision.all</span> <span class="kn">import</span> <span class="o">*</span>
@@ -59,17 +52,15 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Provide-Training-Data">Provide Training Data<a class="anchor-link" href="#Provide-Training-Data"> </a></h2>
+<h2 id="Provide-Training-Data">Provide Training Data<a class="anchor-link" href="#Provide-Training-Data">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Required-data-structure">Required data structure<a class="anchor-link" href="#Required-data-structure"> </a></h3>
+<h3 id="Required-data-structure">Required data structure<a class="anchor-link" href="#Required-data-structure">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -117,14 +108,14 @@ nb_path: "nbs/train.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Working-on-Google-Colab-(recommended)">Working on <em>Google Colab</em> (recommended)<a class="anchor-link" href="#Working-on-Google-Colab-(recommended)"> </a></h3><p>This section allows you to upload a <em>zip</em> folder or connect to your <em>Google Drive</em>.</p>
+<h3 id="Working-on-Google-Colab-(recommended)">Working on <em>Google Colab</em> (recommended)<a class="anchor-link" href="#Working-on-Google-Colab-(recommended)">&#182;</a></h3><p>This section allows you to upload a <em>zip</em> folder or connect to your <em>Google Drive</em>.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Upload-zip-file">Upload <em>zip</em> file<a class="anchor-link" href="#Upload-zip-file"> </a></h4>
+<h4 id="Upload-zip-file">Upload <em>zip</em> file<a class="anchor-link" href="#Upload-zip-file">&#182;</a></h4>
 </div>
 </div>
 </div>
@@ -138,18 +129,18 @@ nb_path: "nbs/train.ipynb"
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to upload a *zip* file</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">u_dict</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">u_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">unzip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File upload only works on Google Colab.&quot;</span><span class="p">)</span>
     <span class="k">pass</span>
@@ -160,11 +151,9 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Connect-to-Google-Drive">Connect to <em>Google Drive</em><a class="anchor-link" href="#Connect-to-Google-Drive"> </a></h4>
+<h4 id="Connect-to-Google-Drive">Connect to <em>Google Drive</em><a class="anchor-link" href="#Connect-to-Google-Drive">&#182;</a></h4>
 </div>
 </div>
 </div>
@@ -179,17 +168,17 @@ nb_path: "nbs/train.ipynb"
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Provide the path to the folder on your _Google Drive_</span>
+<span class="k">try</span><span class="p">:</span>
     <span class="n">drive</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;/content/drive&#39;</span><span class="p">)</span>
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
     <span class="c1">#@markdown Example: &quot;/content/drive/My Drive/data&quot;</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Connecting to Google Drive only works on Google Colab.&quot;</span><span class="p">)</span>
@@ -201,24 +190,22 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Local-Installation">Local Installation<a class="anchor-link" href="#Local-Installation"> </a></h3><p>If you're working on your local machine or server, provide a path to the correct folder.</p>
+<h3 id="Local-Installation">Local Installation<a class="anchor-link" href="#Local-Installation">&#182;</a></h3><p>If you're working on your local machine or server, provide a path to the correct folder.</p>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Provide path (either relative to notebook or absolute) and run cell</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
 </pre></div>
 
     </div>
@@ -226,23 +213,20 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Try-with-sample-data">Try with sample data<a class="anchor-link" href="#Try-with-sample-data"> </a></h3><p>If you don't have any data available yet, try our sample data</p>
+<h3 id="Try-with-sample-data">Try with sample data<a class="anchor-link" href="#Try-with-sample-data">&#182;</a></h3><p>If you don't have any data available yet, try our sample data</p>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;sample_data_cFOS&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to use sample files</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;sample_data_cFOS&#39;</span><span class="p">)</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/matjesg/deepflash2/releases/download/model_library/wue1_cFOS_small.zip&quot;</span>
 <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;sample_data_cFOS.zip&#39;</span><span class="p">)</span>
 <span class="n">unzip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;sample_data_cFOS.zip&#39;</span><span class="p">)</span>
@@ -253,24 +237,23 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Check-and-load-data">Check and load data<a class="anchor-link" href="#Check-and-load-data"> </a></h2>
+<h2 id="Check-and-load-data">Check and load data<a class="anchor-link" href="#Check-and-load-data">&#182;</a></h2>
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">image_folder</span> <span class="o">=</span> <span class="s2">&quot;images&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Provide your parameters according to your provided data</span>
+<span class="n">image_folder</span> <span class="o">=</span> <span class="s2">&quot;images&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">mask_folder</span> <span class="o">=</span> <span class="s2">&quot;masks&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">mask_suffix</span> <span class="o">=</span> <span class="s2">&quot;_mask.png&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<span class="c1">#@markdown Check if you are providing instance labels (class-aware and instance-aware)</span>
+<span class="n">instance_labels</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
 
 <span class="n">f_names</span> <span class="o">=</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">image_folder</span><span class="p">)</span>
 <span class="n">label_fn</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">path</span><span class="o">/</span><span class="n">mask_folder</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">stem</span><span class="si">}{</span><span class="n">mask_suffix</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -288,8 +271,6 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Set <a href="https://matjesg.github.io/deepflash2/data.html#Weight-Calculation">mask weights</a> parameters for training.</p>
@@ -301,14 +282,13 @@ nb_path: "nbs/train.ipynb"
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">border_weight_sigma</span><span class="o">=</span><span class="mi">6</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to set parameters and load data</span>
+<span class="n">border_weight_sigma</span><span class="o">=</span><span class="mi">6</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 <span class="n">foreground_dist_sigma</span><span class="o">=</span><span class="mi">1</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 <span class="n">border_weight_factor</span><span class="o">=</span><span class="mi">50</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 <span class="n">foreground_background_ratio</span><span class="o">=</span><span class="mf">0.1</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
@@ -317,26 +297,9 @@ nb_path: "nbs/train.ipynb"
            <span class="s1">&#39;fds&#39;</span><span class="p">:</span> <span class="n">foreground_dist_sigma</span><span class="p">,</span> 
            <span class="s1">&#39;bwf&#39;</span><span class="p">:</span> <span class="n">border_weight_factor</span><span class="p">,</span>
            <span class="s1">&#39;fbr&#39;</span> <span class="p">:</span> <span class="n">foreground_background_ratio</span><span class="p">}</span>
-</pre></div>
 
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Number of classes: e.g., 2 for binary segmentation (foreground and background class)</span>
+<span class="c1">#@markdown Number of classes: e.g., 2 for binary segmentation (foreground and background class)</span>
 <span class="n">n_classes</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#@param {type:&quot;integer&quot;}</span>
-<span class="c1">#@markdown Check if you are providing instance labels (class-aware and instance-aware)</span>
-<span class="n">instance_labels</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">RandomTileDataset</span><span class="p">(</span><span class="n">f_names</span><span class="p">,</span> <span class="n">label_fn</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span> <span class="n">instance_labels</span><span class="o">=</span><span class="n">instance_labels</span><span class="p">,</span> <span class="o">**</span><span class="n">mw_dict</span><span class="p">)</span>
 </pre></div>
 
@@ -345,16 +308,13 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Use the slider to control the number of displayed images</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to show data. { run: &quot;auto&quot; }</span>
+<span class="c1">#@markdown Use the slider to control the number of displayed images</span>
 <span class="n">first_n</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:100, step:1}</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">show_data</span><span class="p">(</span><span class="n">max_n</span> <span class="o">=</span> <span class="n">first_n</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="n">overlay</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
@@ -364,29 +324,28 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Model-Defintion">Model Defintion<a class="anchor-link" href="#Model-Defintion"> </a></h2>
+<h2 id="Model-Defintion">Model Defintion<a class="anchor-link" href="#Model-Defintion">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Select model <a href="https://matjesg.github.io/deepflash2/models.html#U-Net-architectures">model architecture</a></p>
+<ul>
+<li>Select one of the available <a href="https://matjesg.github.io/deepflash2/models.html#U-Net-architectures">model architectures</a>.</li>
+</ul>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_arch</span> <span class="o">=</span> <span class="s1">&#39;unet_deepflash2&#39;</span> <span class="c1">#@param [&quot;unet_deepflash2&quot;,  &quot;unet_falk2019&quot;, &quot;unet_ronnberger2015&quot;]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown { run: &quot;auto&quot; }</span>
+<span class="n">model_arch</span> <span class="o">=</span> <span class="s1">&#39;unet_deepflash2&#39;</span> <span class="c1">#@param [&quot;unet_deepflash2&quot;,  &quot;unet_falk2019&quot;, &quot;unet_ronnberger2015&quot;]</span>
 </pre></div>
 
     </div>
@@ -394,21 +353,19 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Select <a href="https://matjesg.github.io/deepflash2/">pretraind</a> model weights</p>
 <ul>
+<li>Select <a href="https://matjesg.github.io/deepflash2/">pretraind</a> model weights<ul>
 <li>See here for data description</li>
 <li>Select 'new' to use an untrained model (no pretrained weights)</li>
+</ul>
+</li>
 </ul>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -426,28 +383,51 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Model-Training">Model Training<a class="anchor-link" href="#Model-Training"> </a></h2>
+<h2 id="Model-Training">Model Training<a class="anchor-link" href="#Model-Training">&#182;</a></h2>
 </div>
 </div>
 </div>
-    {% raw %}
-    
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Setting-training-paramers">Setting training paramers<a class="anchor-link" href="#Setting-training-paramers">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li><em>mixed_precision_training</em>: enables <a href="https://docs.fast.ai/callback.fp16#A-little-bit-of-theory">Mixed precision training</a><ul>
+<li>decreases memory usage and speed-up training</li>
+<li>may effect model accuracy</li>
+</ul>
+</li>
+<li><em>batch_size</em>: the number of samples that will be propagated through the network during one iteration<ul>
+<li>4 works best in our experiements</li>
+<li>4-8 works good for <a href="https://docs.fast.ai/callback.fp16#A-little-bit-of-theory">mixed precision training</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1">#@param {type:&quot;slider&quot;, min:2, max:8, step:2}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to setup model for training.</span>
+<span class="n">mixed_precision_training</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1">#@param {type:&quot;slider&quot;, min:2, max:8, step:2}</span>
 <span class="n">cbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">SaveModelCallback</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;iou&#39;</span><span class="p">),</span> <span class="n">ElasticDeformCallback</span><span class="p">]</span>
 <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">Dice_f1</span><span class="p">(),</span> <span class="n">Iou</span><span class="p">()]</span>
 <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">WeightedSoftmaxCrossEntropy</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">dls</span> <span class="o">=</span> <span class="n">DataLoaders</span><span class="o">.</span><span class="n">from_dsets</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span><span class="n">ds</span><span class="p">,</span> <span class="n">bs</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span> <span class="n">dls</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-<span class="n">learn</span> <span class="o">=</span> <span class="n">Learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">wd</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">loss_func</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="n">cbs</span><span class="p">)</span><span class="c1">#.to_fp16()</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">Learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">wd</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">loss_func</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="n">cbs</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">mixed_precision_training</span><span class="p">:</span> <span class="n">learn</span><span class="o">.</span><span class="n">to_fp16</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -455,35 +435,28 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Setting-training-paramers">Setting training paramers<a class="anchor-link" href="#Setting-training-paramers"> </a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Finding a good learning rate</strong></p>
-<p>According to the <a href="https://docs.fast.ai/callback.schedule#LRFinder">fastai docs</a>, a good value for the learning rates is then either :</p>
 <ul>
-<li>one tenth of the minimum before the divergence</li>
-<li>when the slope is the steepest</li>
+<li><strong>Learning rate</strong>: controls how quickly or slowly a neural network model learns. <br>
+We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> when traing with the <strong><a href="https://fastai1.fast.ai/callbacks.one_cycle.html#The-1cycle-policy">One-Cycle-Policy</a></strong>. Using the <strong>Learning Rate Finder</strong> below, a good value for <code>max_lr</code> is somthing in the range of:<ul>
+<li>one tenth of the minimum before the divergence (<em>Minimum/10</em>)</li>
+<li>when the slope is the steepest (<em>steepest point</em>) </li>
+<li>In our experiments, we found that a <strong>maximum learning rate of 5e-4</strong> (e.g., 0.0005) yielded the best results across experiments.</li>
 </ul>
-<p>In our experiments, we found that a <strong>maximum learning rate of 5e-4</strong> (e.g., 0.0005) yielded the best results across experiments.</p>
+</li>
+</ul>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lr_min</span><span class="p">,</span><span class="n">lr_steep</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to a find suitable learning rate</span>
+<span class="n">lr_min</span><span class="p">,</span><span class="n">lr_steep</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum/10: </span><span class="si">{</span><span class="n">lr_min</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, steepest point: </span><span class="si">{</span><span class="n">lr_steep</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -492,23 +465,41 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li><em>n_models</em>: Number of models to train.<ul>
+<li>If you're experimenting with parameters, try only one model first.</li>
+<li>Depending on the data, ensembles should comprise 3-5 models.</li>
+<li>Effects train-validation-split:<ul>
+<li><code>n_models = 1</code> leads to a train-validation-split of 0.75/0.25</li>
+<li><code>n_models &gt; 1</code> (model ensembles) to _<a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html">k-fold cross validation</a>_</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><em>epochs</em>: One epoch is when an entire (augemented) dataset is passed through the model for training.<ul>
+<li>Epochs need to be adusted depending on the size and number of images</li>
+<li>We found that choosing the number of epochs such that the network parameters are update about 1000 times (iterations) leads to satiesfying results in most cases.</li>
+</ul>
+</li>
+</ul>
 
-    {% raw %}
-    
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Set `max_lr` according to the learning rate finder.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@title Set training paramers { run: &quot;auto&quot; }</span>
+<span class="c1">#@markdown Set `max_lr` according to the learning rate finder.</span>
 <span class="n">max_lr</span> <span class="o">=</span> <span class="mf">5e-4</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
-<span class="c1">#@markdown Number of models to train. If you&#39;re experimenting with parameters, try only one model first.</span>
+<span class="c1">#@markdown </span>
 <span class="n">n_models</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:5, step:1}</span>
-<span class="c1">#@markdown One epoch is when an entire (augemented) dataset is passed through the model for training.</span>
-<span class="c1">#@markdown We found that about 30 epochs is sufficient to train a model with 36 images. </span>
-<span class="c1">#@markdown Select more epochs for smaller datasets.</span>
 <span class="n">epochs</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:100, step:1}</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Suggested epochs for 1000 iterations:&quot;</span><span class="p">,</span> <span class="n">calc_iterations</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_models</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -516,26 +507,19 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Train-models">Train models<a class="anchor-link" href="#Train-models"> </a></h3><ul>
-<li>Using a train-test-split of 0.75/0.25 for one model</li>
-<li>Using <em>k-fold cross validation</em> for model ensembles</li>
-</ul>
-
+<h3 id="Train-models">Train models<a class="anchor-link" href="#Train-models">&#182;</a></h3>
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">n_models</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to train model(s).&lt;br/&gt; **THIS CAN TAKE A FEW HOURS FOR MULTIPLE MODELS!**</span>
+<span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">n_models</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 <span class="n">model_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="s1">&#39;models&#39;</span>
 <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">res</span><span class="p">,</span> <span class="n">res_mc</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
@@ -544,7 +528,7 @@ nb_path: "nbs/train.ipynb"
     <span class="n">fold</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;model</span><span class="si">{</span><span class="n">fold</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Train&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">n_models</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">n_models</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
         <span class="n">files_train</span><span class="p">,</span> <span class="n">files_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">f_names</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">files_train</span><span class="p">,</span> <span class="n">files_val</span> <span class="o">=</span> <span class="n">f_names</span><span class="p">[</span><span class="n">train_idx</span><span class="p">],</span> <span class="n">f_names</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span>
@@ -558,7 +542,8 @@ nb_path: "nbs/train.ipynb"
     <span class="k">if</span> <span class="n">pretrained_weights</span><span class="o">==</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="n">apply_init</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span> <span class="n">dls</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> <span class="n">dls_valid</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
         
-    <span class="n">learn</span> <span class="o">=</span> <span class="n">Learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">wd</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">loss_func</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="n">cbs</span><span class="p">)</span><span class="c1">#.to_fp16()</span>
+    <span class="n">learn</span> <span class="o">=</span> <span class="n">Learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">wd</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">loss_func</span><span class="o">=</span><span class="n">loss_fn</span><span class="p">,</span> <span class="n">cbs</span><span class="o">=</span><span class="n">cbs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mixed_precision_training</span><span class="p">:</span> <span class="n">learn</span><span class="o">.</span><span class="n">to_fp16</span><span class="p">()</span>
     <span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="n">epochs</span><span class="p">,</span> <span class="n">max_lr</span><span class="p">)</span>
     <span class="c1"># save_model(model_path/f&#39;{name}.pth&#39;, learn.model, opt=None)</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">learn</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">model_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">.pth&#39;</span><span class="p">,</span> <span class="n">_use_new_zipfile_serialization</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -579,35 +564,33 @@ nb_path: "nbs/train.ipynb"
 </div>
 
 </div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Validate-models-and-ensembles">Validate models and ensembles<a class="anchor-link" href="#Validate-models-and-ensembles"> </a></h2>
+<h2 id="Validate-models">Validate models<a class="anchor-link" href="#Validate-models">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here you can validate your results. 
-If you choose to only train one model (<code>n_models = 1</code>), ensemble and model results will be the same.</p>
+<p>Here you can validate your models. To avoid information leakage, only predictions on the respective models' validation set are made.</p>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pred_dir</span> <span class="o">=</span> <span class="s1">&#39;val_preds&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Create folders to save the resuls. They will be created at your provided &#39;path&#39;.</span>
+<span class="n">pred_dir</span> <span class="o">=</span> <span class="s1">&#39;val_preds&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">pred_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">pred_dir</span><span class="o">/</span><span class="s1">&#39;ensemble&#39;</span>
 <span class="n">pred_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">uncertainty_dir</span> <span class="o">=</span> <span class="s1">&#39;val_uncertainties&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">uncertainty_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">uncertainty_dir</span><span class="o">/</span><span class="s1">&#39;ensemble&#39;</span>
 <span class="n">uncertainty_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">result_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="s1">&#39;results&#39;</span>
+<span class="n">result_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1">#@markdown Define `filetype` to save the predictions and uncertainties. All common filetypes are supported.</span>
 <span class="n">filetype</span> <span class="o">=</span> <span class="s1">&#39;png&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
@@ -618,29 +601,36 @@ If you choose to only train one model (<code>n_models = 1</code>), ensemble and 
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">val_files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Show and save results</span>
 <span class="n">res_list</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">val_files</span><span class="p">:</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">msk</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">pred</span> <span class="o">=</span> <span class="n">ensemble_results</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-    <span class="n">pred_std</span> <span class="o">=</span> <span class="n">ensemble_results</span><span class="p">(</span><span class="n">res_mc</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">df_tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;file&#39;</span> <span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;iou&#39;</span><span class="p">:</span> <span class="n">iou</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span> <span class="p">,</span><span class="s1">&#39;entropy&#39;</span><span class="p">:</span> <span class="n">mean_entropy</span><span class="p">(</span><span class="n">pred_std</span><span class="p">)})</span>
-    <span class="n">plot_results</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">pred_std</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df_tmp</span><span class="p">)</span>
-    <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_tmp</span><span class="p">)</span>
-    <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">pred_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_pred.</span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span> <span class="k">else</span> <span class="n">pred</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span>
-    <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">uncertainty_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_uncertainty.</span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">pred_std</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">model_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_models</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;model</span><span class="si">{</span><span class="n">model_number</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">val_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">mod</span> <span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">mod</span> <span class="o">==</span> <span class="n">model_name</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Validating </span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">pred_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">pred_dir</span><span class="o">/</span><span class="n">model_name</span>
+    <span class="n">pred_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">uncertainty_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">uncertainty_dir</span><span class="o">/</span><span class="n">model_name</span>
+    <span class="n">uncertainty_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">val_files</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">msk</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">res</span><span class="p">[(</span><span class="n">model_name</span><span class="p">,</span><span class="n">file</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">pred_std</span> <span class="o">=</span> <span class="n">res_mc</span><span class="p">[(</span><span class="n">model_name</span><span class="p">,</span><span class="n">file</span><span class="p">)][</span><span class="mi">2</span><span class="p">][</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">df_tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;file&#39;</span> <span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                            <span class="s1">&#39;model&#39;</span> <span class="p">:</span> <span class="n">model_name</span><span class="p">,</span>
+                            <span class="s1">&#39;iou&#39;</span><span class="p">:</span> <span class="n">iou</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">pred</span><span class="p">),</span>
+                            <span class="s1">&#39;entropy&#39;</span><span class="p">:</span> <span class="n">mean_entropy</span><span class="p">(</span><span class="n">pred_std</span><span class="p">)})</span>
+        <span class="n">plot_results</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">pred_std</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df_tmp</span><span class="p">)</span>
+        <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_tmp</span><span class="p">)</span>
+        <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">pred_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s1">_pred.</span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span> <span class="k">else</span> <span class="n">pred</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span>
+        <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">uncertainty_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s1">_uncertainty.</span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">pred_std</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span>
 <span class="n">df_res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span>
-<span class="n">df_res</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="s1">&#39;val_ensemble_results.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">df_res</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">result_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;val_results.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -648,47 +638,9 @@ If you choose to only train one model (<code>n_models = 1</code>), ensemble and 
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_number</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:5, step:1}</span>
-<span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;model</span><span class="si">{</span><span class="n">model_number</span><span class="si">}</span><span class="s1">&#39;</span>
-<span class="n">val_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">mod</span> <span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">mod</span> <span class="o">==</span> <span class="n">model_name</span><span class="p">]</span>
-<span class="n">pred_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">pred_dir</span><span class="o">/</span><span class="n">model_name</span>
-<span class="n">pred_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">uncertainty_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">uncertainty_dir</span><span class="o">/</span><span class="n">model_name</span>
-<span class="n">uncertainty_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">res_list</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">val_files</span><span class="p">:</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">msk</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">pred</span> <span class="o">=</span> <span class="n">res</span><span class="p">[(</span><span class="n">model_name</span><span class="p">,</span><span class="n">file</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">pred_std</span> <span class="o">=</span> <span class="n">res_mc</span><span class="p">[(</span><span class="n">model_name</span><span class="p">,</span><span class="n">file</span><span class="p">)][</span><span class="mi">2</span><span class="p">][</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">df_tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;file&#39;</span> <span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;iou&#39;</span><span class="p">:</span> <span class="n">iou</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span> <span class="p">,</span><span class="s1">&#39;entropy&#39;</span><span class="p">:</span> <span class="n">mean_entropy</span><span class="p">(</span><span class="n">pred_std</span><span class="p">)})</span>
-    <span class="n">plot_results</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">msk</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">pred_std</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df_tmp</span><span class="p">)</span>
-    <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_tmp</span><span class="p">)</span>
-    <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">pred_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_pred.</span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span> <span class="k">else</span> <span class="n">pred</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span>
-    <span class="n">imageio</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">uncertainty_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_uncertainty.</span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">pred_std</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span>
-<span class="n">df_res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span>
-<span class="n">df_res</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;val_</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">_results.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Download-Section">Download Section<a class="anchor-link" href="#Download-Section"> </a></h2>
+<h2 id="Download-Section">Download Section<a class="anchor-link" href="#Download-Section">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -696,21 +648,20 @@ If you choose to only train one model (<code>n_models = 1</code>), ensemble and 
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
 <li>The models will always be the <em>last</em> version trained in Section <em>Model Training</em></li>
-<li>To download validation predictions and uncertainties, you first need to execute Section <em>Validate models and ensembles</em>.</li>
+<li>To download validation predictions and uncertainties, you first need to execute Section <em>Validate models</em>.</li>
 </ul>
 <p><em>Note: If you're connected to <em>Google Drive</em>, the models are automatically saved to your drive.</em></p>
 
 </div>
 </div>
 </div>
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_number</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span> <span class="c1">#@param [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@title Download models { run: &quot;auto&quot; }</span>
+<span class="n">model_number</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span> <span class="c1">#@param [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;]</span>
 <span class="n">model_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="s1">&#39;models&#39;</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;model</span><span class="si">{</span><span class="n">model_number</span><span class="si">}</span><span class="s1">.pth&#39;</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
@@ -725,21 +676,16 @@ If you choose to only train one model (<code>n_models = 1</code>), ensemble and 
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_predictions.zip&#39;</span>
-<span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">pred_dir</span><span class="p">):</span>
-          <span class="n">zf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Download validation predicitions { run: &quot;auto&quot; }</span>
+<span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_predictions&#39;</span>
+<span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">,</span> <span class="s1">&#39;zip&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">/</span><span class="n">pred_dir</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s1">.zip&#39;</span><span class="p">)</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File download only works on Google Colab.&quot;</span><span class="p">)</span>
     <span class="k">pass</span>
@@ -750,21 +696,16 @@ If you choose to only train one model (<code>n_models = 1</code>), ensemble and 
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_uncertainties.zip&#39;</span>
-<span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="s1">&#39;val_uncertainties.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">get_image_files</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">uncertainty_dir</span><span class="p">):</span>
-          <span class="n">zf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Download validation uncertainties</span>
+<span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_uncertainties&#39;</span>
+<span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">,</span> <span class="s1">&#39;zip&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">/</span><span class="n">uncertainty_dir</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s1">.zip&#39;</span><span class="p">)</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File download only works on Google Colab.&quot;</span><span class="p">)</span>
     <span class="k">pass</span>
@@ -775,21 +716,14 @@ If you choose to only train one model (<code>n_models = 1</code>), ensemble and 
 </div>
 
 </div>
-    {% endraw %}
-
-    {% raw %}
-    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_results.zip&#39;</span>
-<span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="s1">&#39;val_results.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">get_files</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="s1">&#39;.csv&#39;</span><span class="p">):</span>
-          <span class="n">zf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Download result analysis &#39;.csv&#39; files</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">result_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;val_results.csv&#39;</span><span class="p">)</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File download only works on Google Colab.&quot;</span><span class="p">)</span>
     <span class="k">pass</span>
@@ -800,8 +734,6 @@ If you choose to only train one model (<code>n_models = 1</code>), ensemble and 
 </div>
 
 </div>
-    {% endraw %}
-
 </div>
  
 
