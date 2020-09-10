@@ -2,10 +2,13 @@
 
 title: Training
 
+
 keywords: fastai
 sidebar: home_sidebar
 
 summary: "Notebook to train deep learning models or ensembles for segmentation of fluorescent labels in microscopy images."
+description: "Notebook to train deep learning models or ensembles for segmentation of fluorescent labels in microscopy images."
+nb_path: "nbs/train.ipynb"
 ---
 <!--
 
@@ -18,17 +21,22 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 -->
 
 <div class="container" id="notebook-container">
+        
+    {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@title Set up environment</span>
-<span class="c1">#@markdown Please run this cell to get started.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Please run this cell to get started.</span>
 <span class="o">%</span><span class="k">load_ext</span> autoreload
 <span class="o">%</span><span class="k">autoreload</span> 2
 <span class="k">try</span><span class="p">:</span>
@@ -52,15 +60,17 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Provide-Training-Data">Provide Training Data<a class="anchor-link" href="#Provide-Training-Data">&#182;</a></h2>
+<h2 id="Provide-Training-Data">Provide Training Data<a class="anchor-link" href="#Provide-Training-Data"> </a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Required-data-structure">Required data structure<a class="anchor-link" href="#Required-data-structure">&#182;</a></h3>
+<h3 id="Required-data-structure">Required data structure<a class="anchor-link" href="#Required-data-structure"> </a></h3>
 </div>
 </div>
 </div>
@@ -108,14 +118,14 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Working-on-Google-Colab-(recommended)">Working on <em>Google Colab</em> (recommended)<a class="anchor-link" href="#Working-on-Google-Colab-(recommended)">&#182;</a></h3><p>This section allows you to upload a <em>zip</em> folder or connect to your <em>Google Drive</em>.</p>
+<h3 id="Working-on-Google-Colab-(recommended)">Working on <em>Google Colab</em> (recommended)<a class="anchor-link" href="#Working-on-Google-Colab-(recommended)"> </a></h3><p>This section allows you to upload a <em>zip</em> folder or connect to your <em>Google Drive</em>.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Upload-zip-file">Upload <em>zip</em> file<a class="anchor-link" href="#Upload-zip-file">&#182;</a></h4>
+<h4 id="Upload-zip-file">Upload <em>zip</em> file<a class="anchor-link" href="#Upload-zip-file"> </a></h4>
 </div>
 </div>
 </div>
@@ -129,13 +139,14 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to upload a *zip* file</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">u_dict</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">u_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -151,9 +162,11 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Connect-to-Google-Drive">Connect to <em>Google Drive</em><a class="anchor-link" href="#Connect-to-Google-Drive">&#182;</a></h4>
+<h4 id="Connect-to-Google-Drive">Connect to <em>Google Drive</em><a class="anchor-link" href="#Connect-to-Google-Drive"> </a></h4>
 </div>
 </div>
 </div>
@@ -168,13 +181,14 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Provide the path to the folder on your _Google Drive_</span>
-<span class="k">try</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">drive</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;/content/drive&#39;</span><span class="p">)</span>
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -190,20 +204,23 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Local-Installation">Local Installation<a class="anchor-link" href="#Local-Installation">&#182;</a></h3><p>If you're working on your local machine or server, provide a path to the correct folder.</p>
+<h3 id="Local-Installation">Local Installation<a class="anchor-link" href="#Local-Installation"> </a></h3><p>If you're working on your local machine or server, provide a path to the correct folder.</p>
 
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Provide path (either relative to notebook or absolute) and run cell</span>
-<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
 </pre></div>
@@ -213,20 +230,23 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Try-with-sample-data">Try with sample data<a class="anchor-link" href="#Try-with-sample-data">&#182;</a></h3><p>If you don't have any data available yet, try our sample data</p>
+<h3 id="Try-with-sample-data">Try with sample data<a class="anchor-link" href="#Try-with-sample-data"> </a></h3><p>If you don't have any data available yet, try our sample data</p>
 
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to use sample files</span>
-<span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;sample_data_cFOS&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;sample_data_cFOS&#39;</span><span class="p">)</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/matjesg/deepflash2/releases/download/model_library/wue1_cFOS_small.zip&quot;</span>
 <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;sample_data_cFOS.zip&#39;</span><span class="p">)</span>
 <span class="n">unzip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;sample_data_cFOS.zip&#39;</span><span class="p">)</span>
@@ -237,19 +257,22 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Check-and-load-data">Check and load data<a class="anchor-link" href="#Check-and-load-data">&#182;</a></h2>
+<h2 id="Check-and-load-data">Check and load data<a class="anchor-link" href="#Check-and-load-data"> </a></h2>
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Provide your parameters according to your provided data</span>
-<span class="n">image_folder</span> <span class="o">=</span> <span class="s2">&quot;images&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">image_folder</span> <span class="o">=</span> <span class="s2">&quot;images&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">mask_folder</span> <span class="o">=</span> <span class="s2">&quot;masks&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">mask_suffix</span> <span class="o">=</span> <span class="s2">&quot;_mask.png&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="c1">#@markdown Check if you are providing instance labels (class-aware and instance-aware)</span>
@@ -271,6 +294,8 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Set <a href="https://matjesg.github.io/deepflash2/data.html#Weight-Calculation">mask weights</a> parameters for training.</p>
@@ -282,13 +307,14 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to set parameters and load data</span>
-<span class="n">border_weight_sigma</span><span class="o">=</span><span class="mi">6</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">border_weight_sigma</span><span class="o">=</span><span class="mi">6</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 <span class="n">foreground_dist_sigma</span><span class="o">=</span><span class="mi">1</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 <span class="n">border_weight_factor</span><span class="o">=</span><span class="mi">50</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 <span class="n">foreground_background_ratio</span><span class="o">=</span><span class="mf">0.1</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
@@ -308,13 +334,16 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to show data. { run: &quot;auto&quot; }</span>
-<span class="c1">#@markdown Use the slider to control the number of displayed images</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Use the slider to control the number of displayed images</span>
 <span class="n">first_n</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:100, step:1}</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">show_data</span><span class="p">(</span><span class="n">max_n</span> <span class="o">=</span> <span class="n">first_n</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="n">overlay</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
@@ -324,9 +353,11 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Model-Defintion">Model Defintion<a class="anchor-link" href="#Model-Defintion">&#182;</a></h2>
+<h2 id="Model-Defintion">Model Defintion<a class="anchor-link" href="#Model-Defintion"> </a></h2>
 </div>
 </div>
 </div>
@@ -339,13 +370,14 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown { run: &quot;auto&quot; }</span>
-<span class="n">model_arch</span> <span class="o">=</span> <span class="s1">&#39;unet_deepflash2&#39;</span> <span class="c1">#@param [&quot;unet_deepflash2&quot;,  &quot;unet_falk2019&quot;, &quot;unet_ronnberger2015&quot;]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_arch</span> <span class="o">=</span> <span class="s1">&#39;unet_deepflash2&#39;</span> <span class="c1">#@param [&quot;unet_deepflash2&quot;,  &quot;unet_falk2019&quot;, &quot;unet_ronnberger2015&quot;]</span>
 </pre></div>
 
     </div>
@@ -353,6 +385,8 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
@@ -366,6 +400,8 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -383,15 +419,17 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Model-Training">Model Training<a class="anchor-link" href="#Model-Training">&#182;</a></h2>
+<h2 id="Model-Training">Model Training<a class="anchor-link" href="#Model-Training"> </a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Setting-training-paramers">Setting training paramers<a class="anchor-link" href="#Setting-training-paramers">&#182;</a></h3>
+<h3 id="Setting-training-paramers">Setting training paramers<a class="anchor-link" href="#Setting-training-paramers"> </a></h3>
 </div>
 </div>
 </div>
@@ -413,13 +451,14 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to setup model for training.</span>
-<span class="n">mixed_precision_training</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mixed_precision_training</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
 <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1">#@param {type:&quot;slider&quot;, min:2, max:8, step:2}</span>
 <span class="n">cbs</span> <span class="o">=</span> <span class="p">[</span><span class="n">SaveModelCallback</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s1">&#39;iou&#39;</span><span class="p">),</span> <span class="n">ElasticDeformCallback</span><span class="p">]</span>
 <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">Dice_f1</span><span class="p">(),</span> <span class="n">Iou</span><span class="p">()]</span>
@@ -435,6 +474,8 @@ summary: "Notebook to train deep learning models or ensembles for segmentation o
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
@@ -450,13 +491,14 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to a find suitable learning rate</span>
-<span class="n">lr_min</span><span class="p">,</span><span class="n">lr_steep</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lr_min</span><span class="p">,</span><span class="n">lr_steep</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum/10: </span><span class="si">{</span><span class="n">lr_min</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, steepest point: </span><span class="si">{</span><span class="n">lr_steep</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -465,6 +507,8 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
@@ -488,13 +532,14 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@title Set training paramers { run: &quot;auto&quot; }</span>
-<span class="c1">#@markdown Set `max_lr` according to the learning rate finder.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Set `max_lr` according to the learning rate finder.</span>
 <span class="n">max_lr</span> <span class="o">=</span> <span class="mf">5e-4</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 <span class="c1">#@markdown </span>
 <span class="n">n_models</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:5, step:1}</span>
@@ -507,19 +552,22 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Train-models">Train models<a class="anchor-link" href="#Train-models">&#182;</a></h3>
+<h3 id="Train-models">Train models<a class="anchor-link" href="#Train-models"> </a></h3>
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to train model(s).&lt;br/&gt; **THIS CAN TAKE A FEW HOURS FOR MULTIPLE MODELS!**</span>
-<span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">n_models</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">n_models</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 <span class="n">model_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="s1">&#39;models&#39;</span>
 <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">res</span><span class="p">,</span> <span class="n">res_mc</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
@@ -564,9 +612,11 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Validate-models">Validate models<a class="anchor-link" href="#Validate-models">&#182;</a></h2>
+<h2 id="Validate-models">Validate models<a class="anchor-link" href="#Validate-models"> </a></h2>
 </div>
 </div>
 </div>
@@ -577,13 +627,14 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Create folders to save the resuls. They will be created at your provided &#39;path&#39;.</span>
-<span class="n">pred_dir</span> <span class="o">=</span> <span class="s1">&#39;val_preds&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pred_dir</span> <span class="o">=</span> <span class="s1">&#39;val_preds&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">pred_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="n">pred_dir</span><span class="o">/</span><span class="s1">&#39;ensemble&#39;</span>
 <span class="n">pred_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">uncertainty_dir</span> <span class="o">=</span> <span class="s1">&#39;val_uncertainties&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
@@ -601,13 +652,16 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Show and save results</span>
-<span class="n">res_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">res_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">model_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_models</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;model</span><span class="si">{</span><span class="n">model_number</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="n">val_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">mod</span> <span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">mod</span> <span class="o">==</span> <span class="n">model_name</span><span class="p">]</span>
@@ -638,9 +692,11 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Download-Section">Download Section<a class="anchor-link" href="#Download-Section">&#182;</a></h2>
+<h2 id="Download-Section">Download Section<a class="anchor-link" href="#Download-Section"> </a></h2>
 </div>
 </div>
 </div>
@@ -655,13 +711,14 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 </div>
 </div>
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@title Download models { run: &quot;auto&quot; }</span>
-<span class="n">model_number</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span> <span class="c1">#@param [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model_number</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span> <span class="c1">#@param [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;]</span>
 <span class="n">model_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="s1">&#39;models&#39;</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;model</span><span class="si">{</span><span class="n">model_number</span><span class="si">}</span><span class="s1">.pth&#39;</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
@@ -676,13 +733,16 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Download validation predicitions { run: &quot;auto&quot; }</span>
-<span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_predictions&#39;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_predictions&#39;</span>
 <span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">,</span> <span class="s1">&#39;zip&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">/</span><span class="n">pred_dir</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s1">.zip&#39;</span><span class="p">)</span>
@@ -696,13 +756,16 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Download validation uncertainties</span>
-<span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_uncertainties&#39;</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">out_name</span> <span class="o">=</span> <span class="s1">&#39;val_uncertainties&#39;</span>
 <span class="n">shutil</span><span class="o">.</span><span class="n">make_archive</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="n">out_name</span><span class="p">,</span> <span class="s1">&#39;zip&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">/</span><span class="n">uncertainty_dir</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">out_name</span><span class="si">}</span><span class="s1">.zip&#39;</span><span class="p">)</span>
@@ -716,13 +779,16 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Download result analysis &#39;.csv&#39; files</span>
-<span class="k">try</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
     <span class="n">files</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">result_path</span><span class="o">/</span><span class="sa">f</span><span class="s1">&#39;val_results.csv&#39;</span><span class="p">)</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File download only works on Google Colab.&quot;</span><span class="p">)</span>
@@ -734,6 +800,8 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 </div>
 
 </div>
+    {% endraw %}
+
 </div>
  
 

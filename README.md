@@ -51,10 +51,10 @@ If you install with pip, you should install PyTorch first by following the PyTor
 Docker images for __deepflash2__ are built on top of [the latest pytorch image](https://hub.docker.com/r/pytorch/pytorch/) and [fastai](https://github.com/fastai/docker-containers) images. **You must install [Nvidia-Docker](https://github.com/NVIDIA/nvidia-docker) to enable gpu compatibility with these containers.**
 
 - CPU only
-> `docker run -p 8888: 8888 matjesg/deepflash`
+> `docker run -p 8888:8888 matjesg/deepflash`
 - With GPU support ([Nvidia-Docker](https://github.com/NVIDIA/nvidia-docker) must be installed.)
 has an editable install of fastai and fastcore.
-> `docker run --gpus all -p 8888: 8888 matjesg/deepflash`
+> `docker run --gpus all -p 8888:8888 matjesg/deepflash`
 All docker containers are configured to start a jupyter server. **deepflash2** notebooks are available in the `deepflash2_notebooks` folder.
 
 For more information on how to run docker see [docker orientation and setup](https://docs.docker.com/get-started/) and [fastai docker](https://github.com/fastai/docker-containers).
