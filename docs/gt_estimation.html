@@ -6,8 +6,8 @@ title: Ground Truth Estimation
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Notebook to derive reference segmentations from segmentations of multiple experts (Based on <a href='http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/Python_html/34_Segmentation_Evaluation.html)'>SimpleITK</a>."
-description: "Notebook to derive reference segmentations from segmentations of multiple experts (Based on <a href='http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/Python_html/34_Segmentation_Evaluation.html)'>SimpleITK</a>."
+summary: "Notebook to derive reference segmentations from segmentations of multiple experts. This notebook is based on <a href='http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/Python_html/34_Segmentation_Evaluation.html'>SimpleITK</a>."
+description: "Notebook to derive reference segmentations from segmentations of multiple experts. This notebook is based on <a href='http://insightsoftwareconsortium.github.io/SimpleITK-Notebooks/Python_html/34_Segmentation_Evaluation.html'>SimpleITK</a>."
 nb_path: "nbs/gt_estimation.ipynb"
 ---
 <!--
@@ -31,18 +31,12 @@ nb_path: "nbs/gt_estimation.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This notebook is optmizied to be executed on Google Colab (<a href="https://colab.research.google.com">https://colab.research.google.com</a>).</p>
+<p>This notebook is optmizied to be executed on <a href="https://colab.research.google.com">Google Colab</a>.</p>
 <ul>
-<li>Please read the instructions carefully.</li>
 <li>Press the the <em>play</em> butten to execute the cells. It will show up between [     ] on the left side of the code cells. </li>
 <li>Run the cells consecutively. Skip cells that do not apply for your case.</li>
+<li>Use Firefox or Google Chrome if you want to upload and download files</li>
 </ul>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
 <p>For more information on ground truth estimation methods see <em>Biancardi, Alberto M., Artit C. Jirapatnakul, and Anthony P. Reeves. "A comparison of ground truth estimation methods." International journal of computer assisted radiology and surgery 5.3 (2010): 295-305</em>.</p>
 
 </div>
@@ -69,7 +63,7 @@ nb_path: "nbs/gt_estimation.ipynb"
 <span class="kn">import</span> <span class="nn">SimpleITK</span> <span class="k">as</span> <span class="nn">sitk</span>
 <span class="kn">from</span> <span class="nn">fastai.vision.all</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">deepflash2.data</span> <span class="kn">import</span> <span class="n">_read_msk</span>
-<span class="kn">from</span> <span class="nn">deepflash2.utils</span> <span class="kn">import</span> <span class="n">staple</span><span class="p">,</span> <span class="n">mvoting</span>
+<span class="kn">from</span> <span class="nn">deepflash2.utils</span> <span class="kn">import</span> <span class="n">staple</span><span class="p">,</span> <span class="n">mvoting</span><span class="p">,</span> <span class="n">unzip</span>
 </pre></div>
 
     </div>
@@ -110,70 +104,7 @@ nb_path: "nbs/gt_estimation.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Colab-(recommended)">Colab (recommended)<a class="anchor-link" href="#Colab-(recommended)"> </a></h3><p>Working on <em>Google Colab</em>, this section allows you to upload a <em>zip</em> folder or connect to your <em>Google Drive</em>.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Upload-zip-file">Upload <em>zip</em> file<a class="anchor-link" href="#Upload-zip-file"> </a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li>The <em>zip</em> file must contain all segmentations and correct folder structure. </li>
-<li>See <a href="https://www.hellotech.com/guide/for/how-to-zip-a-file-mac-windows-pc">here</a> how to <em>zip</em> files on Windows or Mac.</li>
-</ul>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;expert_segmentations&#39;</span><span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">u_dict</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">u_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">zip_ref</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">zip_ref</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<span class="k">except</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File upload only works on Google Colab.&quot;</span><span class="p">)</span>
-    <span class="k">pass</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Warning: File upload only works on Google Colab.
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Connect-to-Google-Drive">Connect to <em>Google Drive</em><a class="anchor-link" href="#Connect-to-Google-Drive"> </a></h4>
+<h3 id="Option-A:-Upload-via-Google-Drive-(Colab-only)">Option A: Upload via <em>Google Drive</em> (Colab only)<a class="anchor-link" href="#Option-A:-Upload-via-Google-Drive-(Colab-only)"> </a></h3>
 </div>
 </div>
 </div>
@@ -200,6 +131,7 @@ nb_path: "nbs/gt_estimation.ipynb"
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/expert_segmentations&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="c1">#@markdown Example: &quot;/content/drive/My Drive/expert_segmentations&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Connecting to Google Drive only works on Google Colab.&quot;</span><span class="p">)</span>
     <span class="k">pass</span>
@@ -209,17 +141,44 @@ nb_path: "nbs/gt_estimation.ipynb"
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
+</div>
+    {% endraw %}
 
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Warning: Connecting to Google Drive only works on Google Colab.
-</pre>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Option-B:-Upload-via-zip-file-(Colab-only)">Option B: Upload via <em>zip</em> file (Colab only)<a class="anchor-link" href="#Option-B:-Upload-via-zip-file-(Colab-only)"> </a></h3>
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>The <em>zip</em> file must contain all segmentations and correct folder structure. </li>
+<li>See <a href="https://www.hellotech.com/guide/for/how-to-zip-a-file-mac-windows-pc">here</a> how to <em>zip</em> files on Windows or Mac.</li>
+</ul>
 
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;expert_segmentations&#39;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">u_dict</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">upload</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">u_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">unzip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: File upload only works on Google Colab.&quot;</span><span class="p">)</span>
+    <span class="k">pass</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 
@@ -228,7 +187,13 @@ nb_path: "nbs/gt_estimation.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Local-Installation">Local Installation<a class="anchor-link" href="#Local-Installation"> </a></h3><p>If you're working on your local machine or server, provide a path to the correct folder.</p>
+<h3 id="Option-C:-Provide-path-(Local-installation)">Option C: Provide path (Local installation)<a class="anchor-link" href="#Option-C:-Provide-path-(Local-installation)"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you're working on your local machine or server, provide a path to the correct folder.</p>
 
 </div>
 </div>
@@ -242,6 +207,7 @@ nb_path: "nbs/gt_estimation.ipynb"
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;expert_segmentations&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
 <span class="c1">#@markdown Example: &quot;expert_segmentations&quot;</span>
 </pre></div>
 
@@ -254,7 +220,13 @@ nb_path: "nbs/gt_estimation.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Try-with-sample-data">Try with sample data<a class="anchor-link" href="#Try-with-sample-data"> </a></h3><p>If you don't have any data available yet, try our sample data</p>
+<h3 id="Option-D:-Try-with-sample-data-(Testing-only)">Option D: Try with sample data (Testing only)<a class="anchor-link" href="#Option-D:-Try-with-sample-data-(Testing-only)"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you don't have any data available yet, try our sample data</p>
 
 </div>
 </div>
@@ -303,26 +275,18 @@ nb_path: "nbs/gt_estimation.ipynb"
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>You have uploaded 7 files from the following experts: {&#39;expert_1&#39;, &#39;mv&#39;, &#39;expert_5&#39;, &#39;expert_2&#39;, &#39;expert_4&#39;, &#39;staple&#39;, &#39;expert_3&#39;}
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simultaneous-truth-and-performance-level-estimation-(STAPLE)">Simultaneous truth and performance level estimation (STAPLE)<a class="anchor-link" href="#Simultaneous-truth-and-performance-level-estimation-(STAPLE)"> </a></h2><p>The STAPLE algorithm considers a collection of segmentations and computes a probabilistic estimate of the true segmentation and a measure of the performance level represented by each segmentation.</p>
+<h2 id="Ground-Truth-Estimationm">Ground Truth Estimationm<a class="anchor-link" href="#Ground-Truth-Estimationm"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Recommended:-Simultaneous-truth-and-performance-level-estimation-(STAPLE)">Recommended: Simultaneous truth and performance level estimation (STAPLE)<a class="anchor-link" href="#Recommended:-Simultaneous-truth-and-performance-level-estimation-(STAPLE)"> </a></h3><p>The STAPLE algorithm considers a collection of segmentations and computes a probabilistic estimate of the true segmentation and a measure of the performance level represented by each segmentation.</p>
 <p><em>Source: Warfield, Simon K., Kelly H. Zou, and William M. Wells. "Simultaneous truth and performance level estimation (STAPLE): an algorithm for the validation of image segmentation." IEEE transactions on medical imaging 23.7 (2004): 903-921</em></p>
 
 </div>
@@ -350,52 +314,12 @@ nb_path: "nbs/gt_estimation.ipynb"
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='1' style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [1/1 00:03<00:00]
-    </div>
-    
-</div>
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Processing mask_1.png
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>If connected, the ground truth estimations are automatically added to you Google Drive. You can also download the files here:</p>
+<p>If connected to <em>Google Drive</em>, the ground truth estimations are automatically added to your drive. You can also download the files here:</p>
 
 </div>
 </div>
@@ -422,26 +346,12 @@ nb_path: "nbs/gt_estimation.ipynb"
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Warning: File download only works on Google Colab.
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Majority-Voting">Majority Voting<a class="anchor-link" href="#Majority-Voting"> </a></h2><p>Use majority voting to obtain the reference segmentation. Note that this filter does not resolve ties. In case of ties it will assign <code>labelForUndecidedPixels</code> to the result.</p>
+<h3 id="Alternative:-Majority-Voting">Alternative: Majority Voting<a class="anchor-link" href="#Alternative:-Majority-Voting"> </a></h3><p>Use majority voting to obtain the reference segmentation. Note that this filter does not resolve ties. In case of ties it will assign <code>labelForUndecidedPixels</code> to the result.</p>
 
 </div>
 </div>
@@ -468,52 +378,12 @@ nb_path: "nbs/gt_estimation.ipynb"
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-
-    <div>
-        <style>
-            /* Turns off some styling */
-            progress {
-                /* gets rid of default border in Firefox and Opera. */
-                border: none;
-                /* Needs to be in here for Safari polyfill so background images work as expected. */
-                background-size: auto;
-            }
-            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
-                background: #F44336;
-            }
-        </style>
-      <progress value='1' class='' max='1' style='width:300px; height:20px; vertical-align: middle;'></progress>
-      100.00% [1/1 00:00<00:00]
-    </div>
-    
-</div>
-
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Processing mask_1.png
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>If connected, the <em>ground truth estimations</em> are automatically added to you <em>Google Drive</em>. You can also download the files here:</p>
+<p>If connected to <em>Google Drive</em>, the ground truth estimations are automatically added to your drive. You can also download the files here:</p>
 
 </div>
 </div>
@@ -537,20 +407,6 @@ nb_path: "nbs/gt_estimation.ipynb"
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Warning: File download only works on Google Colab.
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 

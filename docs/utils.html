@@ -60,7 +60,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="unzip" class="doc_header"><code>unzip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L23" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unzip</code>(<strong><code>path</code></strong>, <strong><code>zip_file</code></strong>)</p>
+<h4 id="unzip" class="doc_header"><code>unzip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L22" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unzip</code>(<strong><code>path</code></strong>, <strong><code>zip_file</code></strong>)</p>
 </blockquote>
 <p>Unzip and structure archive</p>
 
@@ -98,7 +98,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ensemble_results" class="doc_header"><code>ensemble_results</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L35" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ensemble_results</code>(<strong><code>res_dict</code></strong>, <strong><code>file</code></strong>, <strong><code>std</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="ensemble_results" class="doc_header"><code>ensemble_results</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L34" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ensemble_results</code>(<strong><code>res_dict</code></strong>, <strong><code>file</code></strong>, <strong><code>std</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 <p>Combines single model predictions.</p>
 
@@ -130,7 +130,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="plot_results" class="doc_header"><code>plot_results</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L47" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>plot_results</code>(<strong>*<code>args</code></strong>, <strong><code>df</code></strong>, <strong><code>figsize</code></strong>=<em><code>(20, 20)</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="plot_results" class="doc_header"><code>plot_results</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L46" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>plot_results</code>(<strong>*<code>args</code></strong>, <strong><code>df</code></strong>, <strong><code>figsize</code></strong>=<em><code>(20, 20)</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Plot images, (masks), predictions and uncertainties side-by-side.</p>
 
@@ -168,7 +168,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="iou" class="doc_header"><code>iou</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L77" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou</code>(<strong><code>a</code></strong>, <strong><code>b</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
+<h4 id="iou" class="doc_header"><code>iou</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L76" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou</code>(<strong><code>a</code></strong>, <strong><code>b</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
 </blockquote>
 <p>Computes the Intersection-Over-Union metric.</p>
 
@@ -176,6 +176,24 @@ nb_path: "nbs/06_utils.ipynb"
 
 </div>
 
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_eq</span><span class="p">(</span><span class="n">iou</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">iou</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">empty_mask</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 
@@ -200,7 +218,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="mean_entropy" class="doc_header"><code>mean_entropy</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L86" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>mean_entropy</code>(<strong><code>a</code></strong>)</p>
+<h4 id="mean_entropy" class="doc_header"><code>mean_entropy</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L85" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>mean_entropy</code>(<strong><code>a</code></strong>)</p>
 </blockquote>
 <p>Computes the mean entropy.</p>
 
@@ -238,10 +256,85 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="label_mask" class="doc_header"><code>label_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L91" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>label_mask</code>(<strong><code>mask</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>, <strong><code>min_pixel</code></strong>=<em><code>15</code></em>, <strong><code>do_watershed</code></strong>=<em><code>True</code></em>, <strong><code>exclude_border</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="label_mask" class="doc_header"><code>label_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L90" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>label_mask</code>(<strong><code>mask</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>, <strong><code>min_pixel</code></strong>=<em><code>15</code></em>, <strong><code>do_watershed</code></strong>=<em><code>True</code></em>, <strong><code>exclude_border</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 <p>Analyze regions and return labels</p>
 
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst_lbl_a</span> <span class="o">=</span> <span class="n">label_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">min_pixel</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">tst_lbl_a</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">tst_lbl_a</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">tst_lbl</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst_lbl_b</span> <span class="o">=</span> <span class="n">label_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">min_pixel</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">tst_lbl_b</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">tst_lbl</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
 </div>
 
 </div>
@@ -270,7 +363,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_candidates" class="doc_header"><code>get_candidates</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L129" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_candidates</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>)</p>
+<h4 id="get_candidates" class="doc_header"><code>get_candidates</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L128" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_candidates</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>)</p>
 </blockquote>
 <p>Get candiate masks for ROI-wise analysis</p>
 
@@ -302,7 +395,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="iou_mapping" class="doc_header"><code>iou_mapping</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L139" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou_mapping</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>, <strong><code>min_roi_size</code></strong>=<em><code>30</code></em>)</p>
+<h4 id="iou_mapping" class="doc_header"><code>iou_mapping</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L138" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>iou_mapping</code>(<strong><code>labels_a</code></strong>, <strong><code>labels_b</code></strong>)</p>
 </blockquote>
 <p>Compare masks using ROI-wise analysis</p>
 
@@ -310,6 +403,74 @@ nb_path: "nbs/06_utils.ipynb"
 
 </div>
 
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_eq</span><span class="p">(</span><span class="n">iou_mapping</span><span class="p">(</span><span class="n">tst_lbl_a</span><span class="p">,</span> <span class="n">tst_lbl_a</span><span class="p">),</span> <span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">iou_mapping</span><span class="p">(</span><span class="n">tst_lbl_a</span><span class="p">,</span> <span class="n">tst_lbl_b</span><span class="p">),</span> <span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="calculate_roi_measures" class="doc_header"><code>calculate_roi_measures</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L169" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>calculate_roi_measures</code>(<strong>*<code>masks</code></strong>, <strong><code>iou_threshold</code></strong>=<em><code>0.5</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+</blockquote>
+<p>Calculates precision, recall, and f1_score on ROI-level</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_eq</span><span class="p">(</span><span class="n">calculate_roi_measures</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">calculate_roi_measures</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">min_pixel</span><span class="o">=</span><span class="mi">150</span><span class="p">),</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 
@@ -346,7 +507,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="staple" class="doc_header"><code>staple</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L170" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>staple</code>(<strong><code>segmentations</code></strong>, <strong><code>foregroundValue</code></strong>=<em><code>1</code></em>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
+<h4 id="staple" class="doc_header"><code>staple</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L180" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>staple</code>(<strong><code>segmentations</code></strong>, <strong><code>foregroundValue</code></strong>=<em><code>1</code></em>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
 </blockquote>
 <p>STAPLE: Simultaneous Truth and Performance Level Estimation with simple ITK</p>
 
@@ -384,7 +545,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="mvoting" class="doc_header"><code>mvoting</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L179" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>mvoting</code>(<strong><code>segmentations</code></strong>, <strong><code>labelForUndecidedPixels</code></strong>=<em><code>0</code></em>)</p>
+<h4 id="mvoting" class="doc_header"><code>mvoting</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L189" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>mvoting</code>(<strong><code>segmentations</code></strong>, <strong><code>labelForUndecidedPixels</code></strong>=<em><code>0</code></em>)</p>
 </blockquote>
 <p>Majority Voting from  simple ITK Label Voting</p>
 
@@ -422,7 +583,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="calc_iterations" class="doc_header"><code>calc_iterations</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L187" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>calc_iterations</code>(<strong><code>n_slices</code></strong>, <strong><code>batch_size</code></strong>, <strong><code>n_splits</code></strong>, <strong><code>n_iter</code></strong>=<em><code>1000</code></em>)</p>
+<h4 id="calc_iterations" class="doc_header"><code>calc_iterations</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L197" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>calc_iterations</code>(<strong><code>n_slices</code></strong>, <strong><code>batch_size</code></strong>, <strong><code>n_splits</code></strong>, <strong><code>n_iter</code></strong>=<em><code>1000</code></em>)</p>
 </blockquote>
 <p>Calculate the number of required epochs for 'n_iter' iterations.</p>
 

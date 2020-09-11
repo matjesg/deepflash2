@@ -131,7 +131,7 @@ def show_results(x:TensorImage, y:tuple, samples, outs, max_n=4, figsize=None, *
 
 # Cell
 def calculate_weights(clabels=None, instlabels=None, ignore=None,
-                      n_dims = 2, bws=6, fds=1, bwf=50, fbr=.1):
+                      n_dims = 2, bws=10, fds=10, bwf=10, fbr=.1):
     """
     Calculates the weights from the given mask (classlabels `clabels` or `instlabels`).
     """
@@ -501,7 +501,8 @@ class TileDataset(Dataset):
                  tile_shape=(540,540),
                  padding=(184,184),
                  bws=6, fds=1, bwf=50, fbr=.1,
-                 preproc_dir='.preproc_data'):
+                 preproc_dir='.preproc_data',
+                **kwargs):
 
         store_attr()
         self.c = n_classes

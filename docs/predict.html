@@ -69,12 +69,7 @@ nb_path: "nbs/predict.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Required-data-structure">Required data structure<a class="anchor-link" href="#Required-data-structure"> </a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Required data structure</strong></p>
 <ul>
 <li><strong>One folder for images</strong> (different from training image folder!)</li>
 </ul>
@@ -92,14 +87,7 @@ nb_path: "nbs/predict.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Working-on-Google-Colab-(recommended)">Working on <em>Google Colab</em> (recommended)<a class="anchor-link" href="#Working-on-Google-Colab-(recommended)"> </a></h3><p>This section allows you to upload a <em>zip</em> folder or connect to your <em>Google Drive</em>.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Connect-to-Google-Drive-(recommended)">Connect to <em>Google Drive</em> (recommended)<a class="anchor-link" href="#Connect-to-Google-Drive-(recommended)"> </a></h4>
+<h3 id="Option-A:-Upload-via-Google-Drive-(Colab-only)">Option A: Upload via <em>Google Drive</em> (Colab only)<a class="anchor-link" href="#Option-A:-Upload-via-Google-Drive-(Colab-only)"> </a></h3>
 </div>
 </div>
 </div>
@@ -141,7 +129,7 @@ nb_path: "nbs/predict.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Upload-a-zip-file">Upload a <em>zip</em> file<a class="anchor-link" href="#Upload-a-zip-file"> </a></h4>
+<h3 id="Option-B:-Upload-via-zip-file-(Colab-only)">Option B: Upload via <em>zip</em> file (Colab only)<a class="anchor-link" href="#Option-B:-Upload-via-zip-file-(Colab-only)"> </a></h3>
 </div>
 </div>
 </div>
@@ -182,7 +170,13 @@ nb_path: "nbs/predict.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Local-Installation">Local Installation<a class="anchor-link" href="#Local-Installation"> </a></h3><p>If you're working on your local machine or server, provide a path to the correct folder.</p>
+<h3 id="Option-C:-Provide-path-(Local-installation)">Option C: Provide path (Local installation)<a class="anchor-link" href="#Option-C:-Provide-path-(Local-installation)"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you're working on your local machine or server, provide a path to the correct folder.</p>
 
 </div>
 </div>
@@ -209,7 +203,13 @@ nb_path: "nbs/predict.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Try-with-sample-data">Try with sample data<a class="anchor-link" href="#Try-with-sample-data"> </a></h3><p>If you don't have any data available yet, try our sample data</p>
+<h3 id="Option-D:-Try-with-sample-data-(Testing-only)">Option D: Try with sample data (Testing only)<a class="anchor-link" href="#Option-D:-Try-with-sample-data-(Testing-only)"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you don't have any data available yet, try our sample data [Description]</p>
 
 </div>
 </div>
@@ -290,6 +290,9 @@ nb_path: "nbs/predict.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Select model <a href="https://matjesg.github.io/deepflash2/models.html#U-Net-architectures">model architecture</a></p>
+<ul>
+<li>Has to be the same architecture used in <a href="https://matjesg.github.io/deepflash2/train.html">Model Training</a></li>
+</ul>
 
 </div>
 </div>
@@ -316,14 +319,15 @@ nb_path: "nbs/predict.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Select-pretraind-model-weights">Select <a href="https://matjesg.github.io/deepflash2/">pretraind</a> model weights<a class="anchor-link" href="#Select-pretraind-model-weights"> </a></h3>
+<h4 id="Option-A:-Load-customized-weights-(recommended)">Option A: Load customized weights (recommended)<a class="anchor-link" href="#Option-A:-Load-customized-weights-(recommended)"> </a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Using-customized-weights-(recommended)">Using customized weights (recommended)<a class="anchor-link" href="#Using-customized-weights-(recommended)"> </a></h4><ul>
-<li>Customize your models in the <a href="https://matjesg.github.io/deepflash2/train.html">Model Training Notebook</a></li>
+<ul>
+<li>Works with <em>Google Drive</em> connection or local installation.</li>
+<li>If you haven't already done it, train your own models in the <a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/nbs/train.ipynb">Model Training Notebook</a></li>
 </ul>
 
 </div>
@@ -349,6 +353,12 @@ nb_path: "nbs/predict.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Option-B:-Upload-customized-weights-(Colab-only)">Option B: Upload customized weights (Colab only)<a class="anchor-link" href="#Option-B:-Upload-customized-weights-(Colab-only)"> </a></h4>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -374,8 +384,15 @@ nb_path: "nbs/predict.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Using-pretrained-weights-from-deepflash2">Using pretrained weights from deepflash2<a class="anchor-link" href="#Using-pretrained-weights-from-deepflash2"> </a></h4><ul>
-<li>See <a href="https://matjesg.github.io/deepflash2/model_library.html">Model Libray</a> </li>
+<h4 id="Option-C:-Use-pretrained-weights-from-deepflash2-(dangerous)">Option C: Use pretrained weights from deepflash2 (dangerous)<a class="anchor-link" href="#Option-C:-Use-pretrained-weights-from-deepflash2-(dangerous)"> </a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Out-of-the-box prediction without prior validation can lead to invalid results.</li>
+<li>See <a href="https://matjesg.github.io/deepflash2/model_library.html">Model Libray</a> for more information.</li>
 </ul>
 
 </div>

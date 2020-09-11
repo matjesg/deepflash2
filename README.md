@@ -28,6 +28,10 @@ Combining state of the art deep learning with a barrier free environment for lif
 
 
 
+## Workflow
+
+tbd
+
 ## Installing
 
 You can use **deepflash2** by using [Google Colab](colab.research.google.com). You can run every page of the [documentation](matjesg.github.io/deepflash2/) as an interactive notebook - click "Open in Colab" at the top of any page to open it.

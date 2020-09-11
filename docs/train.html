@@ -53,6 +53,7 @@ nb_path: "nbs/train.ipynb"
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">train_test_split</span>
 <span class="kn">from</span> <span class="nn">fastai.vision.all</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">deepflash2.all</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">deepflash2.data</span> <span class="kn">import</span> <span class="n">_read_msk</span>
 </pre></div>
 
     </div>
@@ -70,18 +71,15 @@ nb_path: "nbs/train.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Required-data-structure">Required data structure<a class="anchor-link" href="#Required-data-structure"> </a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Structure</strong></p>
+<p><strong>Required data structure</strong></p>
 <ul>
 <li><strong>One folder for training images</strong></li>
-<li><strong>One folder for segmentation masks</strong></li>
+<li><strong>One folder for segmentation masks</strong><ul>
+<li>We highly recommend using <a href="https://matjesg.github.io/deepflash2/gt_estimation.html">ground truth estimation</a></li>
 </ul>
-<p><em>Examplary structure:</em></p>
+</li>
+</ul>
+<p>_Examplary structure: see <a href="https://matjesg.github.io/deepflash2/add_information.html#Naming">naming conventions</a>_</p>
 <ul>
 <li>[folder] images<ul>
 <li>[file] 0001.tif</li>
@@ -100,32 +98,49 @@ nb_path: "nbs/train.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Naming</strong></p>
+<h3 id="Option-A:-Upload-via-Google-Drive-(Colab-only)">Option A: Upload via <em>Google Drive</em> (Colab only)<a class="anchor-link" href="#Option-A:-Upload-via-Google-Drive-(Colab-only)"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <ul>
-<li>Images names must have unique ID<ul>
-<li>_ID: 0001 -&gt; 0001.tif; ID: img_1 --&gt; img<em>1.png, ...</em> </li>
-</ul>
-</li>
-<li>Masks must start with ID + a mask suffix<ul>
-<li>_0001 -&gt; 0001_mask.png (mask_suffix = "<em>mask.png")</em></li>
-<li>_0001 -&gt; 0001.png (mask<em>suffix = ".png")</em></li>
-</ul>
-</li>
+<li>The folder in your drive must contain all files and correct folder structure. </li>
+<li>See <a href="https://support.google.com/drive/answer/2375091?co=GENIE.Platform%3DDesktop&amp;hl=en">here</a> how to organize your files in <em>Google Drive</em>.</li>
+<li>See this <a href="https://stackoverflow.com/questions/46986398/import-data-into-google-colaboratory">stackoverflow post</a> for browsing files with the file browser</li>
 </ul>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Working-on-Google-Colab-(recommended)">Working on <em>Google Colab</em> (recommended)<a class="anchor-link" href="#Working-on-Google-Colab-(recommended)"> </a></h3><p>This section allows you to upload a <em>zip</em> folder or connect to your <em>Google Drive</em>.</p>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">drive</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;/content/drive&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+    <span class="c1">#@markdown Example: &quot;/content/drive/My Drive/data&quot;</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Connecting to Google Drive only works on Google Colab.&quot;</span><span class="p">)</span>
+    <span class="k">pass</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
-</div>
-</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Upload-zip-file">Upload <em>zip</em> file<a class="anchor-link" href="#Upload-zip-file"> </a></h4>
+<h3 id="Option-B:-Upload-via-zip-file-(Colab-only)">Option B: Upload via <em>zip</em> file (Colab only)<a class="anchor-link" href="#Option-B:-Upload-via-zip-file-(Colab-only)"> </a></h3>
 </div>
 </div>
 </div>
@@ -166,49 +181,13 @@ nb_path: "nbs/train.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Connect-to-Google-Drive">Connect to <em>Google Drive</em><a class="anchor-link" href="#Connect-to-Google-Drive"> </a></h4>
+<h3 id="Option-C:-Provide-path-(Local-installation)">Option C: Provide path (Local installation)<a class="anchor-link" href="#Option-C:-Provide-path-(Local-installation)"> </a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li>The folder in your drive must contain all segmentations and correct folder structure. </li>
-<li>See <a href="https://support.google.com/drive/answer/2375091?co=GENIE.Platform%3DDesktop&amp;hl=en">here</a> how to organize your files in <em>Google Drive</em>.</li>
-<li>See this <a href="https://stackoverflow.com/questions/46986398/import-data-into-google-colaboratory">stackoverflow post</a> for browsing files with the file browser</li>
-</ul>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
-    <span class="n">drive</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;/content/drive&#39;</span><span class="p">)</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
-    <span class="c1">#@markdown Example: &quot;/content/drive/My Drive/data&quot;</span>
-<span class="k">except</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Connecting to Google Drive only works on Google Colab.&quot;</span><span class="p">)</span>
-    <span class="k">pass</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Local-Installation">Local Installation<a class="anchor-link" href="#Local-Installation"> </a></h3><p>If you're working on your local machine or server, provide a path to the correct folder.</p>
+<p>If you're working on your local machine or server, provide a path to the correct folder.</p>
 
 </div>
 </div>
@@ -234,7 +213,13 @@ nb_path: "nbs/train.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Try-with-sample-data">Try with sample data<a class="anchor-link" href="#Try-with-sample-data"> </a></h3><p>If you don't have any data available yet, try our sample data</p>
+<h3 id="Option-D:-Try-with-sample-data-(Testing-only)">Option D: Try with sample data (Testing only)<a class="anchor-link" href="#Option-D:-Try-with-sample-data-(Testing-only)"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you don't have any data available yet, try our sample data</p>
 
 </div>
 </div>
@@ -275,6 +260,8 @@ nb_path: "nbs/train.ipynb"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">image_folder</span> <span class="o">=</span> <span class="s2">&quot;images&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">mask_folder</span> <span class="o">=</span> <span class="s2">&quot;masks&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 <span class="n">mask_suffix</span> <span class="o">=</span> <span class="s2">&quot;_mask.png&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<span class="c1">#@markdown Number of classes: e.g., 2 for binary segmentation (foreground and background class)</span>
+<span class="n">n_classes</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#@param {type:&quot;integer&quot;}</span>
 <span class="c1">#@markdown Check if you are providing instance labels (class-aware and instance-aware)</span>
 <span class="n">instance_labels</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
 
@@ -290,6 +277,20 @@ nb_path: "nbs/train.ipynb"
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Found 5 images and 5 masks in &#34;sample_data_cFOS&#34;.
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -314,19 +315,36 @@ nb_path: "nbs/train.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">border_weight_sigma</span><span class="o">=</span><span class="mi">6</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
-<span class="n">foreground_dist_sigma</span><span class="o">=</span><span class="mi">1</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
-<span class="n">border_weight_factor</span><span class="o">=</span><span class="mi">50</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
-<span class="n">foreground_background_ratio</span><span class="o">=</span><span class="mf">0.1</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to set parameters and load data </span>
+<span class="n">border_weight_sigma</span><span class="o">=</span><span class="mi">10</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:20, step:1}</span>
+<span class="n">foreground_dist_sigma</span><span class="o">=</span><span class="mi">10</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:20, step:1}</span>
+<span class="n">border_weight_factor</span><span class="o">=</span><span class="mi">10</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:50, step:1}</span>
+<span class="n">foreground_background_ratio</span><span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:0.1, max:1, step:0.1}</span>
 
-<span class="n">mw_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bws&#39;</span><span class="p">:</span> <span class="n">border_weight_sigma</span><span class="p">,</span>
-           <span class="s1">&#39;fds&#39;</span><span class="p">:</span> <span class="n">foreground_dist_sigma</span><span class="p">,</span> 
-           <span class="s1">&#39;bwf&#39;</span><span class="p">:</span> <span class="n">border_weight_factor</span><span class="p">,</span>
-           <span class="s1">&#39;fbr&#39;</span> <span class="p">:</span> <span class="n">foreground_background_ratio</span><span class="p">}</span>
+<span class="c1">#@markdown Check if want to plot the resulting weights of one mask</span>
+<span class="n">plot_weights</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="c1">#@markdown Check `use_defaults` to reset your parameters.</span>
+<span class="n">use_defaults</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
 
-<span class="c1">#@markdown Number of classes: e.g., 2 for binary segmentation (foreground and background class)</span>
-<span class="n">n_classes</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#@param {type:&quot;integer&quot;}</span>
-<span class="n">ds</span> <span class="o">=</span> <span class="n">RandomTileDataset</span><span class="p">(</span><span class="n">f_names</span><span class="p">,</span> <span class="n">label_fn</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span> <span class="n">instance_labels</span><span class="o">=</span><span class="n">instance_labels</span><span class="p">,</span> <span class="o">**</span><span class="n">mw_dict</span><span class="p">)</span>
+<span class="n">mw_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bws&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">border_weight_sigma</span> <span class="p">,</span>
+           <span class="s1">&#39;fds&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">foreground_dist_sigma</span><span class="p">,</span> 
+           <span class="s1">&#39;bwf&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">border_weight_factor</span><span class="p">,</span>
+           <span class="s1">&#39;fbr&#39;</span> <span class="p">:</span> <span class="mf">0.1</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">foreground_background_ratio</span><span class="p">}</span>
+
+<span class="c1">#@markdown Select image number</span>
+<span class="n">image_number</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#@param {type:&quot;slider&quot;, min:0, max:100, step:1}</span>
+<span class="k">if</span> <span class="n">plot_weights</span><span class="p">:</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f_names</span><span class="p">),</span> <span class="n">image_number</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Plotting mask for image&#39;</span><span class="p">,</span> <span class="n">f_names</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;- Please wait.&#39;</span><span class="p">)</span>
+    <span class="n">msk</span> <span class="o">=</span> <span class="n">_read_msk</span><span class="p">(</span><span class="n">label_fn</span><span class="p">(</span><span class="n">f_names</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">calculate_weights</span><span class="p">(</span><span class="n">msk</span><span class="p">,</span> <span class="n">n_dims</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span> <span class="o">**</span><span class="n">mw_dict</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">12</span><span class="p">))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">msk</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Mask&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Weights&#39;</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -343,7 +361,25 @@ nb_path: "nbs/train.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Use the slider to control the number of displayed images</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">RandomTileDataset</span><span class="p">(</span><span class="n">f_names</span><span class="p">,</span> <span class="n">label_fn</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span> <span class="n">instance_labels</span><span class="o">=</span><span class="n">instance_labels</span><span class="p">,</span> <span class="o">**</span><span class="n">mw_dict</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to show data.</span>
+<span class="c1">#@markdown Use the slider to control the number of displayed images</span>
 <span class="n">first_n</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:100, step:1}</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">show_data</span><span class="p">(</span><span class="n">max_n</span> <span class="o">=</span> <span class="n">first_n</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="n">overlay</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
@@ -363,9 +399,7 @@ nb_path: "nbs/train.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li>Select one of the available <a href="https://matjesg.github.io/deepflash2/models.html#U-Net-architectures">model architectures</a>.</li>
-</ul>
+<p>Select one of the available <a href="https://matjesg.github.io/deepflash2/models.html#U-Net-architectures">model architectures</a>.</p>
 
 </div>
 </div>
@@ -389,12 +423,10 @@ nb_path: "nbs/train.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>Pretrained weights</p>
 <ul>
-<li>Select <a href="https://matjesg.github.io/deepflash2/">pretraind</a> model weights<ul>
-<li>See here for data description</li>
 <li>Select 'new' to use an untrained model (no pretrained weights)</li>
-</ul>
-</li>
+<li>Or select <a href="https://matjesg.github.io/deepflash2/model_library.html">pretraind</a> model weights from dropdown menu</li>
 </ul>
 
 </div>
@@ -429,7 +461,7 @@ nb_path: "nbs/train.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Setting-training-paramers">Setting training paramers<a class="anchor-link" href="#Setting-training-paramers"> </a></h3>
+<h3 id="Setting-training-paramers-(defaults-represent-recommended-parameters)">Setting training paramers (defaults represent recommended parameters)<a class="anchor-link" href="#Setting-training-paramers-(defaults-represent-recommended-parameters)"> </a></h3>
 </div>
 </div>
 </div>
@@ -479,11 +511,9 @@ nb_path: "nbs/train.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
-<li><strong>Learning rate</strong>: controls how quickly or slowly a neural network model learns. <br>
-We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> when traing with the <strong><a href="https://fastai1.fast.ai/callbacks.one_cycle.html#The-1cycle-policy">One-Cycle-Policy</a></strong>. Using the <strong>Learning Rate Finder</strong> below, a good value for <code>max_lr</code> is somthing in the range of:<ul>
-<li>one tenth of the minimum before the divergence (<em>Minimum/10</em>)</li>
-<li>when the slope is the steepest (<em>steepest point</em>) </li>
-<li>In our experiments, we found that a <strong>maximum learning rate of 5e-4</strong> (e.g., 0.0005) yielded the best results across experiments.</li>
+<li><code>max_lr</code>: The learning rate controls how quickly or slowly a neural network model learns.<ul>
+<li>We found that a maximum learning rate of 5e-4 (i.e., 0.0005) yielded the best results across experiments.</li>
+<li><code>learning_rate_finder</code>: Check only if you want use the <a href="https://matjesg.github.io/deepflash2/add_information.html#Learning-Rate-Finder">Learning Rate Finder</a> on your dataset.</li>
 </ul>
 </li>
 </ul>
@@ -498,8 +528,27 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lr_min</span><span class="p">,</span><span class="n">lr_steep</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum/10: </span><span class="si">{</span><span class="n">lr_min</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, steepest point: </span><span class="si">{</span><span class="n">lr_steep</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learning_rate_finder</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="k">if</span> <span class="n">learning_rate_finder</span><span class="p">:</span>
+    <span class="n">lr_min</span><span class="p">,</span><span class="n">lr_steep</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Minimum/10: </span><span class="si">{</span><span class="n">lr_min</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, steepest point: </span><span class="si">{</span><span class="n">lr_steep</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">max_lr</span> <span class="o">=</span> <span class="mf">5e-4</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
 </pre></div>
 
     </div>
@@ -512,17 +561,40 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
-<li><em>n_models</em>: Number of models to train.<ul>
+<li><code>n_models</code>: Number of models to train.<ul>
 <li>If you're experimenting with parameters, try only one model first.</li>
 <li>Depending on the data, ensembles should comprise 3-5 models.</li>
-<li>Effects train-validation-split:<ul>
-<li><code>n_models = 1</code> leads to a train-validation-split of 0.75/0.25</li>
-<li><code>n_models &gt; 1</code> (model ensembles) to _<a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html">k-fold cross validation</a>_</li>
+<li>_Note: Number of model affects the <a href="https://matjesg.github.io/deepflash2/add_information.html#Train-validation-split">Train-validation-split</a>._</li>
 </ul>
 </li>
 </ul>
-</li>
-<li><em>epochs</em>: One epoch is when an entire (augemented) dataset is passed through the model for training.<ul>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown </span>
+<span class="n">n_models</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:5, step:1}</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Suggested epochs for 1000 iterations:&quot;</span><span class="p">,</span> <span class="n">calc_iterations</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_models</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li><code>epochs</code>: One epoch is when an entire (augemented) dataset is passed through the model for training.<ul>
 <li>Epochs need to be adusted depending on the size and number of images</li>
 <li>We found that choosing the number of epochs such that the network parameters are update about 1000 times (iterations) leads to satiesfying results in most cases.</li>
 </ul>
@@ -539,12 +611,7 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Set `max_lr` according to the learning rate finder.</span>
-<span class="n">max_lr</span> <span class="o">=</span> <span class="mf">5e-4</span> <span class="c1">#@param {type:&quot;number&quot;}</span>
-<span class="c1">#@markdown </span>
-<span class="n">n_models</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:5, step:1}</span>
-<span class="n">epochs</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:100, step:1}</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Suggested epochs for 1000 iterations:&quot;</span><span class="p">,</span> <span class="n">calc_iterations</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_models</span><span class="p">))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:100, step:1}</span>
 </pre></div>
 
     </div>
@@ -643,7 +710,7 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 <span class="n">result_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">/</span><span class="s1">&#39;results&#39;</span>
 <span class="n">result_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="c1">#@markdown Define `filetype` to save the predictions and uncertainties. All common filetypes are supported.</span>
+<span class="c1">#@markdown Define `filetype` to save the predictions and uncertainties. All common [file formats](https://imageio.readthedocs.io/en/stable/formats.html) are supported.</span>
 <span class="n">filetype</span> <span class="o">=</span> <span class="s1">&#39;png&#39;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
 </pre></div>
 
@@ -703,8 +770,8 @@ We need to set the <strong>maximum learning rate</strong> <code>max_lr</code> wh
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
-<li>The models will always be the <em>last</em> version trained in Section <em>Model Training</em></li>
-<li>To download validation predictions and uncertainties, you first need to execute Section <em>Validate models</em>.</li>
+<li>The models will always be the <em>last</em> version trained in section <em>Model Training</em></li>
+<li>To download validation predictions and uncertainties, you first need to execute section <em>Validate models</em>.</li>
 </ul>
 <p><em>Note: If you're connected to <em>Google Drive</em>, the models are automatically saved to your drive.</em></p>
 

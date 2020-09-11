@@ -4,7 +4,8 @@
     "Model Training": "train.html",
     "Prediction on new Data": "predict.html",
     "Model Library": "model_library.html",
-    "Ground Truth Estimation": "gt_estimation.html"
+    "Ground Truth Estimation": "gt_estimation.html",
+    "Additional Information": "add_information.html"
   },
   "deepflash2 API": {
     "Patches for the `fastai` Learner": "learner.html",
