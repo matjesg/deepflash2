@@ -98,7 +98,7 @@ nb_path: "nbs/train.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Option-A:-Upload-via-Google-Drive-(Colab-only)">Option A: Upload via <em>Google Drive</em> (Colab only)<a class="anchor-link" href="#Option-A:-Upload-via-Google-Drive-(Colab-only)"> </a></h3>
+<h3 id="Option-A:-Upload-via-Google-Drive-(recommended,-Colab-only)">Option A: Upload via <em>Google Drive</em> (recommended, Colab only)<a class="anchor-link" href="#Option-A:-Upload-via-Google-Drive-(recommended,-Colab-only)"> </a></h3>
 </div>
 </div>
 </div>
@@ -125,7 +125,7 @@ nb_path: "nbs/train.ipynb"
     <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/content/drive/My Drive/data&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path contains the following files and folders: </span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">L</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
-    <span class="c1">#@markdown Example: &quot;/content/drive/My Drive/data&quot;</span>
+    <span class="c1">#@markdown Follow the instructions and press Enter after copying and pasting the key.</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: Connecting to Google Drive only works on Google Colab.&quot;</span><span class="p">)</span>
     <span class="k">pass</span>
@@ -299,8 +299,7 @@ nb_path: "nbs/train.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Set <a href="https://matjesg.github.io/deepflash2/data.html#Weight-Calculation">mask weights</a> parameters for training.</p>
-<ul>
+<h3 id="Customize-mask-weights-(optional)">Customize <a href="https://matjesg.github.io/deepflash2/data.html#Weight-Calculation">mask weights</a> (optional)<a class="anchor-link" href="#Customize-mask-weights-(optional)"> </a></h3><ul>
 <li>Default values should work for most of the data. </li>
 <li>However, this choice can significantly change the model performance later on.</li>
 </ul>
@@ -315,7 +314,7 @@ nb_path: "nbs/train.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to set parameters and load data </span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown Run to set weight parameters</span>
 <span class="n">border_weight_sigma</span><span class="o">=</span><span class="mi">10</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:20, step:1}</span>
 <span class="n">foreground_dist_sigma</span><span class="o">=</span><span class="mi">10</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:20, step:1}</span>
 <span class="n">border_weight_factor</span><span class="o">=</span><span class="mi">10</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:50, step:1}</span>
@@ -323,13 +322,13 @@ nb_path: "nbs/train.ipynb"
 
 <span class="c1">#@markdown Check if want to plot the resulting weights of one mask</span>
 <span class="n">plot_weights</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
-<span class="c1">#@markdown Check `use_defaults` to reset your parameters.</span>
-<span class="n">use_defaults</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="c1">#@markdown Check `reset_to_defaults` to reset your parameters.</span>
+<span class="n">reset_to_defaults</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
 
-<span class="n">mw_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bws&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">border_weight_sigma</span> <span class="p">,</span>
-           <span class="s1">&#39;fds&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">foreground_dist_sigma</span><span class="p">,</span> 
-           <span class="s1">&#39;bwf&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">border_weight_factor</span><span class="p">,</span>
-           <span class="s1">&#39;fbr&#39;</span> <span class="p">:</span> <span class="mf">0.1</span> <span class="k">if</span> <span class="n">use_defaults</span> <span class="k">else</span> <span class="n">foreground_background_ratio</span><span class="p">}</span>
+<span class="n">mw_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bws&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">reset_to_defaults</span> <span class="k">else</span> <span class="n">border_weight_sigma</span> <span class="p">,</span>
+           <span class="s1">&#39;fds&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">reset_to_defaults</span> <span class="k">else</span> <span class="n">foreground_dist_sigma</span><span class="p">,</span> 
+           <span class="s1">&#39;bwf&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">reset_to_defaults</span> <span class="k">else</span> <span class="n">border_weight_factor</span><span class="p">,</span>
+           <span class="s1">&#39;fbr&#39;</span> <span class="p">:</span> <span class="mf">0.1</span> <span class="k">if</span> <span class="n">reset_to_defaults</span> <span class="k">else</span> <span class="n">foreground_background_ratio</span><span class="p">}</span>
 
 <span class="c1">#@markdown Select image number</span>
 <span class="n">image_number</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#@param {type:&quot;slider&quot;, min:0, max:100, step:1}</span>
@@ -354,6 +353,12 @@ nb_path: "nbs/train.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Create-mask-weights">Create mask weights<a class="anchor-link" href="#Create-mask-weights"> </a></h3>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -361,7 +366,12 @@ nb_path: "nbs/train.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">RandomTileDataset</span><span class="p">(</span><span class="n">f_names</span><span class="p">,</span> <span class="n">label_fn</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span> <span class="n">instance_labels</span><span class="o">=</span><span class="n">instance_labels</span><span class="p">,</span> <span class="o">**</span><span class="n">mw_dict</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span> 
+    <span class="n">mw_dict</span><span class="o">=</span><span class="n">mw_dict</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">mw_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bws&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span><span class="s1">&#39;fds&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;bwf&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span><span class="s1">&#39;fbr&#39;</span> <span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">RandomTileDataset</span><span class="p">(</span><span class="n">f_names</span><span class="p">,</span> <span class="n">label_fn</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span> <span class="n">instance_labels</span><span class="o">=</span><span class="n">instance_labels</span><span class="p">,</span> <span class="o">**</span><span class="n">mw_dict</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -455,13 +465,7 @@ nb_path: "nbs/train.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Model-Training">Model Training<a class="anchor-link" href="#Model-Training"> </a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Setting-training-paramers-(defaults-represent-recommended-parameters)">Setting training paramers (defaults represent recommended parameters)<a class="anchor-link" href="#Setting-training-paramers-(defaults-represent-recommended-parameters)"> </a></h3>
+<h3 id="Setting-model-hyperparameters-(optional)">Setting model hyperparameters (optional)<a class="anchor-link" href="#Setting-model-hyperparameters-(optional)"> </a></h3>
 </div>
 </div>
 </div>
@@ -560,6 +564,18 @@ nb_path: "nbs/train.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Model-Training">Model Training<a class="anchor-link" href="#Model-Training"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Setting-training-parameters">Setting training parameters<a class="anchor-link" href="#Setting-training-parameters"> </a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <ul>
 <li><code>n_models</code>: Number of models to train.<ul>
 <li>If you're experimenting with parameters, try only one model first.</li>
@@ -579,7 +595,16 @@ nb_path: "nbs/train.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#@markdown </span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span>
+    <span class="n">mixed_precision_training</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">max_lr</span><span class="o">=</span><span class="n">max_lr</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">max_lr</span> <span class="o">=</span> <span class="mf">5e-4</span> 
+
 <span class="n">n_models</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:1, max:5, step:1}</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Suggested epochs for 1000 iterations:&quot;</span><span class="p">,</span> <span class="n">calc_iterations</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_models</span><span class="p">))</span>
 </pre></div>
