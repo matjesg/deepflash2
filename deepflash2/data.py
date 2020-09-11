@@ -6,6 +6,7 @@ __all__ = ['show', 'calculate_weights', 'DeformationField', 'RandomTileDataset',
 import os
 import numpy as np
 import imageio
+import shutil
 
 from scipy import ndimage
 from scipy.interpolate import Rbf
@@ -34,19 +35,19 @@ def show(*obj, file_name=None, overlay=False, pred=False,
         img,msk = obj
         weight = None
     elif len(obj)==1:
-        img = obj
+        img = obj[0]
         msk, weight = None, None
 
     else:
         raise ValueError(f'Function not defined for {len(obj)} arguments.')
 
-
     # Image preprocessing
     img = np.array(img)
     # Swap axis to channels last
-    if img.shape[0]<10: img=np.moveaxis(img,0,-1)
+    if img.shape[0]<20: img=np.moveaxis(img,0,-1)
     # One channel images
-    if img.shape[-1]==1: img=img[...,0]
+    if img.ndim == 3 and img.shape[-1] == 1:
+        img=img[...,0]
 
     # Mask preprocessing
     if msk is not None:
@@ -320,7 +321,13 @@ def _get_cached_data(path):
 # Cell
 def _cache_fn(ds, o):
     "Creates path to preprocessed and compressed data."
-    return Path(ds.preproc_dir)/f'{o}_{ds.bws}_{ds.fds}_{ds.bwf}_{ds.fbr}.npz'
+    return ds.preproc_dir/f'{o}_{ds.bws}_{ds.fds}_{ds.bwf}_{ds.fbr}.npz'
+
+# Cell
+def _clear_weights_cache(path):
+    "Clears cache directory with pretrained weights."
+    print(f"Deleting all cache at {path}")
+    shutil.rmtree(path)
 
 # Cell
 class RandomTileDataset(Dataset):
@@ -345,16 +352,21 @@ class RandomTileDataset(Dataset):
                  value_minimum_range=(0, 0),
                  value_maximum_range=(1, 1),
                  value_slope_range=(1, 1),
-                 bws=6, fds=1, bwf=50, fbr=.1,
-                 preproc_dir='.preproc_data'):
+                 bws=6, fds=1, bwf=50, fbr=.1):
 
         store_attr()
         self.c = n_classes
-        Path(preproc_dir).mkdir(exist_ok=True)
+        self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
+        self.preproc_dir.mkdir(exist_ok=True)
+        using_cache = False
 
         for file in progress_bar(files, leave=False):
             try:
                 lbl, wgt, pdf = _get_cached_data(_cache_fn(self, file.name))
+                if not using_cache:
+                    print(f'Using cached mask weights from {self.preproc_dir}')
+                    using_cache = True
+
             except:
                 print('Creating weights for', file.name)
                 label_path = label_fn(file)
@@ -501,12 +513,13 @@ class TileDataset(Dataset):
                  tile_shape=(540,540),
                  padding=(184,184),
                  bws=6, fds=1, bwf=50, fbr=.1,
-                 preproc_dir='.preproc_data',
                 **kwargs):
 
         store_attr()
         self.c = n_classes
-        Path(preproc_dir).mkdir(exist_ok=True)
+        if self.label_fn is not None:
+            self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
+            self.preproc_dir.mkdir(exist_ok=True)
         self.output_shape = tuple(int(t - p) for (t, p) in zip(tile_shape, padding))
 
         tiler = DeformationField(tile_shape)
@@ -517,12 +530,16 @@ class TileDataset(Dataset):
         self.image_shapes = []
         self.in_slices = []
         self.out_slices = []
+        using_cache = False
 
 
         for i, file in enumerate(progress_bar(files, leave=False)):
             if self.label_fn is not None:
                 try:
                     lbl, wgt, pdf = _get_cached_data(_cache_fn(self, file.name))
+                    if not using_cache:
+                        print(f'Using cached mask weights from {self.preproc_dir}')
+                        using_cache = True
                 except:
                     print('Creating weights for', file.name)
                     label_path = label_fn(file)
