@@ -30,8 +30,6 @@ index = {"Learner.predict_tiles": "00_learner.ipynb",
          "get_candidates": "06_utils.ipynb",
          "iou_mapping": "06_utils.ipynb",
          "calculate_roi_measures": "06_utils.ipynb",
-         "staple": "06_utils.ipynb",
-         "mvoting": "06_utils.ipynb",
          "calc_iterations": "06_utils.ipynb"}
 
 modules = ["learner.py",

@@ -219,6 +219,7 @@ nb_path: "nbs/predict.ipynb"
 <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/matjesg/deepflash2/releases/download/model_library/wue1_cFOS_small.zip&quot;</span>
 <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;sample_data_cFOS.zip&#39;</span><span class="p">)</span>
 <span class="n">unzip</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;sample_data_cFOS.zip&#39;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">path</span><span class="o">/</span><span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">/</span><span class="s1">&#39;images_new&#39;</span><span class="p">)</span>
 </pre></div>
 
     </div>
