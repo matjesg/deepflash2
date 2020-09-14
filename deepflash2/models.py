@@ -94,8 +94,14 @@ class UNet2D(nn.Module):
         prev_channels = in_channels
         self.down_path = nn.ModuleList()
         for i in range(depth):
-            bn = True if i>0 else False
-            do = dropout if i>2 else 0.
+            if batch_norm:
+                bn = True if i>0 else False
+            else:
+                bn = False
+            if dropout>0.:
+                do = dropout if i>2 else 0.
+            else:
+                do = 0.
             self.down_path.append(
                 UNetConvBlock(prev_channels, 2 ** (wf + i), padding,
                               batch_norm=bn, dropout=do,neg_slope=neg_slope)
@@ -104,8 +110,14 @@ class UNet2D(nn.Module):
 
         self.up_path = nn.ModuleList()
         for i in reversed(range(depth - 1)):
-            bn = True if i>0 else False
-            do = dropout if i>2 else 0.
+            if batch_norm:
+                bn = True if i>0 else False
+            else:
+                bn = False
+            if dropout>0.:
+                do = dropout if i>2 else 0.
+            else:
+                do = 0.
             self.up_path.append(
                 UNetUpBlock(prev_channels, 2 ** (wf + i), up_mode, padding,
                             batch_norm=bn, dropout=do, neg_slope=neg_slope)
