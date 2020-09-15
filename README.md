@@ -15,14 +15,14 @@ Combining state of the art deep learning with a barrier free environment for lif
     - easy deployment on own hardware
 - Rigorously evaluated deep learning models
     - Model Library
-    - easy integration new (pytorch) models
+    - easy integration new (*pytorch*) models
 - Best practices model training
     - leveraging the _fastai_ library
     - mixed precision training
     - learning rate finder and fit one cycle policy 
     - advanced augementation 
 - Reliable prediction on new data
-    - Leveraging Baysian Uncertainties
+    - leveraging Bayesian Uncertainties
 
 
 
@@ -41,7 +41,7 @@ You can use **deepflash2** by using [Google Colab](colab.research.google.com). Y
 You can install **deepflash2**  on your own machines with conda (highly recommended):
 
 ```bash
-conda install -c matjesg deepflash2 
+conda install -c fastai -c pytorch -c matjesg deepflash2 
 ```
 To install with pip, use
 
