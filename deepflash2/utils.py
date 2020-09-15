@@ -49,6 +49,9 @@ def plot_results(*args, df, figsize=(20, 20), **kwargs):
     if len(args)==3:
         img, pred, pred_std = args
     fig, axs = plt.subplots(nrows=1, ncols=len(args), figsize=figsize, **kwargs)
+    #One channel fix
+    if img.ndim == 3 and img.shape[-1] == 1:
+        img=img[...,0]
     axs[0].imshow(img)
     axs[0].set_axis_off()
     axs[0].set_title(f'File {df.file}')
