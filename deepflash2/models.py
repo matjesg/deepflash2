@@ -186,7 +186,7 @@ def unet_falk2019(in_channels=1 ,n_classes=2, pretrained=False, dataset='wue1_cF
     return model
 
 # Cell
-def unet_deepflash2(in_channels=1 ,n_classes=2, pretrained=False, dataset='wue1_cFOS', progress=True, dropout=.5):
+def unet_deepflash2(in_channels=1 ,n_classes=2, pretrained=False, dataset='wue_cFOS', progress=True, dropout=.5):
     "U-Net model optimized for deepflash2"
     model = UNet2D(in_channels=in_channels, n_classes=n_classes, dropout=dropout,
                    depth=5, wf=6, padding=False, batch_norm=True,
