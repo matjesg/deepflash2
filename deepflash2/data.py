@@ -291,7 +291,8 @@ def _read_img(path, divide=None, **kwargs):
         img = img/np.iinfo(img.dtype).max
     if divide is not None:
         img = img/divide
-    assert img.max()<=1. and img.max()>.04, f'Check image loading, dividing by {divide}, max value is {img.max()}'
+    #assert img.max()<=1. and img.max()>.04, f'Check image loading, dividing by {divide}, max value is {img.max()}'
+    assert img.max()<=1., f'Check image loading, dividing by {divide}'
     if img.ndim == 2:
         img = np.expand_dims(img, axis=2)
     return img
