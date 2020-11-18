@@ -33,6 +33,42 @@ nb_path: "nbs/00_learner.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Cells will be exported to deepflash2.learner,
+unless a different module is specified after an export flag: `%nbdev_export special.module`
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="kn">from</span> <span class="nn">fastai.vision.all</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fastcore.foundation</span> <span class="kn">import</span> <span class="n">patch</span>
+<span class="kn">from</span> <span class="nn">deepflash2.data</span> <span class="kn">import</span> <span class="n">TileDataset</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">entropy</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -52,29 +88,16 @@ from fastprogress.fastprogress import progress_bar</p>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-</div>
-    {% endraw %}
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_hide</span>
+<span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="Learner.predict_tiles" class="doc_header"><code>Learner.predict_tiles</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L12" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Learner.predict_tiles</code>(<strong><code>ds_idx</code></strong>=<em><code>1</code></em>, <strong><code>dl</code></strong>=<em><code>None</code></em>, <strong><code>mc_dropout</code></strong>=<em><code>False</code></em>, <strong><code>n_times</code></strong>=<em><code>1</code></em>)</p>
-</blockquote>
-<p>Make predictions with dropout applied.</p>
-
-</div>
-
-</div>
-
+    </div>
 </div>
 </div>
 
@@ -84,6 +107,57 @@ from fastprogress.fastprogress import progress_bar</p>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="nd">@patch</span>
+<span class="k">def</span> <span class="nf">predict_tiles</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Learner</span><span class="p">,</span> <span class="n">ds_idx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mc_dropout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_times</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="s2">&quot;Make predictions with dropout applied.&quot;</span>
+
+    <span class="k">if</span> <span class="n">dl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">dl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dls</span><span class="p">[</span><span class="n">ds_idx</span><span class="p">]</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">shuffled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">mc_dropout</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_dropout</span><span class="p">()</span>
+
+    <span class="n">mean_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">std_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">progress_bar</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">TensorImage</span><span class="p">):</span>
+            <span class="n">images</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">images</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">out_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_times</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">out_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out_stack</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">out_list</span><span class="p">)</span>
+
+        <span class="n">out_means</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">out_stack</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mean_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_means</span><span class="p">)</span>
+
+        <span class="n">out_sdts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">out_stack</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">std_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_sdts</span><span class="p">)</span>
+
+    <span class="n">softmax_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">mean_list</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">smx_tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">softmax_pred</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()]</span>
+
+    <span class="n">std_pred</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">std_list</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">std_tiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">std_pred</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()]</span>
+
+    <span class="n">smxcores</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">reconstruct_from_tiles</span><span class="p">(</span><span class="n">smx_tiles</span><span class="p">)</span>
+    <span class="n">segmentations</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">smxcores</span><span class="p">]</span>
+    <span class="n">std_deviations</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">reconstruct_from_tiles</span><span class="p">(</span><span class="n">std_tiles</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">smxcores</span><span class="p">,</span> <span class="n">segmentations</span><span class="p">,</span> <span class="n">std_deviations</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -91,22 +165,20 @@ from fastprogress.fastprogress import progress_bar</p>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-<div class="output_wrapper">
-<div class="output">
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_export</span>
+<span class="nd">@patch</span>
+<span class="k">def</span> <span class="nf">apply_dropout</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Learner</span><span class="p">):</span>
+    <span class="s2">&quot;If a module contains &#39;dropout&#39;, it will be switched to .train() mode.&quot;</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">):</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</pre></div>
 
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="Learner.apply_dropout" class="doc_header"><code>Learner.apply_dropout</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L55" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Learner.apply_dropout</code>()</p>
-</blockquote>
-<p>If a module contains 'dropout', it will be switched to .train() mode.</p>
-
-</div>
-
-</div>
-
+    </div>
 </div>
 </div>
 
@@ -159,6 +231,73 @@ from fastprogress.fastprogress import progress_bar</p>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_hide</span>
+<span class="k">def</span> <span class="nf">test_results</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span><span class="n">Learner</span><span class="p">,</span> <span class="n">ds_idx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_n</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">dl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dls</span><span class="p">[</span><span class="n">ds_idx</span><span class="p">]</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">shuffle</span><span class="o">=</span><span class="n">shuffle</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">dl</span><span class="o">.</span><span class="n">one_batch</span><span class="p">()</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">preds</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_preds</span><span class="p">(</span><span class="n">dl</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">],</span> <span class="n">with_decoded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">preds</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dls</span><span class="o">.</span><span class="n">show_results</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">max_n</span><span class="o">=</span><span class="n">max_n</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">nbdev_hide</span>
+<span class="kn">from</span> <span class="nn">nbdev.export</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">notebook2script</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Converted 00_learner.ipynb.
+Converted 01_models.ipynb.
+Converted 02_data.ipynb.
+Converted 03_metrics.ipynb.
+Converted 04_callbacks.ipynb.
+Converted 05_losses.ipynb.
+Converted 06_utils.ipynb.
+Converted gt_estimation.ipynb.
+Converted index.ipynb.
+Converted model_library.ipynb.
+Converted train.ipynb.
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
