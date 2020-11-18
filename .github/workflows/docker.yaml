@@ -15,59 +15,61 @@ jobs:
         build_type: [prod] #dev currently not in use
     steps:
 
+    - name: Copy This Repository Contents
+      uses: actions/checkout@main
+
     - uses: actions/setup-python@v2
       with:
         python-version: '3.8'
         architecture: 'x64'
-
-    - name: Install repo2docker
-      run: python3 -m pip install jupyter-repo2docker
 
     - name: Copy Repository Contents
       uses: actions/checkout@main
       with:
         repository: 'matjesg/deepflash2'
 
-    - name: get version from settings.ini
+    - name: get version from settings.ini and create image name
       id: get_variables
       run: |
         from configparser import ConfigParser
         import os
+        from pathlib import Path
         config = ConfigParser()
+        settings = Path('settings.ini')
+        assert settings.exists(), 'Not able to read or download settings.ini file.'
         config.read('settings.ini')
         cfg = config['DEFAULT']
         print(f"::set-output name=version::{cfg['version']}")
+        btype = os.getenv('BUILD_TYPE')
         assert os.getenv('BUILD_TYPE') in ['prod', 'dev'], "BUILD_TYPE must be either 'prod' or 'dev'"
+        if btype != 'prod':
+            image_name = f''matjes/deepflash2-{btype}'
+        else:
+            image_name = ''matjes/deepflash2
+        print(f"::set-output name=image_name::{image_name}")
       shell: python
       env:
         BUILD_TYPE: ${{ matrix.build_type }}       
-
-    - name: DockerHub Login
+        
+    - name: build and tag container
+      run: |
+        export DOCKER_BUILDKIT=1
+        docker pull ${IMAGE_NAME}:latest || true
+        docker build --cache-from ${IMAGE_NAME}:latest --build-arg BUILD=${BUILD_TYPE} \
+          -t ${IMAGE_NAME}:latest \
+          -t ${IMAGE_NAME}:${VERSION} \
+          -t ${IMAGE_NAME}:$(date +%F)
+      env:
+        VERSION: ${{ steps.get_variables.outputs.version }}
+        IMAGE_NAME: ${{ steps.get_variables.outputs.image_name }}
+        BUILD_TYPE: ${{ matrix.build_type }}
+        
+        
+    - name: push images
       run: |
         echo ${PASSWORD} | docker login -u $USERNAME --password-stdin
+        docker push ${IMAGE_NAME}
       env:
         USERNAME: ${{ secrets.DOCKER_USERNAME }}
         PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Build Prod Container
-      if: matrix.build_type == 'prod'
-      run: |
-        IMAGE_NAME="matjes/deepflash2" 
-        echo "current directory: ${PWD}"
-        echo "::set-env name=IMAGE_NAME::${IMAGE_NAME}"
-        repo2docker --image-name "${IMAGE_NAME}:latest" --push --no-run --user-id 1000 ${PWD}
-    - name: Build Dev Container (with editable install)
-      if: matrix.build_type == 'dev'
-      run: |
-        IMAGE_NAME="matjes/deepflash2-dev"
-        echo "current directory: ${PWD}"
-        echo "::set-env name=IMAGE_NAME::${IMAGE_NAME}" 
-        repo2docker --image-name "${IMAGE_NAME}:latest" --editable --push --user-id 1000 ${PWD}  echo "dev build completed"
-    - name: push tags
-      run: |
-        docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${VERSION}
-        docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:$(date +%F)
-        docker push ${IMAGE_NAME}:${VERSION}
-        docker push ${IMAGE_NAME}:$(date +%F)
-      env:
-        VERSION: ${{ steps.get_variables.outputs.version }}
+        IMAGE_NAME: ${{ steps.get_variables.outputs.image_name }}
