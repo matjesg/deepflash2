@@ -59,7 +59,7 @@ jobs:
           -t ${IMAGE_NAME}:latest \
           -t ${IMAGE_NAME}:${VERSION} \
           -t ${IMAGE_NAME}:$(date +%F) \
-          -f Dockerfile deepflash2-build
+          -f Dockerfile .
       env:
         VERSION: ${{ steps.get_variables.outputs.version }}
         IMAGE_NAME: ${{ steps.get_variables.outputs.image_name }}
