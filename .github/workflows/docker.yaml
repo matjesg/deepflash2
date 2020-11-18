@@ -43,9 +43,9 @@ jobs:
         btype = os.getenv('BUILD_TYPE')
         assert os.getenv('BUILD_TYPE') in ['prod', 'dev'], "BUILD_TYPE must be either 'prod' or 'dev'"
         if btype != 'prod':
-            image_name = f''matjes/deepflash2-{btype}'
+            image_name = f'matjes/deepflash2-{btype}'
         else:
-            image_name = ''matjes/deepflash2
+            image_name = 'matjes/deepflash2'
         print(f"::set-output name=image_name::{image_name}")
       shell: python
       env:
