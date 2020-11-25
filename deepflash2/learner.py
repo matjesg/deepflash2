@@ -19,7 +19,7 @@ def apply_dropout(self:Learner):
 
 # Cell
 @patch
-def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1, tta=False, use_max=False):
+def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1, use_tta=False, use_max=False):
     "Make predictions and reconstruct tiles, optional with dropout and/or tta applied."
 
     if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
