@@ -355,7 +355,10 @@ class RandomTileDataset(Dataset):
                  value_slope_range=(1, 1),
                  bws=6, fds=1, bwf=50, fbr=.1):
 
-        store_attr()
+        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, \
+            padding, sample_mult, flip, rotation_range_deg, deformation_grid, \
+            deformation_magnitude, value_minimum_range, value_maximum_range, \
+            value_slope_range, bws, fds, bwf, fbr')
         self.c = n_classes
         self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
         self.preproc_dir.mkdir(exist_ok=True)
@@ -516,7 +519,8 @@ class TileDataset(Dataset):
                  bws=6, fds=1, bwf=50, fbr=.1,
                 **kwargs):
 
-        store_attr()
+        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, \
+            padding, bws, fds, bwf, fbr')
         self.c = n_classes
         if self.label_fn is not None:
             self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'

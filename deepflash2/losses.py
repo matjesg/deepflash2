@@ -5,6 +5,7 @@ __all__ = ['WeightedSoftmaxCrossEntropy']
 # Cell
 import torch
 import torch.nn.functional as F
+from fastai.torch_core import TensorBase
 
 # Cell
 class WeightedSoftmaxCrossEntropy(torch.nn.Module):
@@ -14,10 +15,12 @@ class WeightedSoftmaxCrossEntropy(torch.nn.Module):
         self.reduction = reduction
         self.axis = axis
 
-    def forward(self, inputs, targets, weights):
+    def _contiguous(self,x): return TensorBase(x.contiguous())
+    def forward(self, inp, targ, weights):
 
+        inp, targ  = map(self._contiguous, (inp, targ))
         # Weighted soft-max cross-entropy loss
-        loss = F.cross_entropy(inputs, targets, reduction='none')
+        loss = F.cross_entropy(inp, targ, reduction='none')
         loss = loss * weights
         if  self.reduction == 'mean':
             return loss.mean()
