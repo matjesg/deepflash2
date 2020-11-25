@@ -7,13 +7,24 @@ from fastai.vision.all import *
 from fastcore.foundation import patch
 from .data import TileDataset
 from scipy.stats import entropy
+import ttach as tta
 
 # Cell
 @patch
-def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1):
-    "Make predictions with dropout applied."
+def apply_dropout(self:Learner):
+    "If a module contains 'dropout', it will be switched to .train() mode."
+    for m in self.model.modules():
+        if isinstance(m, nn.Dropout):
+            m.train()
+
+# Cell
+@patch
+def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1, tta=False, use_max=False):
+    "Make predictions and reconstruct tiles, optional with dropout and/or tta applied."
 
     if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
+    if use_tta: tfms=[tta.HorizontalFlip(), tta.Rotate90(angles=[90,180,270])]
+    else: tfms=[]
 
     self.model.eval()
     if mc_dropout: self.apply_dropout()
@@ -21,19 +32,22 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1):
     mean_list = []
     std_list = []
     for data in progress_bar(dl, leave=False):
-        if isinstance(data, TensorImage):
-            images = data
-        else:
-            images, _, _ = data
+        if isinstance(data, TensorImage): images = data
+        else: images, _, _ = data
         out_list = []
-        for t in range(n_times):
-            with torch.no_grad():
-                out = self.model(images)
-            out = F.softmax(out, dim=1)
-            out_list.append(out)
+        for t in tta.Compose(tfms):
+            for _ in range(n_times):
+                #augment image
+                aug_images = t.augment_image(images)
+                #predict
+                with torch.no_grad():
+                    out = self.model(aug_images)
+                out = F.softmax(out, dim=1)
+                #reverse augmentation for mask
+                out = t.deaugment_mask(out)
+                out_list.append(out)
         out_stack = torch.stack(out_list)
-
-        out_means = torch.mean(out_stack, dim=0)
+        out_means = torch.max(out_stack, dim=0)[0] if use_max else torch.mean(out_stack, dim=0)
         mean_list.append(out_means)
 
         out_sdts = torch.std(out_stack, dim=0)
@@ -50,11 +64,3 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1):
     std_deviations = dl.reconstruct_from_tiles(std_tiles)
 
     return smxcores, segmentations, std_deviations
-
-# Cell
-@patch
-def apply_dropout(self:Learner):
-    "If a module contains 'dropout', it will be switched to .train() mode."
-    for m in self.model.modules():
-        if isinstance(m, nn.Dropout):
-            m.train()
