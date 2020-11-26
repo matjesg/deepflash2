@@ -353,15 +353,17 @@ class RandomTileDataset(Dataset):
                  value_minimum_range=(0, 0),
                  value_maximum_range=(1, 1),
                  value_slope_range=(1, 1),
-                 bws=6, fds=1, bwf=50, fbr=.1):
+                 bws=6, fds=1, bwf=50, fbr=.1,
+                 preproc_dir=None):
 
         store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, \
             padding, sample_mult, flip, rotation_range_deg, deformation_grid, \
             deformation_magnitude, value_minimum_range, value_maximum_range, \
             value_slope_range, bws, fds, bwf, fbr')
         self.c = n_classes
-        self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
-        self.preproc_dir.mkdir(exist_ok=True)
+        if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
+        else: self.preproc_dir = Path(preproc_dir)
+        self.preproc_dir.mkdir(exist_ok=True, parents=True)
         using_cache = False
 
         for file in progress_bar(files, leave=False):
@@ -517,14 +519,16 @@ class TileDataset(Dataset):
                  tile_shape=(540,540),
                  padding=(184,184),
                  bws=6, fds=1, bwf=50, fbr=.1,
-                **kwargs):
+                 preproc_dir=None,
+                 **kwargs):
 
         store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, \
             padding, bws, fds, bwf, fbr')
         self.c = n_classes
         if self.label_fn is not None:
-            self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
-            self.preproc_dir.mkdir(exist_ok=True)
+            if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
+            else: self.preproc_dir = Path(preproc_dir)
+            self.preproc_dir.mkdir(exist_ok=True, parents=True)
         self.output_shape = tuple(int(t - p) for (t, p) in zip(tile_shape, padding))
 
         tiler = DeformationField(tile_shape)
