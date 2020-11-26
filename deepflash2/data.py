@@ -309,7 +309,7 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
             if np.array_equal(msk[...,0], msk[...,1]):
                 msk = msk[...,0]
         # Mask check
-        assert len(np.unique(msk))==n_classes, 'Check n_classes and provided mask'
+        assert len(np.unique(msk))<=n_classes, 'Check n_classes and provided mask'
     return msk
 
 # Cell
