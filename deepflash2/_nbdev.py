@@ -2,8 +2,8 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"Learner.predict_tiles": "00_learner.ipynb",
-         "Learner.apply_dropout": "00_learner.ipynb",
+index = {"Learner.apply_dropout": "00_learner.ipynb",
+         "Learner.predict_tiles": "00_learner.ipynb",
          "UNetConvBlock": "01_models.ipynb",
          "UNetUpBlock": "01_models.ipynb",
          "UNet2D": "01_models.ipynb",

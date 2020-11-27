@@ -84,7 +84,7 @@ def iou(a,b,threshold=0.5):
     return np.count_nonzero(overlap)/np.count_nonzero(union)
 
 # Cell
-def label_mask(mask, threshold=0.5, min_pixel=15, do_watershed=True, exclude_border=False):
+def label_mask(mask, threshold=0.5, min_pixel=15, do_watershed=False, exclude_border=False):
     '''Analyze regions and return labels'''
     if mask.ndim == 3:
         mask = np.squeeze(mask, axis=2)
