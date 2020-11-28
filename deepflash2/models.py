@@ -50,7 +50,7 @@ class UNetUpBlock(nn.Module):
         if up_mode == 'upconv':
             up_block.append(nn.ConvTranspose2d(in_size, out_size, kernel_size=2, stride=2))
         elif up_mode == 'upsample':
-            up_block.append(nn.Upsample(mode='bilinear', scale_factor=2))
+            up_block.append(nn.Upsample(mode='bilinear', scale_factor=2, align_corners=True))
             up_block.append(nn.Conv2d(in_size, out_size, kernel_size=1))
         if batch_norm:
             up_block.append(nn.BatchNorm2d(out_size))
@@ -218,7 +218,7 @@ class FPN(nn.Module):
             for in_ch, out_ch in zip(input_channels, output_channels)])
 
     def forward(self, xs:list, last_layer):
-        hcs = [F.interpolate(c(x),scale_factor=2**(len(self.convs)-i),mode='bilinear')
+        hcs = [F.interpolate(c(x),scale_factor=2**(len(self.convs)-i),mode='bilinear', align_corners=True)
                for i,(c,x) in enumerate(zip(self.convs, xs))]
         hcs.append(last_layer)
         return torch.cat(hcs, dim=1)
@@ -355,7 +355,7 @@ class UneXt50(nn.Module):
         dec0 = self.dec1(dec1,enc0)
         x = self.fpn([enc5, dec3, dec2, dec1], dec0)
         x = self.final_conv(self.drop(x))
-        x = F.interpolate(x,scale_factor=2,mode='bilinear', align_corners=True)
+        x = F.interpolate(x,scale_factor=2,mode='bilinear',align_corners=True)
         return x
 
 # Cell
