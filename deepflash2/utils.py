@@ -64,14 +64,14 @@ def plot_results(*args, df, figsize=(20, 20), **kwargs):
         axs[2].set_title(f'Prediction \n IoU: {df.iou:.2f}')
         axs[3].imshow(pred_std)
         axs[3].set_axis_off()
-        axs[3].set_title(f'Uncertainty \n Entropy: {df.entropy:.2f}')
+        axs[3].set_title(f'Uncertainty')
     if len(args)==3:
         axs[1].imshow(pred)
         axs[1].set_axis_off()
         axs[1].set_title('Prediction')
         axs[2].imshow(pred_std)
         axs[2].set_axis_off()
-        axs[2].set_title(f'Uncertainty \n Entropy: {df.entropy:.2f}')
+        axs[2].set_title(f'Uncertainty')
     plt.show()
 
 # Cell
