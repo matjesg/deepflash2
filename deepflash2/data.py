@@ -357,7 +357,7 @@ class BaseDataset(Dataset):
         preproc_queue=L()
         for f in self.files:
             try:
-                lbl, wgt, pdf = _get_cached_data(self._cache_fn(file.name))
+                lbl, wgt, pdf = _get_cached_data(self._cache_fn(f.name))
                 if not using_cache:
                     if verbose>0: print(f'Using cached mask weights from {self.preproc_dir}')
                     using_cache = True
