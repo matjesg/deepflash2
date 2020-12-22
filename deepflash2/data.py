@@ -413,7 +413,7 @@ class RandomTileDataset(BaseDataset):
 
                 except:
                     print('Creating weights for', file.name)
-                    label_path = label_fn(file)
+                    label_path = self.label_fn(file)
                     if self.instance_labels:
                         clabels = None
                         instlabels = _read_msk(label_path, instance_labels=True)
@@ -527,7 +527,7 @@ class TileDataset(BaseDataset):
                         using_cache = True
                 except:
                     print('Creating weights for', file.name)
-                    label_path = label_fn(file)
+                    label_path = self.label_fn(file)
                     if self.instance_labels:
                         clabels = None
                         instlabels = _read_msk(label_path, instance_labels=True)
