@@ -126,8 +126,8 @@ class EnsembleLearner:
         name = self.ensemble_dir/f'{self.arch}_model-{i}.pth'
         print(f'Starting training for {name.name}')
         files_train, files_val = self.splits[i]
-        train_ds = RandomTileDataset(files_train, self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
-        valid_ds = TileDataset(files_val, self.label_fn, **self.mw_kwargs,**self.ds_kwargs)
+        train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
+        valid_ds = TileDataset(files_val, label_fn=self.label_fn, **self.mw_kwargs,**self.ds_kwargs)
         batch_tfms = Normalize.from_stats(*self.stats)
         dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=batch_tfms)
         model = torch.hub.load(self.repo, self.arch, pretrained=self.pretrained, n_classes=dls.c, in_channels=self.in_channels, **kwargs)
@@ -266,7 +266,7 @@ class EnsembleLearner:
 
     def lr_find(self, files=None, bs=4):
         files = files or self.files
-        train_ds = RandomTileDataset(files, self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
+        train_ds = RandomTileDataset(files, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
         dls = DataLoaders.from_dsets(train_ds,train_ds, bs=bs)
         model = torch.hub.load(self.repo, self.arch, pretrained=self.pretrained, n_classes=dls.c, in_channels=self.in_channels)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
