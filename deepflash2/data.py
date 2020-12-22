@@ -7,6 +7,7 @@ import os
 import numpy as np
 import imageio
 import shutil
+from joblib import Parallel, delayed
 
 from scipy import ndimage
 from scipy.interpolate import Rbf
@@ -322,18 +323,53 @@ def _get_cached_data(path):
 # Cell
 class BaseDataset(Dataset):
     def __init__(self, files, label_fn=None, create_weights=True, instance_labels = False, n_classes=2, divide=None, ignore={},
-                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, bws=6, fds=1, bwf=50, fbr=.1, **kwargs):
+                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, bws=6, fds=1, bwf=50, fbr=.1, n_jobs=1, verbose=0, **kwargs):
         store_attr('files, label_fn, instance_labels, create_weights, divide, n_classes, ignore, tile_shape, \
                     padding, bws, fds, bwf, fbr')
         self.c = n_classes
+        if self.label_fn is None: self.create_weights=False
         if label_fn is not None:
             if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
             else: self.preproc_dir = Path(preproc_dir)
             self.preproc_dir.mkdir(exist_ok=True, parents=True)
+            if create_weights: self._create_weights(n_jobs, verbose)
 
     def _cache_fn(self, o):
         "Creates path to preprocessed and compressed data."
         return self.preproc_dir/f'{o}_{self.bws}_{self.fds}_{self.bwf}_{self.fbr}.npz'
+
+    def _preproc(self, file):
+        "Preprocesses and saves labels (msk), weights, and pdf."
+        label_path = self.label_fn(file)
+        if self.instance_labels:
+            clabels = None
+            instlabels = _read_msk(label_path, instance_labels=True)
+        else:
+            clabels = _read_msk(label_path, self.c)
+            instlabels = None
+        ign = self.ignore[file.name] if file.name in self.ignore else None
+        lbl, wgt, pdf = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c,
+                                          bws=self.bws, fds=self.fds, bwf=self.bwf, fbr=self.fbr)
+        np.savez_compressed(self._cache_fn(file.name), lbl=lbl, wgt=wgt, pdf=pdf)
+
+    def _create_weights(self, n_jobs=1, verbose=0):
+        using_cache = False
+        preproc_queue=L()
+        for f in self.files:
+            try:
+                lbl, wgt, pdf = _get_cached_data(self._cache_fn(file.name))
+                if not using_cache:
+                    if verbose>0: print(f'Using cached mask weights from {self.preproc_dir}')
+                    using_cache = True
+            except:
+                if n_jobs==1:
+                    if verbose>0: print('Creating weights for', f.name)
+                    self._preproc(f)
+                else:
+                    preproc_queue.append(f)
+        if len(preproc_queue)>0:
+            if verbose>0: print('Creating weights for', L([f.name for f in preproc_queue]))
+            _ = Parallel(n_jobs=n_jobs, verbose=verbose, backend='threading')(delayed(self._preproc)(f) for f in preproc_queue)
 
     def get_data(self, files=None, max_n=None, mask=False):
         if files is not None:
@@ -349,7 +385,6 @@ class BaseDataset(Dataset):
             else: d = _read_img(f, divide=self.divide)
             data_list.append(d)
         return data_list
-
 
     def show_data(self, files=None, max_n=6, ncols=1, figsize=None, **kwargs):
         if files is not None:
@@ -401,29 +436,6 @@ class RandomTileDataset(BaseDataset):
         super().__init__(*args, **kwargs)
         store_attr('sample_mult, flip, rotation_range_deg, deformation_grid, deformation_magnitude, value_minimum_range, \
                     value_maximum_range, value_slope_range')
-        if self.label_fn is None: self.create_weights=False
-        if self.create_weights:
-            using_cache = False
-            for file in progress_bar(self.files, leave=False):
-                try:
-                    lbl, wgt, pdf = _get_cached_data(self._cache_fn(file.name))
-                    if not using_cache:
-                        print(f'Using cached mask weights from {self.preproc_dir}')
-                        using_cache = True
-
-                except:
-                    print('Creating weights for', file.name)
-                    label_path = self.label_fn(file)
-                    if self.instance_labels:
-                        clabels = None
-                        instlabels = _read_msk(label_path, instance_labels=True)
-                    else:
-                        clabels = _read_msk(label_path, self.c)
-                        instlabels = None
-                    ign = self.ignore[file.name] if file.name in self.ignore else None
-                    lbl, wgt, pdf = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c,
-                                                      bws=self.bws, fds=self.fds, bwf=self.bwf, fbr=self.fbr)
-                    np.savez_compressed(self._cache_fn(file.name), lbl=lbl, wgt=wgt, pdf=pdf)
 
         # Sample mulutiplier: Number of random samplings from augmented image
         if self.sample_mult is None:
@@ -504,8 +516,6 @@ class TileDataset(BaseDataset):
     n_inp = 1
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-
         self.output_shape = tuple(int(t - p) for (t, p) in zip(self.tile_shape, self.padding))
         tiler = DeformationField(self.tile_shape)
         self.tile_data = []
@@ -515,31 +525,11 @@ class TileDataset(BaseDataset):
         self.image_shapes = []
         self.in_slices = []
         self.out_slices = []
-        using_cache = False
-
 
         for i, file in enumerate(progress_bar(self.files, leave=False)):
-            if self.label_fn is not None:
-                try:
-                    lbl, wgt, pdf = _get_cached_data(self._cache_fn(file.name))
-                    if not using_cache:
-                        print(f'Using cached mask weights from {self.preproc_dir}')
-                        using_cache = True
-                except:
-                    print('Creating weights for', file.name)
-                    label_path = self.label_fn(file)
-                    if self.instance_labels:
-                        clabels = None
-                        instlabels = _read_msk(label_path, instance_labels=True)
-                    else:
-                        clabels = _read_msk(label_path, self.c)
-                        instlabels = None
-                    ign = self.ignore[path.name] if file.name in self.ignore else None
-                    lbl, wgt, pdf = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c,
-                                                      bws=self.bws, fds=self.fds, bwf=self.bwf, fbr=self.fbr)
-                    np.savez_compressed(self._cache_fn(file.name), lbl=lbl, wgt=wgt, pdf=pdf)
-
             img = _read_img(file, divide=self.divide)
+            if self.label_fn is not None:
+                lbl, wgt, _ = _get_cached_data(self._cache_fn(file.name))
 
             # Tiling
             data_shape = img.shape[:-1]

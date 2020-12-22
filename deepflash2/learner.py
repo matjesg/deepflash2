@@ -101,7 +101,7 @@ class EnsembleLearner:
                  metrics=None, loss_fn=None, cbs=None, mpt=False, ds_kwargs={},
                  opt_func=ranger, path=None, ensemble_dir='ensemble', mw_kwargs={},
                  stats=None, item_tfms=[Brightness(max_lighting=0.1)]):
-        store_attr(but='path,ensemble_dir,ds_kwargs,metrics,loss,cbs')
+        store_attr(but='path,ensemble_dir,ds_kwargs,metrics,loss,cbs,n_jobs,verbose')
         self.path = Path(path) if path is not None else Path('.')
         self.ensemble_dir = self.path/ensemble_dir
         self.loss_fn = loss_fn or WeightedSoftmaxCrossEntropy(axis=1)
@@ -122,18 +122,18 @@ class EnsembleLearner:
         kf = KFold(n_splits, shuffle=True, random_state=self.random_state)
         self.splits = {key:(self.files[idx[0]], self.files[idx[1]]) for key, idx in zip(range(1,n_splits+1), kf.split(self.files))}
 
-    def fit(self, i, epochs, lr_max=5e-3, bs=4, **kwargs):
+    def fit(self, i, epochs, lr_max=5e-3, bs=4, n_jobs=1, verbose=1, **kwargs):
         name = self.ensemble_dir/f'{self.arch}_model-{i}.pth'
-        print(f'Starting training for {name.name}')
         files_train, files_val = self.splits[i]
-        train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
-        valid_ds = TileDataset(files_val, label_fn=self.label_fn, **self.mw_kwargs,**self.ds_kwargs)
+        train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, **self.mw_kwargs, **self.ds_kwargs)
+        valid_ds = TileDataset(files_val, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, **self.mw_kwargs,**self.ds_kwargs)
         batch_tfms = Normalize.from_stats(*self.stats)
         dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=batch_tfms)
         model = torch.hub.load(self.repo, self.arch, pretrained=self.pretrained, n_classes=dls.c, in_channels=self.in_channels, **kwargs)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
         learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=self.opt_func, cbs=self.cbs)
         if self.mpt: learn.to_fp16()
+        print(f'Starting training for {name.name}')
         learn.fit_one_cycle(epochs, lr_max)
 
         print(f'Saving model at {name}')
@@ -264,9 +264,9 @@ class EnsembleLearner:
                 std = tmp['std']
             plot_results(img, pred, std, df=r)
 
-    def lr_find(self, files=None, bs=4):
+    def lr_find(self, files=None, bs=4, n_jobs=1, verbose=1):
         files = files or self.files
-        train_ds = RandomTileDataset(files, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
+        train_ds = RandomTileDataset(files, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, **self.mw_kwargs, **self.ds_kwargs)
         dls = DataLoaders.from_dsets(train_ds,train_ds, bs=bs)
         model = torch.hub.load(self.repo, self.arch, pretrained=self.pretrained, n_classes=dls.c, in_channels=self.in_channels)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
