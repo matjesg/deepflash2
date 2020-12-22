@@ -401,7 +401,7 @@ class RandomTileDataset(BaseDataset):
         super().__init__(*args, **kwargs)
         store_attr('sample_mult, flip, rotation_range_deg, deformation_grid, deformation_magnitude, value_minimum_range, \
                     value_maximum_range, value_slope_range')
-
+        if self.label_fn is None: self.create_weights=False
         if self.create_weights:
             using_cache = False
             for file in progress_bar(self.files, leave=False):
@@ -425,12 +425,12 @@ class RandomTileDataset(BaseDataset):
                                                       bws=self.bws, fds=self.fds, bwf=self.bwf, fbr=self.fbr)
                     np.savez_compressed(self._cache_fn(file.name), lbl=lbl, wgt=wgt, pdf=pdf)
 
-            # Sample mulutiplier: Number of random samplings from augmented image
-            self.sample_mult = sample_mult
-            if self.sample_mult is None:
-                tile_shape = np.array(self.tile_shape)-np.array(self.padding)
-                msk_shape = np.array(lbl.shape[-2:])
-                self.sample_mult = int(np.product(np.floor(msk_shape/tile_shape)))
+        # Sample mulutiplier: Number of random samplings from augmented image
+        if self.sample_mult is None:
+            tile_shape = np.array(self.tile_shape)-np.array(self.padding)
+            msk_shape = np.array(self.get_data(max_n=1)[0].shape[:-1])
+            #msk_shape = np.array(lbl.shape[-2:])
+            self.sample_mult = int(np.product(np.floor(msk_shape/tile_shape)))
 
         self.on_epoch_end()
 

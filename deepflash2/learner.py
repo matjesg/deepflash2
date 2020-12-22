@@ -15,7 +15,7 @@ from .metrics import Dice_f1, Iou
 from .losses import WeightedSoftmaxCrossEntropy
 from .callbacks import ElasticDeformCallback
 from .models import get_default_shapes
-from .data import TileDataset, RandomTileDataset
+from .data import TileDataset, RandomTileDataset, _read_img
 from .utils import iou, plot_results
 import deepflash2.tta as tta
 
@@ -115,7 +115,6 @@ class EnsembleLearner:
         self.ds = RandomTileDataset(files, label_fn=label_fn, create_weights=False, **self.mw_kwargs, **self.ds_kwargs)
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.stats = stats or self.ds.compute_stats()
-        self.batch_tfms = Normalize.from_stats(*self.stats)
         self.df_val, self.df_ens, self.df_model = None,None,None
 
     def _set_splits(self):
@@ -129,7 +128,8 @@ class EnsembleLearner:
         files_train, files_val = self.splits[i]
         train_ds = RandomTileDataset(files_train, self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
         valid_ds = TileDataset(files_val, self.label_fn, **self.mw_kwargs,**self.ds_kwargs)
-        dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=self.batch_tfms)
+        batch_tfms = Normalize.from_stats(*self.stats)
+        dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=batch_tfms)
         model = torch.hub.load(self.repo, self.arch, pretrained=self.pretrained, n_classes=dls.c, in_channels=self.in_channels, **kwargs)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
         learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=self.opt_func, cbs=self.cbs)
@@ -153,8 +153,9 @@ class EnsembleLearner:
 
     def predict(self, files, model_no, bs=4, **kwargs):
         model_path = self.models[model_no]
+        batch_tfms = Normalize.from_stats(*self.stats)
         ds = TileDataset(files, **self.ds_kwargs)
-        dls = DataLoaders.from_dsets(ds, batch_size=bs, after_batch=self.batch_tfms, shuffle=False, drop_last=False)
+        dls = DataLoaders.from_dsets(ds, batch_size=bs, after_batch=batch_tfms, shuffle=False, drop_last=False)
         model = torch.hub.load(self.repo, self.arch, pretrained=None, n_classes=dls.c, in_channels=self.in_channels, pre_ssl=False)
         model.load_state_dict(torch.load(model_path), strict=True)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
@@ -256,7 +257,7 @@ class EnsembleLearner:
         else: df = self.df_models[df_models.model_no==model_no]
         if file is not None: df = df[df.file==file]
         for _, r in df.iterrows():
-            img = self.ds.get_data(r.img_path)[0]
+            img = _read_img(r.img_path)
             with open(r.res_path, 'rb') as res:
                 tmp = np.load(res)
                 pred = tmp['seg']
