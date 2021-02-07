@@ -100,8 +100,8 @@ def _connect_to_drive(path=None):
         with colab.output.temporary():
             con = query_yes_no("Connect to Google Drive?")
         if con:
-            with colab.output.temporary(): colab.drive.mount('/content')
-            path = Path('/content/My Drive')
+            with colab.output.temporary(): colab.drive.mount('/content/drive/')
+            path = Path('/content/drive/My Drive')
     return path
 
 # Cell
@@ -1035,7 +1035,7 @@ class GUI(GetAttr):
 
         box_sb = w.VBox(children=[x.sb_acc for x in self.cat.values()], layout=w.Layout(grid_area='sidebar'))
         box_main = w.VBox(children=[x.main_box for x in self.cat.values()], layout=w.Layout(grid_area='main'))
-        box_proj = w.VBox(children=[self.proj.button, self.proj.dialog], layout=w.Layout(grid_area='proj', flex_flow='column', align_items='flex-end'))
+        box_proj = w.VBox(children=[self.proj.button, self.proj.dialog], layout=w.Layout(grid_area='proj', flex_flow='column', align_items='flex-start'))
 
         gb = w.GridBox(children=[self.header, self.cat_btns_box, box_proj, box_sb, box_main, self.footer],
                        layout=w.Layout(
