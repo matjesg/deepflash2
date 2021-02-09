@@ -76,10 +76,15 @@ class GTEstimator(GetAttr):
         self.experts = sorted(set(self.experts))
         if verbose>0: print(f'Found {len(self.masks)} unique segmentation mask(s) from {len(self.experts)} expert(s)')
 
-    def show_data(self, max_n=6, figsize=None, **kwargs):
-        max_n = min((max_n, len(self.masks)))
+    def show_data(self, max_n=6, files=None, figsize=None, **kwargs):
+        if files is not None:
+            files = [(m,exps) for m, exps in self.masks.items() if m in files]
+            max_n = len(files)
+        else:
+            max_n = min((max_n, len(self.masks)))
+            files = list(self.masks.items())[:max_n]
         if not figsize: figsize = (len(self.experts)*3,3)
-        for m, exps in list(self.masks.items())[:max_n]:
+        for m, exps in files:
             fig, axs = plt.subplots(nrows=1, ncols=len(exps), figsize=figsize, **kwargs)
             for i, exp in enumerate(exps):
                 msk = _read_msk(self.mask_fn(exp,m))

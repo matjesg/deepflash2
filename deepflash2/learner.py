@@ -3,14 +3,17 @@
 __all__ = ['Config', 'energy_max', 'save_tmp', 'EnsembleLearner']
 
 # Cell
+import shutil, gc, joblib
 from dataclasses import dataclass
 import torch.nn as nn
 import torch.nn.functional as F
-import shutil, gc
 from fastai.vision.all import *
 from fastcore.all import *
-from scipy.stats import entropy
+
+from sklearn import svm
 from sklearn.model_selection import KFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from .metrics import Dice_f1, Iou
 from .losses import WeightedSoftmaxCrossEntropy
@@ -71,6 +74,11 @@ class Config:
     #Pred Settings
     pred_tta:bool = True
 
+    #OOD Settings
+    svm_kernel:str = 'rbf'
+    svm_nu:float = 0.01
+    svm_gamma:float = 0.01
+
     #Folder Structure
     gt_dir:str = 'gt_estimation'
     train_dir:str = 'train'
@@ -83,11 +91,17 @@ class Config:
         mw_vars = ['bwf', 'bws', 'fds', 'fbr']
         return dict(filter(lambda x: x[0] in mw_vars, self.__dict__.items()))
 
+    @property
+    def svm_kwargs(self):
+        svm_vars = ['svm_kernel', 'svm_nu', 'svm_gamma']
+        return dict(filter(lambda x: x[0] in svm_vars, self.__dict__.items()))
+
     def save(self, path):
         'Save configuration to path'
         path = Path(path)
         with open(path.with_suffix('.json'), 'w') as config_file:
             json.dump(self.__dict__, config_file)
+        print(f'Saved current configuration to {path}.json')
 
     def load(self, path):
         'Load configuration from path'
@@ -96,6 +110,7 @@ class Config:
             with open(path) as config_file: c = json.load(config_file)
             if not Path(c['proj_dir']).is_dir(): c['project']='deepflash2'
             for k,v in c.items(): setattr(self, k, v)
+            print(f'Successsfully loaded configuration from {path}')
         except:
             print('Error! Select valid config file (.json)')
 
@@ -205,7 +220,7 @@ class EnsembleLearner(GetAttr):
         self.cbs = cbs or [SaveModelCallback(monitor='iou'), ElasticDeformCallback] #ShowGraphCallback
         self.ensemble_dir = ensemble_dir or self.path/'ensemble'
 
-        self.files = get_image_files(self.path/image_dir)
+        self.files = get_image_files(self.path/image_dir, recurse=False)
         if any([mask_dir, label_fn]):
             if label_fn: self.label_fn = label_fn
             else: self.label_fn = get_label_fn(self.files[0], self.path/mask_dir)
@@ -415,11 +430,11 @@ class EnsembleLearner(GetAttr):
         self.df_models = pd.DataFrame(res_list)
         self.df_ens  = self.ensemble_results(new_files)
 
-    def show_ensemble_results(self, file=None, model_no=None):
+    def show_ensemble_results(self, files=None, model_no=None):
         if self.df_ens is None: assert print("Please run `get_ensemble_results` first.")
         if model_no is None: df = self.df_ens
         else: df = self.df_models[df_models.model_no==model_no]
-        if file is not None: df = df[df.file==file]
+        if files is not None: df = df[df.file.isin(files)]
         for _, r in df.iterrows():
             img = _read_img(r.img_path)
             with open(r.res_path, 'rb') as res:
@@ -441,6 +456,29 @@ class EnsembleLearner(GetAttr):
         sug_lrs = learn.lr_find(**kwargs)
         return sug_lrs, learn.recorder
 
+    def ood_train(self, features=['energy_max'], **kwargs):
+        self.ood = Pipeline([('scaler', StandardScaler()), ('svm',svm.OneClassSVM(**kwargs))])
+        self.ood.fit(self.df_ens[features])
+
+    def ood_score(self, features=['energy_max']):
+        self.df_ens['ood_score'] = self.ood.score_samples(self.df_ens[features])
+
+    def ood_save(self, path):
+        'Save OOD model to path'
+        path = Path(path)
+        joblib.dump(self.ood, path.with_suffix('.pkl'))
+        print(f'Saved OOD model to {path}.pkl')
+
+    def ood_load(self, path):
+        'Load OOD model from path'
+        path = Path(path)
+        try:
+            self.ood = joblib.load(path)
+            print(f'Successsfully loaded OOD Model from {path}')
+        except:
+            print('Error! Select valid joblib file (.pkl)')
+
+
     def clear_tmp(self):
         try: shutil.rmtree(self.path/'.tmp')
         except: print("No temporary files to delete")
@@ -460,5 +498,9 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          get_models="Get models saved at `path`",
          set_n="Change to `n` models per ensemble",
          lr_find="Wrapper for learning rate finder",
+         ood_train="Train SVM for OOD Detection",
+         ood_score="Get OOD score",
+         ood_save="Save OOD SVM",
+         ood_load="Load OOD SVM",
          clear_tmp="Clear directory with temporary files"
 )
