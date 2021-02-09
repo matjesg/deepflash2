@@ -91,6 +91,8 @@ tooltip_css = """<style>
 def set_css_in_cell_output():
     d.display(d.HTML(tooltip_css))
 
+get_ipython().events.register('pre_run_cell', set_css_in_cell_output)
+
 # Cell
 def _html_wrap(name, tooltip='', url=None):
     'Wrapper function to create html with tooltip and link to URL'
@@ -163,6 +165,7 @@ def _get_expert_sample_masks(path):
     path.mkdir(exist_ok=True, parents=True)
     url = "https://github.com/matjesg/bioimage_analysis/raw/master/train_data/lab-wue1/labels/"
     experts = ['expert_'+str(e) for e in range(1,6)]
+
     for e in  experts:
         (path/e).mkdir(exist_ok=True, parents=True)
         urllib.request.urlretrieve(f'{url}/{e}/0001_cFOS.png', path/e/'mask_1.png')
@@ -1020,7 +1023,6 @@ class GUI(GetAttr):
     cat_btns_box = w.Box(children=list(cat_btns.values()), layout=w.Layout(grid_area='cat_btns'))
 
     def __init__(self):
-        get_ipython().events.register('pre_run_cell', set_css_in_cell_output)
         self.config = Config()
         self.base_path = _connect_to_drive().resolve()
 
