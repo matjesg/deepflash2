@@ -1121,10 +1121,10 @@ class GUI(GetAttr):
     }
     cat_btns_box = w.Box(children=list(cat_btns.values()), layout=w.Layout(grid_area='cat_btns'))
 
-    def __init__(self):
+    def __init__(self, path=None, reinit=False):
         self.config = Config()
         self.base_path = _connect_to_drive().resolve()
-        self.el, self.el_pred, self.gt_est = None, None, None
+        self.config.proj_dir = str(self.base_path/self.proj_dir) if self.proj_dir=='deepflash2' else self.proj_dir
 
         #Project Dir
         self.proj = PathSelector(self.base_path, 'Project Folder', tooltip='Project Folder \ndefault: <deepflash2>')
@@ -1135,9 +1135,9 @@ class GUI(GetAttr):
             v.on_click(self.cat_clicked)
 
         #Categories
-        self.gt = GTEstUI(hide=True, path=self.base_path)
-        self.train = TrainUI(hide=True,path=self.base_path, config=self.config)
-        self.pred = PredUI(hide=True, path=self.base_path, config=self.config)
+        self.gt = GTEstUI(hide=True, path=self.proj_path)
+        self.train = TrainUI(hide=True,path=self.proj_path, config=self.config)
+        self.pred = PredUI(hide=True, path=self.proj_path, config=self.config)
         self.cat = {'gt':self.gt, 'train':self.train, 'pred':self.pred}
 
         #Connect Buttons
@@ -1169,7 +1169,9 @@ class GUI(GetAttr):
         self.pred.sb['pred'].ood_path.button_select.on_click(self.pred_ood_load_clicked)
         self.pred.sb['pred'].ood.on_click(self.pred_ood_score_clicked)
 
-        self._set_download_dirs()
+        # Init Project
+        self._init_proj()
+
         self.star_info = w.Label('*Required')
         self.star_info.layout.display = "none"
 
@@ -1190,19 +1192,38 @@ class GUI(GetAttr):
                            '''))
         display(self.gb)
 
-    def _set_download_dirs(self):
-        self.gt.sb['gt'].down.set_path(Path(self.proj_dir)/self.gt_dir)
-        self.train.sb['valid'].down.set_path(Path(self.proj_dir)/self.train_dir)
-        self.pred.sb['pred'].down.set_path(Path(self.proj_dir)/self.pred_dir)
-        self.pred.sb['data'].ens.set_path(Path(self.proj_dir)/self.train_dir/self.ens_dir)
 
-    def set_project_dir(self, b):
-        self.config.proj_dir = str(self.base_path/self.proj.path)
+    @property
+    def proj_path(self):
+        return Path(self.proj_dir)
+
+    def _set_download_dirs(self):
+        self.gt.sb['gt'].down.set_path(self.proj_path/self.gt_dir)
+        self.train.sb['valid'].down.set_path(self.proj_path/self.train_dir)
+        self.pred.sb['pred'].down.set_path(self.proj_path/self.pred_dir)
+        self.pred.sb['data'].ens.set_path(self.proj_path/self.train_dir/self.ens_dir)
+
+    def _set_selection_dirs(self):
+        self.gt.sb['data'].msk.set_path(self.proj_path)
+        self.train.sb['data'].img.set_path(self.proj_path)
+        self.train.sb['data'].msk.set_path(self.proj_path)
+        self.train.sb['data'].cfg.set_path(self.proj_path)
+        self.train.sb['valid'].ens.set_path(self.proj_path)
+        self.pred.sb['data'].img.set_path(self.proj_path)
+        self.pred.sb['data'].ens.set_path(self.proj_path)
+        self.pred.sb['pred'].ood_path.set_path(self.proj_path)
+
+    def _init_proj(self):
+        self.el, self.el_pred, self.gt_est = None, None, None
         self._set_download_dirs()
 
+    def set_project_dir(self, b):
+        self.config.proj_dir = str(self.proj.path)
+        self._init_proj()
+        self._set_selection_dirs()
+
+
     def cat_clicked(self, b):
-        #first execution only
-        if self.config.proj_dir=='deepflash2': self.config.proj_dir = str(Path(self.config.proj_dir).resolve())
         self.star_info.layout.display = "block"
         for k,v in self.cat_btns.items():
             if v==b:
@@ -1220,9 +1241,9 @@ class GUI(GetAttr):
     def gt_data_run_clicked(self, b):
         out = self.gt.main['data']
         out.clear_output()
-        exp_folder = self.gt.sb['data'].msk.path.relative_to(self.base_path)
+        exp_folder = self.gt.sb['data'].msk.path.relative_to(self.proj_path)
         with out:
-            self.gt_est = GTEstimator(exp_folder, config=self.config, path=self.base_path)
+            self.gt_est = GTEstimator(exp_folder, config=self.config, path=self.proj_path)
             items = {x:x for x in self.gt_est.masks.keys()}
             ipp = ItemsPerPage(self.gt_est.show_data, items=items)
             display(ipp.widget)
@@ -1231,8 +1252,8 @@ class GUI(GetAttr):
         out = self.gt.main['data']
         out.clear_output()
         with out:
-            path = Path(self.proj_dir)/'sample_data'/'expert_segmentations'
-            print(f'Dowloading expert sample data into {path.relative_to(self.base_path)}')
+            path = self.proj_path/'sample_data'/'expert_segmentations'
+            print(f'Dowloading expert sample data into {path.relative_to(self.proj_path)}')
             _get_expert_sample_masks(path)
             self.gt.sb['data'].msk.path = path
             self.gt_data_run_clicked('')
@@ -1245,7 +1266,7 @@ class GUI(GetAttr):
     def gt_ref_clicked(self, b):
         out = self.gt.main['gt']
         out.clear_output()
-        self.gt_save_dir = (Path(self.proj_dir)/self.gt_dir/b.name).relative_to(self.base_path)
+        self.gt_save_dir = (self.proj_path/self.gt_dir/b.name).relative_to(self.proj_path)
         res_out = w.Output()
         with out:
             assert type(self.gt_est)==GTEstimator, 'Please load data first!'
@@ -1270,12 +1291,12 @@ class GUI(GetAttr):
         out = self.train.main['data']
         out.clear_output()
         with out: print('Loading data. Please wait')
-        image_folder = self.train.sb['data'].img.path.relative_to(self.base_path)
-        mask_folder = self.train.sb['data'].msk.path.relative_to(self.base_path)
-        ens_folder = (Path(self.proj_dir)/self.train_dir/self.ens_dir).relative_to(self.base_path)
+        image_folder = self.train.sb['data'].img.path.relative_to(self.proj_path)
+        mask_folder = self.train.sb['data'].msk.path.relative_to(self.proj_path)
+        ens_folder = (self.proj_path/self.train_dir/self.ens_dir).relative_to(self.proj_path)
 
         with out:
-            self.el = EnsembleLearner(image_folder, mask_folder, self.config, self.base_path, ens_folder)
+            self.el = EnsembleLearner(image_folder, mask_folder, self.config, self.proj_path, ens_folder)
             items = {x:x for x in self.el.files}
             ipp = ItemsPerPage(self.el.ds.show_data, items=items, overlay=True if self.c==2 else False)
             display(ipp.widget)
@@ -1284,8 +1305,8 @@ class GUI(GetAttr):
         out = self.train.main['data']
         out.clear_output()
         with out:
-            path = Path(self.proj_dir)/'sample_data'
-            print(f'Dowloading sample data into {path.relative_to(self.base_path)}')
+            path = self.proj_path/'sample_data'
+            print(f'Dowloading sample data into {path.relative_to(self.proj_path)}')
             _get_train_sample_data(path)
             self.train.sb['data'].img.path = path/'images'
             self.train.sb['data'].msk.path = path/'masks'
@@ -1302,7 +1323,7 @@ class GUI(GetAttr):
 
     def train_cfg_save_clicked(self, b):
         timestr = time.strftime("%Y%m%d%H%M")
-        path = Path(self.proj_dir)/self.train_dir/f'config_{timestr}'
+        path = self.proj_path/self.train_dir/f'config_{timestr}'
         with self.train.main['train']: self.config.save(path)
 
 
@@ -1345,7 +1366,7 @@ class GUI(GetAttr):
         else:
             self.el.get_valid_results(model_no, use_tta=self.tta)
         out.clear_output()
-        save_dir = (Path(self.proj_dir)/self.train_dir/self.val_dir).relative_to(self.base_path)
+        save_dir = (self.proj_path/self.train_dir/self.val_dir).relative_to(self.proj_path)
         with out: self.el.show_valid_results(model_no, save_dir=save_dir)
 
     def train_valid_ens_save_clicked(self, b):
@@ -1367,7 +1388,7 @@ class GUI(GetAttr):
             print(f'Training OOD Model')
             self.el.ood_train(**self.svm_kwargs)
             timestr = time.strftime("%Y%m%d%H%M")
-            ood_path = Path(self.proj_dir)/self.train_dir/self.ens_dir/f'ood_{timestr}'
+            ood_path = self.proj_path/self.train_dir/self.ens_dir/f'ood_{timestr}'
             self.el.ood_save(ood_path)
             print(f'Showing ensemble results.')
             items = {x.name:x.name for x in self.el.files}
@@ -1410,11 +1431,11 @@ class GUI(GetAttr):
         out = self.pred.main['data']
         out.clear_output()
         with out: print('Loading data. Please wait')
-        image_folder = self.pred.sb['data'].img.path.relative_to(self.base_path)
-        ens_folder = self.pred.sb['data'].ens.path.relative_to(self.base_path)
+        image_folder = self.pred.sb['data'].img.path.relative_to(self.proj_path)
+        ens_folder = self.pred.sb['data'].ens.path.relative_to(self.proj_path)
 
         with out:
-            self.el_pred = EnsembleLearner(image_folder, config=self.config, path=self.base_path, ensemble_dir=ens_folder)
+            self.el_pred = EnsembleLearner(image_folder, config=self.config, path=self.proj_path, ensemble_dir=ens_folder)
             self.el_pred.get_models()
             items = {x:x for x in self.el_pred.files}
             ipp = ItemsPerPage(self.el_pred.ds.show_data, items=items, figsize = (5,5))

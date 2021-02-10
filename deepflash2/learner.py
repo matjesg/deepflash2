@@ -108,7 +108,7 @@ class Config:
         path = Path(path)
         try:
             with open(path) as config_file: c = json.load(config_file)
-            if not Path(c['proj_dir']).is_dir(): c['project']='deepflash2'
+            if not Path(c['proj_dir']).is_dir(): c['proj_dir']='deepflash2'
             for k,v in c.items(): setattr(self, k, v)
             print(f'Successsfully loaded configuration from {path}')
         except:
