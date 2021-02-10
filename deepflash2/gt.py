@@ -65,6 +65,7 @@ class GTEstimator(GetAttr):
         self.mask_fn = lambda exp,msk: self.path/self.exp_dir/exp/msk
 
         f_list = get_image_files(self.path/self.exp_dir)
+        assert len(f_list)>0, f'Found {len(f_list)} masks in "{self.path/self.exp_dir}". Please check your masks and expert folders.'
         ass_str = f'Found unexpected folder structure in {self.path/self.exp_dir}. Please check your provided masks and folders.'
         assert len(f_list[0].relative_to(self.path/self.exp_dir).parents)==2, ass_str
 

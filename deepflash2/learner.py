@@ -221,7 +221,7 @@ class EnsembleLearner(GetAttr):
         self.ensemble_dir = ensemble_dir or self.path/'ensemble'
 
         self.files = get_image_files(self.path/image_dir, recurse=False)
-        assert len(self.files)>0, f'Found {len(self.files)} images in "{image_dir}". Please check your images and folder'
+        assert len(self.files)>0, f'Found {len(self.files)} images in "{image_dir}". Please check your images and image folder'
         if any([mask_dir, label_fn]):
             if label_fn: self.label_fn = label_fn
             else: self.label_fn = get_label_fn(self.files[0], self.path/mask_dir)
