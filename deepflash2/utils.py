@@ -89,7 +89,7 @@ def iou(a,b,threshold=0.5):
     b = np.array(b) > threshold
     overlap = a*b # Logical AND
     union = a+b # Logical OR
-    return np.count_nonzero(overlap)/np.count_nonzero(union)
+    return np.divide(np.count_nonzero(overlap),np.count_nonzero(union))
 
 # Cell
 def label_mask(mask, threshold=0.5, min_pixel=15, do_watershed=False, exclude_border=False):
