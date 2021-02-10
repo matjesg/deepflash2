@@ -1112,9 +1112,12 @@ class GUI(GetAttr):
 
     #Category Buttons
     cat_btns = {
-        'gt':w.Button(description='GT Estimation', layout=w.Layout(flex='1 1 0%',width='auto')),
-        'train':w.Button(description='Training', layout=w.Layout(flex='1 1 0%',width='auto')),
-        'pred':w.Button(description='Prediction', layout=w.Layout(flex='1 1 0%', width='auto'))
+        'gt':w.Button(description='GT Estimation', layout=w.Layout(flex='1 1 0%',width='auto'),
+                     tooltip='Derive reference segmentations from segmentations of multiple experts.'),
+        'train':w.Button(description='Training', layout=w.Layout(flex='1 1 0%',width='auto'),
+                        tooltip='Train deep learning ensembles for segmentation of fluorescent labels in microscopy images.'),
+        'pred':w.Button(description='Prediction', layout=w.Layout(flex='1 1 0%', width='auto'),
+                       tooltip='Predict segmentation masks on new data using customized models')
     }
     cat_btns_box = w.Box(children=list(cat_btns.values()), layout=w.Layout(grid_area='cat_btns'))
 
@@ -1174,7 +1177,7 @@ class GUI(GetAttr):
         box_main = w.VBox(children=[x.main_box for x in self.cat.values()], layout=w.Layout(grid_area='main'))
         box_proj = w.VBox(children=[self.proj.button, self.proj.dialog], layout=w.Layout(grid_area='proj', flex_flow='column', align_items='flex-start'))
 
-        gb = w.GridBox(children=[self.header, self.cat_btns_box, box_proj, box_sb, box_main, self.footer],
+        self.gb = w.GridBox(children=[self.header, self.cat_btns_box, box_proj, box_sb, box_main, self.footer],
                        layout=w.Layout(
                            width='100%',
                            grid_template_columns='350px auto',
@@ -1185,7 +1188,7 @@ class GUI(GetAttr):
                            "sidebar main"
                            "footer footer"
                            '''))
-        display(gb)
+        display(self.gb)
 
     def _set_download_dirs(self):
         self.gt.sb['gt'].down.set_path(Path(self.proj_dir)/self.gt_dir)
@@ -1194,7 +1197,7 @@ class GUI(GetAttr):
         self.pred.sb['data'].ens.set_path(Path(self.proj_dir)/self.train_dir/self.ens_dir)
 
     def set_project_dir(self, b):
-        self.config.proj_dir = str(self.proj.path)
+        self.config.proj_dir = str(self.base_path/self.proj.path)
         self._set_download_dirs()
 
     def cat_clicked(self, b):
