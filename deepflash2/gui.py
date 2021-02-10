@@ -162,7 +162,7 @@ class ZipUpload():
 class ItemsPerPage:
     "Dropdown to show n items per page"
 
-    def __init__(self, plot_fn=None, items=dict(), srt=True, srt_by='name', **kwargs):
+    def __init__(self, plot_fn=None, items=dict(), srt=True, srt_by='name', srt_index=0, **kwargs):
 
         self.plot_fn = plot_fn
         self.items = items
@@ -172,7 +172,7 @@ class ItemsPerPage:
         # Widgets and Layout
         self.drp = w.Dropdown(options=[5,10,20,50,100], layout=w.Layout(width='auto', min_width='1px'))
         drp_lbl = w.HTML('&emsp;Items per Page')
-        self.srt = w.Dropdown(options=['ascending', 'descending'], layout=w.Layout(width='auto', min_width='1px'))
+        self.srt = w.Dropdown(index=srt_index, options=['ascending', 'descending'], layout=w.Layout(width='auto', min_width='1px'))
         self.srt.layout.display = "none"
         up_left = w.HBox([self.srt, drp_lbl, self.drp])
         lyt = w.Layout(width='100px')
@@ -189,7 +189,7 @@ class ItemsPerPage:
         self.nxt.on_click(self.on_button_clicked)
         self.prv.on_click(self.on_button_clicked)
         self.lbl.value = self.page_lbl
-        self.on_srt_change({'new':''})
+        self.on_srt_change({'new': self.srt.options[srt_index]})
 
         if srt:
             self.srt.layout.display = "block"
@@ -1134,7 +1134,7 @@ class GUI(GetAttr):
         #Categories
         self.gt = GTEstUI(hide=True, path=self.base_path)
         self.train = TrainUI(hide=True,path=self.base_path, config=self.config)
-        self.pred = PredUI(hide=True, path=self.base_path)
+        self.pred = PredUI(hide=True, path=self.base_path, config=self.config)
         self.cat = {'gt':self.gt, 'train':self.train, 'pred':self.pred}
 
         #Connect Buttons
@@ -1316,7 +1316,9 @@ class GUI(GetAttr):
             if (sel != 'ensemble') and (sel != f'model_{i}'): continue
             with out: print(f'Training of model {i}')
             if COLAB:
-                with colab.output.temporary(): self.el.fit(i)
+                with colab.output.temporary():
+                    print('Temporary Logs:')
+                    self.el.fit(i)
             else:
                 self.el.fit(i)
             with out:
@@ -1334,6 +1336,7 @@ class GUI(GetAttr):
             print(f'Validating {sel}. This may take a while!')
         if COLAB:
             with colab.output.temporary():
+                print('Temporary Logs:')
                 self.el.get_valid_results(model_no, use_tta=self.tta)
         else:
             self.el.get_valid_results(model_no, use_tta=self.tta)
@@ -1351,6 +1354,7 @@ class GUI(GetAttr):
         with out: print(f'OOD Detection: Running ensemble prediction on training data. This may take a while!')
         if COLAB:
             with colab.output.temporary():
+                print('Temporary Logs:')
                 self.el.get_ensemble_results(self.el.files, use_tta=True)
         else:
             self.el.get_ensemble_results(self.el.files, use_tta=True)
@@ -1375,6 +1379,7 @@ class GUI(GetAttr):
             print('Starting Learning Rate Finder. Please Wait.')
         if COLAB:
             with colab.output.temporary():
+                print('Temporary Logs:')
                 sug_lrs, rec = self.el.lr_find(show_plot=False)
         else:
             sug_lrs, rec = self.el.lr_find(show_plot=False)
@@ -1413,6 +1418,7 @@ class GUI(GetAttr):
         use_tta = use_tta or self.pred_tta
         out = self.pred.main['pred']
         out.clear_output()
+        save_dir = self.pred.sb['pred'].down.path
 
         with out:
             assert type(self.el_pred)==EnsembleLearner, 'Please load data first!'
@@ -1420,13 +1426,14 @@ class GUI(GetAttr):
 
         if COLAB:
             with colab.output.temporary():
-                self.el_pred.get_ensemble_results(self.el_pred.files, use_tta=use_tta)
+                print('Temporary Logs:')
+                self.el_pred.get_ensemble_results(self.el_pred.files, save_dir=save_dir, use_tta=use_tta)
         else:
-            self.el_pred.get_ensemble_results(self.el_pred.files, use_tta=use_tta)
+            self.el_pred.get_ensemble_results(self.el_pred.files, save_dir=save_dir, use_tta=use_tta)
         if show:
             with out:
-                items = {x.name:x.name for x in t.el_pred.files}
-                ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items)
+                items = {x.name:x.name for x in self.el_pred.files}
+                ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, unc=use_tta)
                 display(ipp.widget)
 
     def pred_ood_load_clicked(self, b):
@@ -1453,8 +1460,9 @@ class GUI(GetAttr):
             print('Scoring predictions')
             self.el_pred.ood_score()
             save_dir = self.pred.sb['pred'].down.path
-            print('Saving scoring results to {save_dir}')
-            self.el_pred.df_end.to_csv(save_dir/f'prediction_with_ood_score.csv', index=False)
-            items = {r.file:r.ood_score for _, r in t.el_pred.df_ens.iterrows()}
-            ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score')
+            print(f'Saving scoring results to {save_dir}')
+            self.el_pred.df_ens.to_csv(save_dir/f'prediction_with_ood_score.csv', index=False)
+            items = {r.file:r.ood_score for _, r in self.el_pred.df_ens.iterrows()}
+            print(f'A lower OOD score indicates out-of-distribution (OOD) or anomalous data.')
+            ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', srt_index=1, unc_metric='ood_score')
             display(ipp.widget)

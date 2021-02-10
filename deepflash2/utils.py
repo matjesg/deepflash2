@@ -43,12 +43,14 @@ def ensemble_results(res_dict, file, std=False):
     return a
 
 # Cell
-def plot_results(*args, df, figsize=(20, 20), **kwargs):
+def plot_results(*args, df, unc_metric=None, figsize=(20, 20), **kwargs):
     "Plot images, (masks), predictions and uncertainties side-by-side."
     if len(args)==4:
         img, msk, pred, pred_std = args
     if len(args)==3:
         img, pred, pred_std = args
+    if len(args)==2:
+        img, pred = args
     fig, axs = plt.subplots(nrows=1, ncols=len(args), figsize=figsize, **kwargs)
     #One channel fix
     if img.ndim == 3 and img.shape[-1] == 1:
@@ -56,6 +58,7 @@ def plot_results(*args, df, figsize=(20, 20), **kwargs):
     axs[0].imshow(img)
     axs[0].set_axis_off()
     axs[0].set_title(f'File {df.file}')
+    unc_title = f'Uncertainty \n {unc_metric}: {df[unc_metric]:.3f}' if unc_metric else 'Uncertainty'
     if len(args)==4:
         axs[1].imshow(msk)
         axs[1].set_axis_off()
@@ -65,14 +68,18 @@ def plot_results(*args, df, figsize=(20, 20), **kwargs):
         axs[2].set_title(f'Prediction \n IoU: {df.iou:.2f}')
         axs[3].imshow(pred_std)
         axs[3].set_axis_off()
-        axs[3].set_title(f'Uncertainty')
-    if len(args)==3:
+        axs[3].set_title(unc_title)
+    elif len(args)==3:
         axs[1].imshow(pred)
         axs[1].set_axis_off()
         axs[1].set_title('Prediction')
         axs[2].imshow(pred_std)
         axs[2].set_axis_off()
-        axs[2].set_title(f'Uncertainty')
+        axs[2].set_title(unc_title)
+    elif len(args)==2:
+        axs[1].imshow(pred)
+        axs[1].set_axis_off()
+        axs[1].set_title('Prediction')
     plt.show()
 
 # Cell

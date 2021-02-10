@@ -354,7 +354,7 @@ class EnsembleLearner(GetAttr):
         if self.df_val is None: self.get_validresults(**kwargs)
         df = self.df_val
         if file is not None: df = df[df.file==file]
-        if file is not None: df = df[df.model_no==model_no]
+        if model_no is not None: df = df[df.model_no==model_no]
         if save_dir:
             save_dir = self.path/save_dir
             pred_path = save_dir/'masks'
@@ -379,19 +379,25 @@ class EnsembleLearner(GetAttr):
     def get_models(self, path=None):
         path = path or self.ensemble_dir
         models = get_files(path, extensions='.pth', recurse=False)
-        if len(models)>0:
-            self.models = {}
-            for m in models:
-                model_id = int(m.stem[-1])
-                self.models[model_id] = m
-            print(f'Found {len(self.models)} models in folder {path}')
-            print( self.models)
-        else:
-            print(f'No models found in folder: {path}')
+        assert len(models)>0, f'No models found in {path}'
+        self.models = {}
+        for m in models:
+            model_id = int(m.stem[-1])
+            self.models[model_id] = m
+        print(f'Found {len(self.models)} models in folder {path}')
+        print(self.models)
 
-    def ensemble_results(self, files):
+    def ensemble_results(self, files, save_dir=None, filetype='.png', use_tta=None, **kwargs):
+        use_tta = use_tta or self.pred_tta
         pth_out = self.path/'.tmp'/f'{self.arch}_ensemble'
         pth_out.mkdir(exist_ok=True, parents=True)
+        if save_dir:
+            save_dir = self.path/save_dir
+            pred_path = save_dir/'masks'
+            pred_path.mkdir(parents=True, exist_ok=True)
+            if use_tta:
+                unc_path = save_dir/'uncertainties'
+                unc_path.mkdir(parents=True, exist_ok=True)
         res_list = []
         for f in files:
             for m in self.models.values():
@@ -404,17 +410,22 @@ class EnsembleLearner(GetAttr):
                     m_enrgy.append(tmp['enrgy'])
             smx = m_smx.result()
             seg = np.argmax(smx, axis=-1)
+            std = m_std.result()
             enrgy = m_enrgy.result()
-            np.savez(pth_out/f'{f.stem}.npz', smx=smx, seg=seg, std=m_std.result(), enrgy=enrgy)
+            np.savez(pth_out/f'{f.stem}.npz', smx=smx, seg=seg, std=std, enrgy=enrgy)
             df_tmp = pd.Series({'file' : f.name,
                                 'model' :  pth_out.name,
                                 'img_path': f,
                                 'res_path': pth_out/f'{f.stem}.npz',
                                 'energy_max': enrgy.numpy()})
             res_list.append(df_tmp)
+            if save_dir:
+                save_mask(seg.numpy(), pred_path/f'{df_tmp.file}_{df_tmp.model}_mask', filetype)
+                if use_tta:
+                    save_unc(std.numpy(), unc_path/f'{df_tmp.file}_{df_tmp.model}_unc', filetype)
         return pd.DataFrame(res_list)
 
-    def get_ensemble_results(self, new_files, **kwargs):
+    def get_ensemble_results(self, new_files, save_dir=None, filetype='.png', **kwargs):
         res_list = []
         for i in self.models:
             res = self.predict(new_files, i, **kwargs)
@@ -428,9 +439,9 @@ class EnsembleLearner(GetAttr):
                                     'energy_max': res[3][j].numpy()})
                 res_list.append(df_tmp)
         self.df_models = pd.DataFrame(res_list)
-        self.df_ens  = self.ensemble_results(new_files)
+        self.df_ens  = self.ensemble_results(new_files, save_dir=save_dir, filetype=filetype, **kwargs)
 
-    def show_ensemble_results(self, files=None, model_no=None):
+    def show_ensemble_results(self, files=None, model_no=None, unc=True, unc_metric=None):
         if self.df_ens is None: assert print("Please run `get_ensemble_results` first.")
         if model_no is None: df = self.df_ens
         else: df = self.df_models[df_models.model_no==model_no]
@@ -441,7 +452,8 @@ class EnsembleLearner(GetAttr):
                 tmp = np.load(res)
                 pred = tmp['seg']
                 std = tmp['std']
-            plot_results(img, pred, std, df=r)
+            if unc: plot_results(img, pred, std, df=r, unc_metric=unc_metric)
+            else: plot_results(img, pred, df=r)
 
     def lr_find(self, files=None, bs=None, n_jobs=-1, verbose=1, **kwargs):
         bs = bs or self.bs
