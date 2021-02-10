@@ -654,7 +654,7 @@ class TrainModelSB(BaseParamWidget, GetAttr):
     grid[2, 1:]= params['n_iter']
     grid[3, 0] = w.HTML(_html_wrap(*_dtrain['s']))
     grid[3, 1:]= sel
-    grid[4, 0] = w.Label('MAY TAKE SOME HOURS')
+    #grid[4, 0] = w.Label('MAY TAKE SOME HOURS')
     grid[5, :] = w.HTML('<hr>')
     grid[6, 0] = w.HTML(_html_wrap(*_dtrain['lr']))
     grid[6, 1:]= params['lr']
@@ -1308,7 +1308,8 @@ class GUI(GetAttr):
         out.clear_output()
         with out:
             assert type(self.el)==EnsembleLearner, 'Please load data first!'
-            print('Starting training. This may take up to a few hours - watch the logs below.')
+            print('''Starting training. This may take up to a few hours - depending on your hardware, the number of models, and\
+            training iterations. \nPlease watch the logs below. The final results will be printed here.''')
 
         sel = self.train.sb['train'].sel.value
         self.el.set_n(self.n)
@@ -1366,7 +1367,9 @@ class GUI(GetAttr):
             ood_path = Path(self.proj_dir)/self.train_dir/self.ens_dir/f'ood_{timestr}'
             self.el.ood_save(ood_path)
             print(f'Showing ensemble results.')
-            self.el.show_ensemble_results()
+            items = {x.name:x.name for x in self.el.files}
+            ipp = ItemsPerPage(self.el.show_ensemble_results, items=items)
+            display(ipp.widget)
 
     #Lr finder
     def lr_open(self,b):
