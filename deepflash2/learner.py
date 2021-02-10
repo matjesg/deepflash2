@@ -75,9 +75,9 @@ class Config:
     pred_tta:bool = True
 
     #OOD Settings
-    svm_kernel:str = 'rbf'
-    svm_nu:float = 0.01
-    svm_gamma:float = 0.01
+    kernel:str = 'rbf'
+    nu:float = 0.01
+    gamma:float = 0.01
 
     #Folder Structure
     gt_dir:str = 'gt_estimation'
@@ -93,7 +93,7 @@ class Config:
 
     @property
     def svm_kwargs(self):
-        svm_vars = ['svm_kernel', 'svm_nu', 'svm_gamma']
+        svm_vars = ['kernel', 'nu', 'gamma']
         return dict(filter(lambda x: x[0] in svm_vars, self.__dict__.items()))
 
     def save(self, path):
@@ -221,16 +221,16 @@ class EnsembleLearner(GetAttr):
         self.ensemble_dir = ensemble_dir or self.path/'ensemble'
 
         self.files = get_image_files(self.path/image_dir, recurse=False)
+        assert len(self.files)>0, f'Found {len(self.files)} images in "{image_dir}". Please check your images and folder'
         if any([mask_dir, label_fn]):
             if label_fn: self.label_fn = label_fn
             else: self.label_fn = get_label_fn(self.files[0], self.path/mask_dir)
             #Check if corresponding masks exist
             mask_check = [self.label_fn(x).is_file() for x in self.files]
-            if len(self.files)==sum(mask_check) and len(self.files)>0:
-                print(f'Found {len(self.files)} images in "{image_dir}" and {sum(mask_check)} masks in "{mask_dir}".')
-            else:
-                print(f'IMAGE/MASK MISMATCH! Found {len(self.files)} images in "{image_dir}"and {sum(mask_check)} masks in "{mask_dir}".')
-                assert 'Please check your images and masks (and folders)'
+            chk_str = f'Found {len(self.files)} images in "{image_dir}" and {sum(mask_check)} masks in "{mask_dir}".'
+            assert len(self.files)==sum(mask_check) and len(self.files)>0, f'Please check your images and masks (and folders). {chk_str}'
+            print(chk_str)
+
         else:
             self.label_fn = label_fn
 
@@ -245,7 +245,7 @@ class EnsembleLearner(GetAttr):
         self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, create_weights=False, **self.mw_kwargs, **self.ds_kwargs)
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.stats = self.stats or self.ds.compute_stats()
-        self.df_val, self.df_ens, self.df_model = None,None,None
+        self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
 
 
     def _set_splits(self):

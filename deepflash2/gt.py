@@ -64,9 +64,13 @@ class GTEstimator(GetAttr):
         self.path = Path(path) if path is not None else Path('.')
         self.mask_fn = lambda exp,msk: self.path/self.exp_dir/exp/msk
 
+        f_list = get_image_files(self.path/self.exp_dir)
+        ass_str = f'Found unexpected folder structure in {self.path/self.exp_dir}. Please check your provided masks and folders.'
+        assert len(f_list[0].relative_to(self.path/self.exp_dir).parents)==2, ass_str
+
         self.masks = {}
         self.experts = []
-        for m in sorted(get_image_files(self.path/self.exp_dir)):
+        for m in sorted(f_list):
             exp = m.parent.name
             if m.name in self.masks:
                 self.masks[m.name].append(exp)
@@ -78,7 +82,7 @@ class GTEstimator(GetAttr):
 
     def show_data(self, max_n=6, files=None, figsize=None, **kwargs):
         if files is not None:
-            files = [(m,exps) for m, exps in self.masks.items() if m in files]
+            files = [(m,self.masks[m]) for m in files]
             max_n = len(files)
         else:
             max_n = min((max_n, len(self.masks)))
