@@ -80,9 +80,9 @@ class Config:
     gamma:float = 0.01
 
     #Folder Structure
-    gt_dir:str = 'gt_estimation'
-    train_dir:str = 'train'
-    pred_dir:str = 'preds'
+    gt_dir:str = '1-GT_Estimation'
+    train_dir:str = '2-Training'
+    pred_dir:str = '3-Prediction'
     ens_dir:str = 'ensemble'
     val_dir:str = 'valid'
 

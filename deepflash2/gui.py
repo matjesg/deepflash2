@@ -499,7 +499,7 @@ class GTEstSB:
     #Run Staple
     staple = w.Button(description='Run', layout=w.Layout(width='auto'),
                       tooltip='Run simultaneous truth and performance level estimation')
-    setattr(staple, 'name', 'staple')
+    setattr(staple, 'name', 'STAPLE')
     grid[0, 1:] = staple
 
     #Run MV
@@ -654,6 +654,7 @@ class TrainModelSB(BaseParamWidget, GetAttr):
     grid[2, 1:]= params['n_iter']
     grid[3, 0] = w.HTML(_html_wrap(*_dtrain['s']))
     grid[3, 1:]= sel
+    grid[4, 0] = w.Label('MAY TAKE SOME HOURS')
     grid[5, :] = w.HTML('<hr>')
     grid[6, 0] = w.HTML(_html_wrap(*_dtrain['lr']))
     grid[6, 1:]= params['lr']
@@ -1142,6 +1143,8 @@ class GUI(GetAttr):
         self.gt.sb['data'].sd.on_click(self.gt_data_sd_clicked)
         self.gt.sb['gt'].staple.on_click(self.gt_ref_clicked)
         self.gt.sb['gt'].mv.on_click(self.gt_ref_clicked)
+        self.gt_to_train = w.Button(description='Continue to training with estimated ground truth.', layout=w.Layout(width='auto'))
+        self.gt_to_train.on_click(self.gt_to_train_clicked)
 
         ## Train
         self.train.sb['data'].run.on_click(self.train_data_run_clicked)
@@ -1231,16 +1234,27 @@ class GUI(GetAttr):
             self.gt.sb['data'].msk.path = path
             self.gt_data_run_clicked('')
 
+    def gt_to_train_clicked(self, b):
+        self.train.sb['data'].msk.refresh(self.gt_save_dir)
+        self.train.sb['data'].msk.on_button_select_clicked("")
+        self.cat_clicked(self.cat_btns['train'])
+
     def gt_ref_clicked(self, b):
         out = self.gt.main['gt']
         out.clear_output()
-        save_dir = (Path(self.proj_dir)/self.gt_dir/b.name).relative_to(self.base_path)
+        self.gt_save_dir = (Path(self.proj_dir)/self.gt_dir/b.name).relative_to(self.base_path)
         res_out = w.Output()
         with out:
             assert type(self.gt_est)==GTEstimator, 'Please load data first!'
             display(res_out)
-            self.gt_est.gt_estimation(method=b.name, save_dir=save_dir)
+            self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
         with res_out:
+            print(f'{b.name} segmentation masks saved to {self.gt_save_dir}.')
+            display(self.gt_to_train)
+            print('------------------')
+            print('------------------')
+            print('RESULT SUMMARY')
+            print('------------------')
             print(f'Overall similarity to {b.name}')
             display(pd.DataFrame(self.gt_est.df_agg.mean()))
             print('------------------')
@@ -1438,7 +1452,9 @@ class GUI(GetAttr):
         with out:
             print('Scoring predictions')
             self.el_pred.ood_score()
-            #save df_ens!
+            save_dir = self.pred.sb['pred'].down.path
+            print('Saving scoring results to {save_dir}')
+            self.el_pred.df_end.to_csv(save_dir/f'prediction_with_ood_score.csv', index=False)
             items = {r.file:r.ood_score for _, r in t.el_pred.df_ens.iterrows()}
             ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score')
             display(ipp.widget)
