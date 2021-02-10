@@ -1283,7 +1283,7 @@ class GUI(GetAttr):
         with out: print('Loading data. Please wait')
         image_folder = self.train.sb['data'].img.path.relative_to(self.proj_path)
         mask_folder = self.train.sb['data'].msk.path.relative_to(self.proj_path)
-        ens_folder = (self.proj_path/self.train_dir/self.ens_dir).relative_to(self.proj_path)
+        ens_folder = self.proj_path/self.train_dir/self.ens_dir
 
         with out:
             self.el = EnsembleLearner(image_folder, mask_folder, self.config, self.proj_path, ens_folder)
@@ -1322,8 +1322,8 @@ class GUI(GetAttr):
         out.clear_output()
         with out:
             assert type(self.el)==EnsembleLearner, 'Please load data first!'
-            print('''Starting training. This may take up to a few hours - depending on your hardware, the number of models, and\
-            training iterations. \nPlease watch the logs below. The final results will be printed here.''')
+            print('Starting training. This may take up to a few hours - depending on your hardware, the number of models, and training iterations.')
+            print('Please watch the logs below. The final results will be printed here.')
 
         sel = self.train.sb['train'].sel.value
         self.el.set_n(self.n)

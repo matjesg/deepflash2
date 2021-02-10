@@ -244,6 +244,7 @@ class EnsembleLearner(GetAttr):
         self._set_splits()
         self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, create_weights=False, **self.mw_kwargs, **self.ds_kwargs)
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
+        print('Computing Stats...')
         self.stats = self.stats or self.ds.compute_stats()
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
 
