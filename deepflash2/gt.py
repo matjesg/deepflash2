@@ -97,13 +97,13 @@ class GTEstimator(GetAttr):
             plt.tight_layout()
             plt.show()
 
-    def gt_estimation(self, method='staple', show=True, save_dir=None, filetype='.png', figsize = (10,5), **kwargs):
-        assert method in ['staple', 'majority_voting']
+    def gt_estimation(self, method='STAPLE', show=True, save_dir=None, filetype='.png', figsize = (10,5), **kwargs):
+        assert method in ['STAPLE', 'majority_voting']
         res = []
         if save_dir: print(f'Saving {method} results to {save_dir}')
         for m, exps in self.masks.items():
             masks = [_read_msk(self.mask_fn(exp,m)) for exp in exps]
-            if method=='staple':
+            if method=='STAPLE':
                 ref = staple(masks, self.staple_fval, self.staple_thres)
             elif method=='majority_voting':
                 ref = m_voting(masks, self.mv_undec)
