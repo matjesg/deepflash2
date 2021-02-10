@@ -145,7 +145,7 @@ def _get_expert_sample_masks(path):
 class ZipUpload():
     "Widgets upload and extract zip files"
     def __init__(self, path=None, layout=None):
-        self.path = path or Path()
+        self.path = path or Path('.')
         layout = layout or w.Layout(width='100%')
         self.widget = w.FileUpload(description='Upload .zip', accept='.zip',
                                    multiple=True,layout=layout)
@@ -170,7 +170,7 @@ class ItemsPerPage:
         self.current_page = 0
 
         # Widgets and Layout
-        self.drp = w.Dropdown(options=[5,10,20,50,100], layout=w.Layout(width='auto', min_width='1px'))
+        self.drp = w.Dropdown(options=[1,5,10,20,50,100], layout=w.Layout(width='auto', min_width='1px'))
         drp_lbl = w.HTML('&emsp;Items per Page')
         self.srt = w.Dropdown(index=srt_index, options=['ascending', 'descending'], layout=w.Layout(width='auto', min_width='1px'))
         self.srt.layout.display = "none"
@@ -463,7 +463,6 @@ class GTDataSB:
     grid[4, 0] = w.HTML(_html_wrap(*_dgt['sd']))
 
     #Data Upload
-    grid[3, 1:] = ZipUpload().widget
     sd = w.Button(description='Load Sample Data',layout=w.Layout(width='auto'),tooltip='Click to download sample data')
     grid[4, 1:] = sd
 
@@ -478,7 +477,8 @@ class GTDataSB:
         path = path or Path('.')
         self.msk  = PathSelector(path, 'Select Parent Folder')
         self.grid[0, 1:] = self.msk.button
-
+        self.du =  ZipUpload(path)
+        self.grid[3, 1:] = self.du.widget
 
 # Cell
 class GTEstSB:
@@ -602,8 +602,6 @@ class TrainDataSB(BaseParamWidget, GetAttr):
     grid[7, 0] = w.HTML(_html_wrap(*_dtrain['sd']))
     grid[8,0] = w.HTML(_html_wrap(*_dtrain['cfg_load']))
 
-    #Data Upload
-    grid[6, 1:] = ZipUpload().widget
     sd = w.Button(description='Load Sample Data',layout=w.Layout(width='auto'), tooltip='Click to download sample data')
     grid[7, 1:] = sd
 
@@ -624,6 +622,9 @@ class TrainDataSB(BaseParamWidget, GetAttr):
         #Load Config
         self.cfg = PathConfig(path, 'Select Config File', select_file=True)
         self.grid[8, 1:] = self.cfg.button
+        #Data Upload
+        self.du =  ZipUpload(path)
+        self.grid[6, 1:] = self.du.widget
 
 # Cell
 class TrainModelSB(BaseParamWidget, GetAttr):
@@ -991,17 +992,11 @@ class PredInputSB:
     hints = w.Label(txt)
 
     grid = w.GridspecLayout(5, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
-
     #Labels
     grid[0, 0] = w.HTML(_html_wrap(*_dpred['img_pred']))
     grid[1, 0] = w.HTML(_html_wrap(*_dpred['mdl']))
     grid[3, :] = w.HTML('<hr>')
     grid[4, 0] = w.HTML(_html_wrap(*_dpred['up_pred']))
-    #grid[5, 0] = w.Label('Sample Data')
-
-    #Data Upload
-    grid[4, 1:] = ZipUpload().widget
-    #grid[5, 1:] = TrainSampleData(layout=w.Layout(width='auto')).widget
 
     #Load Data
     run = w.Button(description='Load*', layout=w.Layout(width='auto', min_width='1px'))
@@ -1016,6 +1011,9 @@ class PredInputSB:
         self.grid[0, 1:] = self.img.button
         self.ens  = PathSelector(path, 'Select')
         self.grid[1, 1:] = self.ens.button
+        #Data Upload
+        self.du = ZipUpload(path)
+        self.grid[4, 1:] = self.du.widget
 
 # Cell
 class PredSB(BaseParamWidget, GetAttr):
@@ -1273,18 +1271,10 @@ class GUI(GetAttr):
             display(res_out)
             self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
         with res_out:
-            print(f'{b.name} segmentation masks saved to {self.gt_save_dir}.')
+            print(f'{b.name} segmentation masks saved to folder: {self.gt_save_dir}.')
+            print(f'{b.name} similiarity results are saved to folder: {self.gt_dir}.')
+            print(f'You can download masks and results in the "Downloads" Section.')
             display(self.gt_to_train)
-            print('------------------')
-            print('------------------')
-            print('RESULT SUMMARY')
-            print('------------------')
-            print(f'Overall similarity to {b.name}')
-            display(pd.DataFrame(self.gt_est.df_agg.mean()))
-            print('------------------')
-            print(f'Overall similarity to {b.name} by expert')
-            display(self.gt_est.df_agg)
-            print('------------------')
 
     # Train
     def train_data_run_clicked(self, b):

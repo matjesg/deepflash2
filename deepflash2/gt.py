@@ -37,7 +37,8 @@ def staple(segmentations, foregroundValue = 1, threshold = 0.5):
     segmentations = [sitk.GetImageFromArray(x) for x in segmentations]
     STAPLE_probabilities = sitk.STAPLE(segmentations)
     STAPLE = STAPLE_probabilities > threshold
-    return sitk.GetArrayViewFromImage(STAPLE)
+    #STAPLE = sitk.GetArrayViewFromImage(STAPLE)
+    return sitk.GetArrayFromImage(STAPLE)
 
 # Cell
 def m_voting(segmentations, labelForUndecidedPixels = 0):
@@ -45,7 +46,7 @@ def m_voting(segmentations, labelForUndecidedPixels = 0):
     sitk = import_sitk()
     segmentations = [sitk.GetImageFromArray(x) for x in segmentations]
     mv_segmentation = sitk.LabelVoting(segmentations, labelForUndecidedPixels)
-    return sitk.GetArrayViewFromImage(mv_segmentation)
+    return sitk.GetArrayFromImage(mv_segmentation)
 
 # Cell
 def msk_show(ax, msk, title):
