@@ -108,7 +108,7 @@ class GTEstimator(GetAttr):
                 ref = staple(masks, self.staple_fval, self.staple_thres)
             elif method=='majority_voting':
                 ref = m_voting(masks, self.mv_undec)
-            assert ref.mean() > 0, 'Please try again!'
+            #assert ref.mean() > 0, 'Please try again!'
             df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'iou': [iou(ref, msk) for msk in masks]})
             res.append(df_tmp)
             if show:
