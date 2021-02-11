@@ -555,7 +555,7 @@ _dtrain = {
     'il'  : ('Instance Labels', 'Are you providing instance labels (class-aware and instance-aware)?'),
     'up'  : ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain the correct folder structure.', 'https://matjesg.github.io/deepflash2/add_information.html#Naming'),
     'sd'  : ('Sample Data', 'Get sample data for demonstration and testing.'),
-    'pretrained': ('Pretrained*', 'Select pretrained weights from the model libray or <new> to use an untrained model (random initialization).', 'https://matjesg.github.io/deepflash2/model_library.html'),
+    'pretrained': ('Pretrained*', 'Select pretrained weights from the model libray or "new" to use an untrained model (random initialization).', 'https://matjesg.github.io/deepflash2/model_library.html'),
     'n'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
     's'   : ('Select', 'Train all models (ensemble) or (re-)train specific model.'),
     'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.'),
@@ -1190,17 +1190,20 @@ class GUI(GetAttr):
         self.gt.sb['gt'].down.set_path(self.proj_path/self.gt_dir)
         self.train.sb['valid'].down.set_path(self.proj_path/self.train_dir)
         self.pred.sb['pred'].down.set_path(self.proj_path/self.pred_dir)
-        self.pred.sb['data'].ens.set_path(self.proj_path/self.train_dir/self.ens_dir)
+        #Models dir
+        self.pred.sb['data'].ens.path = self.proj_path/self.train_dir/self.ens_dir
 
     def _set_selection_dirs(self):
         self.gt.sb['data'].msk.set_path(self.proj_path)
         self.train.sb['data'].img.set_path(self.proj_path)
         self.train.sb['data'].msk.set_path(self.proj_path)
         self.train.sb['data'].cfg.set_path(self.proj_path)
-        self.train.sb['valid'].ens.set_path(self.proj_path)
         self.pred.sb['data'].img.set_path(self.proj_path)
-        self.pred.sb['data'].ens.set_path(self.proj_path)
         self.pred.sb['pred'].ood_path.set_path(self.proj_path)
+
+        self.train.sb['valid'].ens.set_path(self.proj_path)
+        self.pred.sb['data'].ens.set_path(self.proj_path)
+
 
     def _init_proj(self):
         self.el, self.el_pred, self.gt_est = None, None, None
@@ -1208,8 +1211,8 @@ class GUI(GetAttr):
 
     def set_project_dir(self, b):
         self.config.proj_dir = str(self.proj.path)
-        self._init_proj()
         self._set_selection_dirs()
+        self._init_proj()
 
 
     def cat_clicked(self, b):
@@ -1420,7 +1423,7 @@ class GUI(GetAttr):
         out.clear_output()
         with out: print('Loading data. Please wait')
         image_folder = self.pred.sb['data'].img.path.relative_to(self.proj_path)
-        ens_folder = self.pred.sb['data'].ens.path.relative_to(self.proj_path)
+        ens_folder = self.pred.sb['data'].ens.path
 
         with out:
             self.el_pred = EnsembleLearner(image_folder, config=self.config, path=self.proj_path, ensemble_dir=ens_folder)
