@@ -152,23 +152,34 @@ class UNet2D(nn.Module):
 
 # Cell
 _MODEL_BASE_URL = 'https://github.com/matjesg/deepflash2/releases/download/model_library/'
-def _load_pretrained(model, dataset, progress=True):
+def _load_pretrained(model, arch, dataset, progress=True):
     "Loads pretrained model weights"
-    url = _MODEL_BASE_URL+dataset+'.pth'
+    url = f'{_MODEL_BASE_URL}{dataset}-{arch}.pth'
     try:
         state_dict = torch.hub.load_state_dict_from_url(url, map_location='cpu', progress=progress)
     except:
-        print(f"Error: No weights available for model trained on {dataset}.")
+        print(f"Error: No weights available for model {arch} trained on {dataset}.")
+        print(f"Continuing without pretrained weights.")
+        return
+    try:
+        if arch=='unet_deepflash2':
+            if model.state_dict()['last.weight'].shape != state_dict['last.weight'].shape:
+                print(f"No pretrained weights for {model.state_dict()['last.weight'].shape[0]} classes in final layer.")
+                state_dict.pop('last.bias')
+                state_dict.pop('last.weight')
+        elif arch=='unext50_deepflash2':
+            if model.state_dict()['final_conv.0.weight'].shape != state_dict['final_conv.0.weight'].shape:
+                print(f"No pretrained weights for {model.state_dict()['final_conv.0.weight'].shape[0]} classes in final layer.")
+                state_dict.pop('final_conv.0.bias')
+                state_dict.pop('final_conv.0.weight')
 
-    if model.state_dict()['last.weight'].shape != state_dict['last.weight'].shape:
-        print(f"No pretrained weights for {model.state_dict()['last.weight'].shape[0]} classes in final layer.")
-        state_dict.pop('last.bias')
-        state_dict.pop('last.weight')
+        # TODO Better handle different number of input channels
+        _ = model.load_state_dict(state_dict, strict=False)
+        print(f"Loaded model weights trained on {dataset}.")
 
-
-    # TODO Better handle different number of input channels
-    _ = model.load_state_dict(state_dict, strict=False)
-    #print(f"Loaded model weights trained on {dataset}.")
+    except Exception as e:
+        print(f'Error: {e}')
+        print(f"Continuing without pretrained weights.")
 
 # Cell
 def unet_ronneberger2015(in_channels=1 ,n_classes=2, pretrained=None, progress=True, **kwargs):
@@ -177,7 +188,7 @@ def unet_ronneberger2015(in_channels=1 ,n_classes=2, pretrained=None, progress=T
                    depth=5, wf=6, padding=False, batch_norm=False,
                    neg_slope=0., up_mode='upconv', dropout=0, **kwargs)
     if pretrained is not None:
-        _load_pretrained(model, dataset=pretrained, progress=progress)
+        _load_pretrained(model, arch='unet_deepflash2', dataset=pretrained, progress=progress)
     return model
 
 # Cell
@@ -187,7 +198,7 @@ def unet_falk2019(in_channels=1 ,n_classes=2, pretrained=None, progress=True, **
                depth=5, wf=6, padding=False, batch_norm=False,
                neg_slope=0.1, up_mode='upconv', dropout=0, **kwargs)
     if pretrained is not None:
-        _load_pretrained(model, dataset=pretrained, progress=progress)
+        _load_pretrained(model, arch='unet_deepflash2', dataset=pretrained, progress=progress)
     return model
 
 # Cell
@@ -197,7 +208,7 @@ def unet_deepflash2(in_channels=1 ,n_classes=2, pretrained=None, progress=True, 
                    depth=5, wf=6, padding=False, batch_norm=True,
                    neg_slope=0.1, up_mode='upconv', **kwargs)
     if pretrained is not None:
-        _load_pretrained(model, dataset=pretrained, progress=progress)
+        _load_pretrained(model, arch='unet_deepflash2', dataset=pretrained, progress=progress)
     return model
 
 # Cell
@@ -373,7 +384,7 @@ def unext50_deepflash2(in_channels=1 ,n_classes=2, pretrained=None, progress=Tru
     "UneXt50 model. Customize via kwargs"
     model = UneXt50(in_channels=in_channels, n_classes=n_classes, **kwargs)
     if pretrained is not None:
-        _load_pretrained(model, dataset=pretrained, progress=progress)
+        _load_pretrained(model, arch='unext50_deepflash2', dataset=pretrained, progress=progress)
     return model
 
 # Cell

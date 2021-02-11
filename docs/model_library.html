@@ -6,8 +6,8 @@ title: Model Library
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "This Notebook contains information on the datasets of the pretrained models."
-description: "This Notebook contains information on the datasets of the pretrained models."
+summary: "Information on the datasets of the pretrained models."
+description: "Information on the datasets of the pretrained models."
 nb_path: "nbs/model_library.ipynb"
 ---
 <!--
@@ -31,12 +31,12 @@ nb_path: "nbs/model_library.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li><p>[cFOS_Wue]: 
+<h2 id="wue-cFOS">wue-cFOS<a class="anchor-link" href="#wue-cFOS"> </a></h2><p><strong>Dataset Description</strong>:
 Trained on 36 image-mask pairs of cFOS labels in the dorsal hippocampus (including 12 images of each sub-region: dentate gyrus, CA3 and CA1). Masks for training were prepared by five independent experts. Images were acquired using laser-scanning confocal microscopy with a resolution of 1.6 pixel per µm.</p>
-<p><img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Wue.png" width="250" height="250" alt="cFOS_Wue">
-  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Wue_mask.png" width="250" height="250" alt="cFOS_Wue_mask"></p>
-</li>
+<ul>
+<li>Images: 36 (laser-scanning confocal microscopy with a resolution of 1.6 pixel per µm)</li>
+<li>Experts: 5 (Ground Truth Estimation: STAPLE)</li>
+<li>Training: tbd.</li>
 </ul>
 
 </div>
@@ -44,12 +44,21 @@ Trained on 36 image-mask pairs of cFOS labels in the dorsal hippocampus (includi
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Wue.png" width="45%" alt="cFOS_Wue"> 
+&nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Wue_mask.png" width="45%" alt="cFOS_Wue"> 
+</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="wue-Parv">wue-Parv<a class="anchor-link" href="#wue-Parv"> </a></h2><p>Trained on 36 image-mask pairs of Parvalbumin-labels in the dorsal hippocampus (including 12 images of each sub-region: dentate gyrus, CA3 and CA1). Masks for training were prepared by five independent experts. Images were acquired using laser-scanning confocal microscopy with a resolution of 1.6 pixel per µm.</p>
 <ul>
-<li><p>[Parv]:
-Trained on 36 image-mask pairs of Parvalbumin-labels in the dorsal hippocampus (including 12 images of each sub-region: dentate gyrus, CA3 and CA1). Masks for training were prepared by five independent experts. Images were acquired using laser-scanning confocal microscopy with a resolution of 1.6 pixel per µm.</p>
-<p><img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/Parv.png" width="250" height="250" alt="Parv">
-  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/Parv_mask.png" width="250" height="250" alt="Parv"></p>
-</li>
+<li>Images: 36 (laser-scanning confocal microscopy with a resolution of 1.6 pixel per µm)</li>
+<li>Experts: 5 (Ground Truth Estimation: STAPLE)</li>
+<li>Training: tbd.</li>
 </ul>
 
 </div>
@@ -57,39 +66,36 @@ Trained on 36 image-mask pairs of Parvalbumin-labels in the dorsal hippocampus (
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li><p>[cFOS_Inns1]:
-with five image-mask pairs of cFOS labels in the amygdala. Masks for fine-tuning were prepared by one expert. Images acquired using epifluorescence microscopy with a resolution of 1 pixel per µm.</p>
-<p><img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Inns1.png" width="250" height="250" alt="cFOS_Inns1">
-  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Inns1_mask.png" width="250" height="250" alt="cFOS_Inns1_mask"></p>
-</li>
-</ul>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/Parv.png" width="45%" alt="cFOS_Wue"> 
+&nbsp; &nbsp; &nbsp; &nbsp;
+  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/Parv_mask.png" width="45%" alt="cFOS_Wue"> 
+</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="wue-OPN3">wue-OPN3<a class="anchor-link" href="#wue-OPN3"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>tbd.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li><p>[cFOS_Inns2]:
-with five image-mask pairs of cFOS labels in the infralimbic cortex. Masks for fine-tuning were prepared by one expert. Images acquired using epifluorescence microscopy with a resolution of 2 pixel per µm.</p>
-<p><img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Inns2.png" width="250" height="250" alt="cFOS_Inns2">
-  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Inns2_mask.png" width="250" height="250" alt="cFOS_Inns2_mask"></p>
-</li>
-</ul>
-
+<h2 id="wue-GFP">wue-GFP<a class="anchor-link" href="#wue-GFP"> </a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li><p>[cFOS_Mue]:
-with five image-mask pairs of cFOS labels in the paraventricular nucleus of the thalamus. Masks for fine-tuning were prepared by one expert. Images acquired using laser-scanning confocal microscopy with a resolution of 0.8 pixel per µm.</p>
-<p><img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Mue.png" width="250" height="250" alt="cFOS_Mue">
-  <img src="https://raw.githubusercontent.com/matjesg/DeepFLaSH/master/assets/cFOS_Mue_mask.png" width="250" height="250" alt="cFOS_Mue_mask"></p>
-</li>
-</ul>
+<p>tbd.</p>
 
 </div>
 </div>

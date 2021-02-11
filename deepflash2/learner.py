@@ -130,7 +130,7 @@ _optim_dict = {
 _archs = ["unext50_deepflash2", "unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015"]
 
 # Cell
-_pretrained = ["new", "wue_cFOS", "wue_Parv", "wue_GFAP", "wue_GFP", "wue_OPN3"]
+_pretrained = ["new", "wue_cFOS", "wue_Parv", "wue_GFP", "wue_OPN3"]
 
 # Cell
 @patch
