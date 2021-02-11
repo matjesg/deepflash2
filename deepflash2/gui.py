@@ -440,7 +440,7 @@ class PathConfig(PathSelector):
 
 # Cell
 _dgt = {
-    'exp' : ('Expert Masks*', 'The parent folder containing sub-folders with segmentation masks, one folder per expert.', 'https://matjesg.github.io/deepflash2/add_information.html#Naming'),
+    'exp' : ('Expert Masks*', 'The parent folder containing sub-folders with segmentation masks, one folder per expert.', 'https://matjesg.github.io/deepflash2/add_information.html#Ground-Truth-Estimation'),
     'up_gt': ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain sub-folders with segmentation masks, one folder per expert.'),
     'sd'  : ('Sample Data', 'Sample data for demonstration and testing.'),
     'staple': ("STAPLE", "Simultaneous truth and performance level estimation (STAPLE)", "https://pubmed.ncbi.nlm.nih.gov/15250643/"),
@@ -549,11 +549,11 @@ class GTEstUI(BaseUI):
 
 # Cell
 _dtrain = {
-    'img' : ('Image Folder*', 'One folder containing all training images.', 'https://matjesg.github.io/deepflash2/add_information.html#Naming'),
+    'img' : ('Image Folder*', 'One folder containing all training images.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'msk' : ('Mask Folder*', 'One folder containing all segmentation masks. We highly recommend using ground truth estimation from multiple experts.'),
     'c'   : ('No. of Classes', 'Number of classes: e.g., 2 for binary segmentation (foreground and background class).'),
     'il'  : ('Instance Labels', 'Are you providing instance labels (class-aware and instance-aware)?'),
-    'up'  : ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain the correct folder structure.', 'https://matjesg.github.io/deepflash2/add_information.html#Naming'),
+    'up'  : ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain the correct folder structure.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'sd'  : ('Sample Data', 'Get sample data for demonstration and testing.'),
     'pretrained': ('Pretrained*', 'Select pretrained weights from the model libray or "new" to use an untrained model (random initialization).', 'https://matjesg.github.io/deepflash2/model_library.html'),
     'n'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
@@ -568,8 +568,7 @@ _dtrain = {
     'tta' : ('Uncertainties', 'Enable uncertainty estimation via test-time augmentation (more reliable and accurate, but slow).'),
     's_val': ('Select', 'Select model for validation. Select "Ensemble" to validate all models.'),
     'mdl' : ('Model Folder', '(Optional) One folder containing the all models of the ensemble. If not selected, latest models from Training will be selected.'),
-    'ood' : ('OOD Detection', '(Optional) For inference/prediction: Train a support-vector machine (SVM) for the detection of out-of-distribution (OOD) or anomalous data.',
-               'https://matjesg.github.io/deepflash2/add_information.html#Naming'),
+    'ood' : ('OOD Detection', '(Optional) For inference/prediction: Train a support-vector machine (SVM) for the detection of out-of-distribution (OOD) or anomalous data.'),
 }
 
 # Cell
@@ -969,7 +968,7 @@ class TrainUI(BaseUI):
 
 # Cell
 _dpred = {
-    'img_pred' : ('Image Folder*', 'One folder containing all new images for prediction.', 'https://matjesg.github.io/deepflash2/add_information.html#Naming'),
+    'img_pred' : ('Image Folder*', 'One folder containing all new images for prediction.', 'https://matjesg.github.io/deepflash2/add_information.html#Prediction'),
     'mdl' : ('Model Folder', 'One folder containing the all models of the ensemble. If not selected, latest models from Training will be selected.'),
     'up_pred' : ('Upload Data', 'Upload a zip file with images or models.'),
     'ood_model' : ('OOD Model', '(Optional) Select model for out-of-distribution detection. If not selected, latest models from training will be used.'),
