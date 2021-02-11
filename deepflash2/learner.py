@@ -380,6 +380,7 @@ class EnsembleLearner(GetAttr):
                 tmp = np.load(res)
                 pred = tmp['seg']
                 std = tmp['std']
+            print(f'Validation image {r.file} for {r.model}:')
             if self.tta: plot_results(img, msk, pred, std, df=r)
             else: plot_results(img, msk, pred, np.zeros_like(pred), df=r)
             if save_dir:
