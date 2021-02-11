@@ -1467,16 +1467,17 @@ class GUI(GetAttr):
 
     def _get_ood(self, path):
         files = get_files(path, extensions='.pkl', recurse=False, folders=None, followlinks=False)
-        assert len(files)>0, f"No trained OOD Model found at {path}! Please select a valid model!"
+        print(files)
+        with self.pred.main['pred']: assert len(files)>0, f"No trained OOD Model found at {path}! Please select a valid model!"
         files.sort(key=os.path.getctime)
         self.el_pred.ood_load(files[0])
 
     def pred_ood_score_clicked(self, b):
         out = self.pred.main['pred']
         out.clear_output()
+        if self.el_pred.ood is None: self._get_ood(self.el_pred.ensemble_dir)
+        if self.el_pred.df_ens is None: self.pred_run_clicked('', use_tta=True, show=False)
         with out:
-            if self.el_pred.ood is None: self._get_ood(self.el_pred.ensemble_dir)
-            if self.el_pred.df_ens is None: self.pred_run_clicked('', use_tta=True, show=False)
             print('Scoring predictions')
             self.el_pred.ood_score()
             save_dir = self.pred.sb['pred'].down.path
@@ -1484,5 +1485,5 @@ class GUI(GetAttr):
             self.el_pred.df_ens.to_csv(save_dir/f'prediction_with_ood_score.csv', index=False)
             items = {r.file:r.ood_score for _, r in self.el_pred.df_ens.iterrows()}
             print(f'A lower OOD score indicates out-of-distribution (OOD) or anomalous data.')
-            ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', srt_index=1, unc_metric='ood_score')
+            ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', unc_metric='ood_score')
             display(ipp.widget)
