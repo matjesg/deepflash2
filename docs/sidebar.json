@@ -5,11 +5,13 @@
     "Tutorial" : "tutorial.html",
     "Model Library": "model_library.html",
     "Additional Information": "add_information.html",
-    "Legacy Version" : {
-        "Ground Truth Estimation": "gt_estimation.html",
-        "Model Training": "train.html",
-        "Prediction on new Data": "predict.html"
-  }
+    "": {
+        "Legacy Version" : {
+            "Ground Truth Estimation": "gt_estimation.html",
+            "Model Training": "train.html",
+            "Prediction on new Data": "predict.html"
+            }
+    }
   },
   "deepflash2 API": {
     "Learner": "learner.html",
