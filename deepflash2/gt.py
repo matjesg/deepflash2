@@ -5,14 +5,17 @@ __all__ = ['install', 'import_sitk', 'staple', 'm_voting', 'msk_show', 'GTEstima
 # Cell
 import sys, subprocess, imageio, pandas as pd, numpy as np
 from pathlib import Path
-from fastai.data.transforms import get_image_files
 from fastcore.basics import GetAttr
 from fastcore.foundation import L
+from fastprogress.fastprogress import ConsoleProgressBar
+from fastai.data.transforms import get_image_files
 import matplotlib.pyplot as plt
 
 from .data import _read_msk
 from .learner import Config
 from .utils import save_mask, iou
+
+
 
 # Cell
 #from https://stackoverflow.com/questions/12332975/installing-python-module-within-code
@@ -101,8 +104,8 @@ class GTEstimator(GetAttr):
     def gt_estimation(self, method='STAPLE', show=True, save_dir=None, filetype='.png', figsize = (10,5), **kwargs):
         assert method in ['STAPLE', 'majority_voting']
         res = []
-        if save_dir: print(f'Saving {method} results to {save_dir}')
-        for m, exps in self.masks.items():
+        print(f'Starting ground truth estimation - {method}')
+        for m, exps in ConsoleProgressBar(self.masks.items()):
             masks = [_read_msk(self.mask_fn(exp,m)) for exp in exps]
             if method=='STAPLE':
                 ref = staple(masks, self.staple_fval, self.staple_thres)

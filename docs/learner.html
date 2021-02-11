@@ -1,13 +1,13 @@
 ---
 
-title: Patches for the `fastai` Learner
+title: Ensemble Learner
 
 
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Imlements functions necessary to build `Learner` suitable for bioimgage segmentation"
-description: "Imlements functions necessary to build `Learner` suitable for bioimgage segmentation"
+summary: "Implements functions necessary to build an  `EnsembleLearner` suitable for bioimgage segmentation"
+description: "Implements functions necessary to build an  `EnsembleLearner` suitable for bioimgage segmentation"
 nb_path: "nbs/00_learner.ipynb"
 ---
 <!--
@@ -36,6 +36,12 @@ nb_path: "nbs/00_learner.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Config">Config<a class="anchor-link" href="#Config"> </a></h2>
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -47,7 +53,102 @@ nb_path: "nbs/00_learner.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="Learner.apply_dropout" class="doc_header"><code>Learner.apply_dropout</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L23" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Learner.apply_dropout</code>()</p>
+<h4 id="Config" class="doc_header"><code>Config</code><a href="https://github.com/fastai/fastcore/tree/master/fastcore/foundation.py#L252" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Config</code>(<strong><code>cfg_name</code></strong>=<em><code>'settings.ini'</code></em>)</p>
+</blockquote>
+<p>Reading and writing <code>settings.ini</code></p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t1</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">t1</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;test_config&#39;</span><span class="p">)</span>
+<span class="n">t2</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+<span class="n">t2</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test_config.json&#39;</span><span class="p">)</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Saved current configuration to test_config.json
+Successsfully loaded configuration from test_config.json
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Patches-for-the-fastai-Learner">Patches for the <code>fastai</code> Learner<a class="anchor-link" href="#Patches-for-the-fastai-Learner"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="Learner.apply_dropout" class="doc_header"><code>Learner.apply_dropout</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L136" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Learner.apply_dropout</code>()</p>
 </blockquote>
 <p>If a module contains 'dropout', it will be switched to .train() mode.</p>
 
@@ -79,7 +180,7 @@ nb_path: "nbs/00_learner.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="energy_max" class="doc_header"><code>energy_max</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L31" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>energy_max</code>(<strong><code>e</code></strong>, <strong><code>ks</code></strong>=<em><code>20</code></em>, <strong><code>dim</code></strong>=<em><code>None</code></em>)</p>
+<h4 id="energy_max" class="doc_header"><code>energy_max</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L144" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>energy_max</code>(<strong><code>e</code></strong>, <strong><code>ks</code></strong>=<em><code>20</code></em>, <strong><code>dim</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
 
 </div>
@@ -128,7 +229,7 @@ nb_path: "nbs/00_learner.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="Learner.predict_tiles" class="doc_header"><code>Learner.predict_tiles</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L37" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Learner.predict_tiles</code>(<strong><code>ds_idx</code></strong>=<em><code>1</code></em>, <strong><code>dl</code></strong>=<em><code>None</code></em>, <strong><code>mc_dropout</code></strong>=<em><code>False</code></em>, <strong><code>n_times</code></strong>=<em><code>1</code></em>, <strong><code>use_tta</code></strong>=<em><code>False</code></em>, <strong><code>tta_merge</code></strong>=<em><code>'mean'</code></em>, <strong><code>energy_T</code></strong>=<em><code>1</code></em>, <strong><code>energy_ks</code></strong>=<em><code>20</code></em>, <strong><code>padding</code></strong>=<em><code>(0, 0, 0, 0)</code></em>)</p>
+<h4 id="Learner.predict_tiles" class="doc_header"><code>Learner.predict_tiles</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L150" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Learner.predict_tiles</code>(<strong><code>ds_idx</code></strong>=<em><code>1</code></em>, <strong><code>dl</code></strong>=<em><code>None</code></em>, <strong><code>mc_dropout</code></strong>=<em><code>False</code></em>, <strong><code>n_times</code></strong>=<em><code>1</code></em>, <strong><code>use_tta</code></strong>=<em><code>False</code></em>, <strong><code>tta_merge</code></strong>=<em><code>'mean'</code></em>, <strong><code>energy_T</code></strong>=<em><code>1</code></em>, <strong><code>energy_ks</code></strong>=<em><code>20</code></em>, <strong><code>padding</code></strong>=<em><code>(0, 0, 0, 0)</code></em>)</p>
 </blockquote>
 <p>Make predictions and reconstruct tiles, optional with dropout and/or tta applied.</p>
 
@@ -166,7 +267,7 @@ nb_path: "nbs/00_learner.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_tmp" class="doc_header"><code>save_tmp</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L91" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_tmp</code>(<strong><code>pth_tmp</code></strong>, <strong><code>files</code></strong>, <strong><code>results</code></strong>)</p>
+<h4 id="save_tmp" class="doc_header"><code>save_tmp</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L204" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_tmp</code>(<strong><code>pth_tmp</code></strong>, <strong><code>files</code></strong>, <strong><code>results</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -211,9 +312,7 @@ nb_path: "nbs/00_learner.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="EnsembleLearner" class="doc_header"><code>class</code> <code>EnsembleLearner</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L98" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>EnsembleLearner</code>(<strong><code>files</code></strong>, <strong><code>label_fn</code></strong>=<em><code>None</code></em>, <strong><code>n</code></strong>=<em><code>5</code></em>, <strong><code>n_splits</code></strong>=<em><code>5</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>wd</code></strong>=<em><code>0.001</code></em>, <strong><code>repo</code></strong>=<em><code>'matjesg/deepflash2'</code></em>, <strong><code>arch</code></strong>=<em><code>'unext50_deepflash2'</code></em>, <strong><code>random_state</code></strong>=<em><code>42</code></em>, <strong><code>metrics</code></strong>=<em><code>None</code></em>, <strong><code>loss_fn</code></strong>=<em><code>None</code></em>, <strong><code>cbs</code></strong>=<em><code>None</code></em>, <strong><code>mpt</code></strong>=<em><code>False</code></em>, <strong><code>ds_kwargs</code></strong>=<em><code>{}</code></em>, <strong><code>opt_func</code></strong>=<em><code>ranger</code></em>, <strong><code>path</code></strong>=<em><code>None</code></em>, <strong><code>ensemble_dir</code></strong>=<em><code>'ensemble'</code></em>, <strong><code>mw_kwargs</code></strong>=<em><code>{}</code></em>, <strong><code>stats</code></strong>=<em><code>None</code></em>, <strong><code>item_tfms</code></strong>=<em><code>[Brightness -- {'max_lighting': 0.1, 'p': 1.0, 'draw': None, 'batch': False}:
-encodes: (TensorImage,object) -&gt; encodes
-decodes: ]</code></em>)</p>
+<h2 id="EnsembleLearner" class="doc_header"><code>class</code> <code>EnsembleLearner</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/learner.py#L211" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>EnsembleLearner</code>(<strong><code>image_dir</code></strong>=<em><code>'images'</code></em>, <strong><code>mask_dir</code></strong>=<em><code>None</code></em>, <strong><code>config</code></strong>=<em><code>None</code></em>, <strong><code>path</code></strong>=<em><code>None</code></em>, <strong><code>ensemble_dir</code></strong>=<em><code>None</code></em>, <strong><code>label_fn</code></strong>=<em><code>None</code></em>, <strong><code>metrics</code></strong>=<em><code>None</code></em>, <strong><code>loss_fn</code></strong>=<em><code>None</code></em>, <strong><code>cbs</code></strong>=<em><code>None</code></em>, <strong><code>ds_kwargs</code></strong>=<em><code>{}</code></em>) :: <code>GetAttr</code></p>
 </blockquote>
 <p>Meta class to train and predict model ensembles with <code>n</code> models</p>
 

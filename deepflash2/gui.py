@@ -637,7 +637,7 @@ class TrainModelSB(BaseParamWidget, GetAttr):
 
     params = {
         'pretrained': w.Dropdown(options=_pretrained, continuous_update=True, layout=w.Layout(width='auto', min_width='1px')),
-        'n': w.IntSlider(min=1, max=10, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
+        'n': w.IntSlider(min=1, max=5, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
         'n_iter':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
         'lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px'))
     }
@@ -1112,9 +1112,9 @@ class GUI(GetAttr):
     }
     cat_btns_box = w.Box(children=list(cat_btns.values()), layout=w.Layout(grid_area='cat_btns'))
 
-    def __init__(self, path=None, reinit=False):
+    def __init__(self, path=Path('.'), reinit=False):
         self.config = Config()
-        self.base_path = _connect_to_drive().resolve()
+        self.base_path = path.resolve()
         self.config.proj_dir = str(self.base_path/self.proj_dir) if self.proj_dir=='deepflash2' else self.proj_dir
 
         #Project Dir
@@ -1265,10 +1265,12 @@ class GUI(GetAttr):
             display(res_out)
             self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
         with res_out:
-            print(f'{b.name} segmentation masks saved to folder: {self.gt_save_dir}.')
-            print(f'{b.name} similiarity results are saved to folder: {self.gt_dir}.')
-            print(f'You can download masks and results in the "Downloads" Section.')
+            print('Ground Truth Estimation finished:')
+            print(f'- {b.name} segmentation masks saved to folder: {self.gt_save_dir}.')
+            print(f'- {b.name} similiarity results are saved to folder: {self.gt_dir}.')
+            print(f'- You can download masks and results in the "Downloads" Section.')
             display(self.gt_to_train)
+            print(f'--------------------------------------------------------------')
 
     # Train
     def train_data_run_clicked(self, b):

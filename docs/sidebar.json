@@ -1,19 +1,26 @@
 {
   "deepflash2": {
     "Getting Started": "/", 
-    "Model Training": "train.html",
-    "Prediction on new Data": "predict.html",
+    "User Interface" : "deepflash2.html",
+    "Tutorial" : "tutorial.html",
     "Model Library": "model_library.html",
-    "Ground Truth Estimation": "gt_estimation.html",
-    "Additional Information": "add_information.html"
+    "Additional Information": "add_information.html",
+    "Legacy Version" : {
+        "Ground Truth Estimation": "gt_estimation.html",
+        "Model Training": "train.html",
+        "Prediction on new Data": "predict.html"
+  }
   },
   "deepflash2 API": {
-    "Patches for the `fastai` Learner": "learner.html",
+    "Learner": "learner.html",
     "Models": "models.html",
     "Data": "data.html",
     "Metrics": "metrics.html",
     "Callbacks": "callbacks.html",
     "Losses": "losses.html",
-    "Utility functions": "utils.html"
+    "Utility functions": "utils.html",
+    "Test-time augmentation": "tta.html",
+    "User Interface": "gui.html",
+    "Ground Truth Estimation": "gt.html"
   }
 }
