@@ -12,6 +12,7 @@ from sklearn import svm
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
 from fastcore.basics import patch, GetAttr
 from fastcore.foundation import add_docs
