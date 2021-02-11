@@ -2,6 +2,12 @@
 
 <!-- do not remove -->
 
+## 0.1.0
+
+### New Features
+
+- Adding GUI and new project structure ([#8](https://github.com/matjesg/deepflash2/pull/8)), thanks to [@matjesg](https://github.com/matjesg)
+
 ## 0.0.14
 
 ### New Features

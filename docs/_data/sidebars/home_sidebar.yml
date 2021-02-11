@@ -21,18 +21,19 @@ entries:
     - output: web,pdf
       title: Additional Information
       url: add_information.html
-    - output: web
       subfolders:
-      - output: web,pdf
-        title: Ground Truth Estimation
-        url: gt_estimation.html
-      - output: web,pdf
-        title: Model Training
-        url: train.html
-      - output: web,pdf
-        title: Prediction on new Data
-        url: predict.html
-      title: Legacy Version
+      - output: web
+        subfolderitems:
+        - output: web,pdf
+          title: Ground Truth Estimation
+          url: gt_estimation.html
+        - output: web,pdf
+          title: Model Training
+          url: train.html
+        - output: web,pdf
+          title: Prediction on new Data
+          url: predict.html
+        title: Legacy Version
     output: web
     title: deepflash2
   - folderitems:
