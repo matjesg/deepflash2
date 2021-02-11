@@ -19,7 +19,7 @@ from .metrics import Dice_f1, Iou
 from .losses import WeightedSoftmaxCrossEntropy
 from .callbacks import ElasticDeformCallback
 from .models import get_default_shapes
-from .data import TileDataset, RandomTileDataset, _read_img
+from .data import TileDataset, RandomTileDataset, _read_img, _read_msk, calculate_weights
 from .utils import iou, plot_results, get_label_fn, calc_iterations, save_mask, save_unc
 import deepflash2.tta as tta
 
@@ -469,6 +469,22 @@ class EnsembleLearner(GetAttr):
         sug_lrs = learn.lr_find(**kwargs)
         return sug_lrs, learn.recorder
 
+    def show_mask_weights(self, files, figsize=(12,12), **kwargs):
+        masks = [self.label_fn(Path(f)) for f in files]
+        for m in masks:
+            print(self.mw_kwargs)
+            print(f'Calculating weights. Please wait...')
+            msk = _read_msk(m)
+            _, w, _ = calculate_weights(msk, n_dims=self.c, **self.mw_kwargs)
+            fig, axes = plt.subplots(nrows=1, ncols=2, figsize=figsize, **kwargs)
+            axes[0].imshow(msk)
+            axes[0].set_axis_off()
+            axes[0].set_title(f'Mask {m.name}')
+            axes[1].imshow(w)
+            axes[1].set_axis_off()
+            axes[1].set_title('Weights')
+            plt.show()
+
     def ood_train(self, features=['energy_max'], **kwargs):
         self.ood = Pipeline([('scaler', StandardScaler()), ('svm',svm.OneClassSVM(**kwargs))])
         self.ood.fit(self.df_ens[features])
@@ -477,20 +493,17 @@ class EnsembleLearner(GetAttr):
         self.df_ens['ood_score'] = self.ood.score_samples(self.df_ens[features])
 
     def ood_save(self, path):
-        'Save OOD model to path'
         path = Path(path)
         joblib.dump(self.ood, path.with_suffix('.pkl'))
         print(f'Saved OOD model to {path}.pkl')
 
     def ood_load(self, path):
-        'Load OOD model from path'
         path = Path(path)
         try:
             self.ood = joblib.load(path)
             print(f'Successsfully loaded OOD Model from {path}')
         except:
             print('Error! Select valid joblib file (.pkl)')
-
 
     def clear_tmp(self):
         try: shutil.rmtree(self.path/'.tmp')
@@ -511,9 +524,10 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          get_models="Get models saved at `path`",
          set_n="Change to `n` models per ensemble",
          lr_find="Wrapper for learning rate finder",
+         show_mask_weights='Plot fn for masks and weights',
          ood_train="Train SVM for OOD Detection",
          ood_score="Get OOD score",
-         ood_save="Save OOD SVM",
-         ood_load="Load OOD SVM",
+         ood_save='Save OOD model to path',
+         ood_load='Load OOD model from path',
          clear_tmp="Clear directory with temporary files"
 )

@@ -85,7 +85,6 @@ class GTEstimator(GetAttr):
     def show_data(self, max_n=6, files=None, figsize=None, **kwargs):
         if files is not None:
             files = [(m,self.masks[m]) for m in files]
-            max_n = len(files)
         else:
             max_n = min((max_n, len(self.masks)))
             files = list(self.masks.items())[:max_n]

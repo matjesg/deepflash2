@@ -871,16 +871,8 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
     'fds':w.IntSlider(min=1, max=20, continuous_update=True, layout= w.Layout(width='auto'))}
     out = w.Output()
 
-    #Close Button
-    tt_show = 'Show example'
-    button_show = w.Button(description='Show', tooltip=tt_show)
-
-    #Select
-    select = w.Dropdown(options=["unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015"], layout=w.Layout(width='auto', min_width='1px'))
-
     #Hint
     lbl = w.HTML('Settings are saved automatically. Click <a href="https://matjesg.github.io/deepflash2/data.html#Weight-Calculation">here</a> for detailed information.')
-
 
     #Grid
     grid = w.GridspecLayout(6, 2, width='400px',  grid_gap="0px", align_items='center')
@@ -893,7 +885,9 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
     grid[3, 0] = w.Label('Forground Distance Sigma')
     grid[3, 1] = params['fds']
     grid[4, :] = w.HTML('<hr>')
-    grid[5, :] = w.HTML('<b>Visualization</b>')
+    grid[5, 0] = w.HTML('Visualization')
+    show = w.Button(description='Show', tooltip='Show example', layout= w.Layout(width='auto'))
+    grid[5, 1:] = show
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -901,7 +895,6 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
         self.widget = w.Accordion(children=[w.VBox([w.HBox([self.button_reset, self.button_close]),
                                            self.lbl,
                                            self.grid,
-                                           w.HBox([self.button_show, self.select]),
                                            self.out])]
                          )
         self.widget.set_title(0, 'Custom Mask Weights')
@@ -1153,13 +1146,11 @@ class GUI(GetAttr):
         self.train.sb['data'].cfg.button_select.on_click(self.train_data_load_cfg_clicked)
         self.train.sb['train'].run.on_click(self.train_run_clicked)
         self.train.sb['train'].cfg_save.on_click(self.train_cfg_save_clicked)
-        #self.train.sb['train'].params['n'].observe(self.train_n_change, 'value')
         self.train.sb['valid'].run.on_click(self.train_valid_run_clicked)
         self.train.sb['valid'].ens.button_select.on_click(self.train_valid_ens_save_clicked)
         self.train.sb['valid'].ood.on_click(self.train_valid_ood_clicked)
-
         self.train.xtr['lr'].run.on_click(self.lr_start_clicked)
-        #self.train.xtr['param'].run.on_click(self.lr_start_clicked)
+        self.train.xtr['mw'].show.on_click(self.mw_show_clicked)
 
         ## Pred
         self.pred.sb['data'].run.on_click(self.pred_data_run_clicked)
@@ -1413,8 +1404,15 @@ class GUI(GetAttr):
     def par_open(self,b):
         self.par.widget.layout.display = "block"
 
-    def mw_on_show_clicked(self, b):
-        pass
+    def mw_show_clicked(self, b):
+        out = self.train.xtr['mw'].out
+        out.clear_output()
+        with out:
+            print('Loading data. Please wait...')
+            items = {x:x for x in self.el.files}
+            ipp = ItemsPerPage(self.el.show_mask_weights, items=items)
+            out.clear_output()
+            display(ipp.widget)
 
     # Prediction
     def pred_data_run_clicked(self, b):
