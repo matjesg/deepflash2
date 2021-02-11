@@ -3,17 +3,26 @@
 __all__ = ['Config', 'energy_max', 'save_tmp', 'EnsembleLearner']
 
 # Cell
-import shutil, gc, joblib
-from dataclasses import dataclass
-import torch.nn as nn
-import torch.nn.functional as F
-from fastai.vision.all import *
-from fastcore.all import *
+import shutil, gc, joblib, json, numpy as np, pandas as pd
+import torch, torch.nn as nn, torch.nn.functional as F
+from dataclasses import dataclass, field, asdict
+from pathlib import Path
+from nbdev.showdoc import add_docs
 
 from sklearn import svm
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+
+from fastcore.basics import patch, GetAttr
+from fastprogress import progress_bar
+from fastai import optimizer
+from fastai.torch_core import TensorImage
+from fastai.learner import Learner
+from fastai.callback.tracker import SaveModelCallback
+from fastai.data.core import DataLoaders
+from fastai.data.transforms import get_image_files, get_files, Normalize
+from fastai.vision.augment import Brightness
 
 from .metrics import Dice_f1, Iou
 from .losses import WeightedSoftmaxCrossEntropy
@@ -100,7 +109,7 @@ class Config:
         'Save configuration to path'
         path = Path(path)
         with open(path.with_suffix('.json'), 'w') as config_file:
-            json.dump(self.__dict__, config_file)
+            json.dump(asdict(self), config_file)
         print(f'Saved current configuration to {path}.json')
 
     def load(self, path):
@@ -116,14 +125,14 @@ class Config:
 
 # Cell
 _optim_dict = {
-    'ranger' : ranger,
-    'Adam' : Adam,
-    'RAdam' : RAdam,
-    'QHAdam' :QHAdam,
-    'Larc' : Larc,
-    'Lamb' : Lamb,
-    'SGD' : SGD,
-    'RMSProp' : RMSProp,
+    'ranger' : optimizer.ranger,
+    'Adam' : optimizer.Adam,
+    'RAdam' : optimizer.RAdam,
+    'QHAdam' :optimizer.QHAdam,
+    'Larc' : optimizer.Larc,
+    'Lamb' : optimizer.Lamb,
+    'SGD' : optimizer.SGD,
+    'RMSProp' : optimizer.RMSProp,
 }
 
 # Cell
@@ -371,7 +380,8 @@ class EnsembleLearner(GetAttr):
                 tmp = np.load(res)
                 pred = tmp['seg']
                 std = tmp['std']
-            plot_results(img, msk, pred, std, df=r)
+            if self.tta: plot_results(img, msk, pred, std, df=r)
+            else: plot_results(img, msk, pred, np.zeros_like(pred), df=r)
             if save_dir:
                 save_mask(pred, pred_path/f'{r.file}_{r.model}_mask', filetype)
                 if self.tta:
@@ -446,7 +456,7 @@ class EnsembleLearner(GetAttr):
         if self.df_ens is None: assert print("Please run `get_ensemble_results` first.")
         if model_no is None: df = self.df_ens
         else: df = self.df_models[df_models.model_no==model_no]
-        if files is not None: df = df[df.file.isin(files)]
+        if files is not None: df = df.set_index('file', drop=False).loc[files]
         for _, r in df.iterrows():
             img = _read_img(r.img_path)
             with open(r.res_path, 'rb') as res:

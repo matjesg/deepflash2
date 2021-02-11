@@ -6,7 +6,6 @@ __all__ = ['install', 'import_sitk', 'staple', 'm_voting', 'msk_show', 'GTEstima
 import sys, subprocess, imageio, pandas as pd, numpy as np
 from pathlib import Path
 from fastcore.basics import GetAttr
-from fastcore.foundation import L
 from fastprogress.fastprogress import ConsoleProgressBar
 from fastai.data.transforms import get_image_files
 import matplotlib.pyplot as plt
@@ -14,8 +13,6 @@ import matplotlib.pyplot as plt
 from .data import _read_msk
 from .learner import Config
 from .utils import save_mask, iou
-
-
 
 # Cell
 #from https://stackoverflow.com/questions/12332975/installing-python-module-within-code

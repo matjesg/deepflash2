@@ -1467,6 +1467,7 @@ class GUI(GetAttr):
 
     def _get_ood(self, path):
         files = get_files(path, extensions='.pkl', recurse=False, folders=None, followlinks=False)
+        assert len(files)>0, f"No trained OOD Model found at {path}! Please select a valid model!"
         files.sort(key=os.path.getctime)
         self.el_pred.ood_load(files[0])
 
@@ -1474,9 +1475,8 @@ class GUI(GetAttr):
         out = self.pred.main['pred']
         out.clear_output()
         with out:
-            if not self.el_pred.ood: self._get_ood(self.el_pred.ensemble_dir)
-        if not self.pred_tta or self.el_pred.df_ens is None: self.pred_run_clicked('', use_tta=True, show=False)
-        with out:
+            if self.el_pred.ood is None: self._get_ood(self.el_pred.ensemble_dir)
+            if self.el_pred.df_ens is None: self.pred_run_clicked('', use_tta=True, show=False)
             print('Scoring predictions')
             self.el_pred.ood_score()
             save_dir = self.pred.sb['pred'].down.path
