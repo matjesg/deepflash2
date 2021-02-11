@@ -7,7 +7,6 @@ import shutil, gc, joblib, json, numpy as np, pandas as pd
 import torch, torch.nn as nn, torch.nn.functional as F
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
-from nbdev.showdoc import add_docs
 
 from sklearn import svm
 from sklearn.model_selection import KFold
@@ -15,6 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from fastcore.basics import patch, GetAttr
+from fastcore.foundation import add_docs
 from fastprogress import progress_bar
 from fastai import optimizer
 from fastai.torch_core import TensorImage
