@@ -3,7 +3,7 @@
 __all__ = ['import_sitk', 'staple', 'm_voting', 'msk_show', 'GTEstimator']
 
 # Cell
-import sys, subprocess, imageio, pandas as pd, numpy as np
+import imageio, pandas as pd, numpy as np
 from pathlib import Path
 from fastcore.basics import GetAttr
 from fastprogress.fastprogress import ConsoleProgressBar

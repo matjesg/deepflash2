@@ -26,6 +26,8 @@ from torch.utils.data import Dataset, DataLoader
 from fastai.vision.all import *
 from fastcore.all import *
 
+from .utils import import_package
+
 # Cell
 def show(*obj, file_name=None, overlay=False, pred=False,
          show_bbox=True, figsize=(10,10), cmap='binary_r', **kwargs):
@@ -288,7 +290,7 @@ class DeformationField:
 def _read_img(path, divide=None, **kwargs):
     "Read image and normalize to 0-1 range"
     if path.suffix == '.zarr':
-        import zarr
+        zarr = import_package('zarr')
         img = zarr.convenience.load(str(path)) # assuming shape (z_dim, n_channel, y_dim, x_dim)
         img = np.max(img, axis=0) # max z projection
         img = np.moveaxis(img, 0, -1)
