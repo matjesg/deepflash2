@@ -60,79 +60,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="install" class="doc_header"><code>install</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L19" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>install</code>(<strong><code>package</code></strong>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="import_sitk" class="doc_header"><code>import_sitk</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L23" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>import_sitk</code>()</p>
+<h4 id="import_sitk" class="doc_header"><code>import_sitk</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>import_sitk</code>()</p>
 </blockquote>
 
 </div>
@@ -218,7 +146,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="staple" class="doc_header"><code>staple</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L34" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>staple</code>(<strong><code>segmentations</code></strong>, <strong><code>foregroundValue</code></strong>=<em><code>1</code></em>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
+<h4 id="staple" class="doc_header"><code>staple</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L29" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>staple</code>(<strong><code>segmentations</code></strong>, <strong><code>foregroundValue</code></strong>=<em><code>1</code></em>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>)</p>
 </blockquote>
 <p>STAPLE: Simultaneous Truth and Performance Level Estimation with simple ITK</p>
 
@@ -298,7 +226,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="m_voting" class="doc_header"><code>m_voting</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>m_voting</code>(<strong><code>segmentations</code></strong>, <strong><code>labelForUndecidedPixels</code></strong>=<em><code>0</code></em>)</p>
+<h4 id="m_voting" class="doc_header"><code>m_voting</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L39" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>m_voting</code>(<strong><code>segmentations</code></strong>, <strong><code>labelForUndecidedPixels</code></strong>=<em><code>0</code></em>)</p>
 </blockquote>
 <p>Majority Voting from  simple ITK Label Voting</p>
 
@@ -378,7 +306,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="msk_show" class="doc_header"><code>msk_show</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L52" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>msk_show</code>(<strong><code>ax</code></strong>, <strong><code>msk</code></strong>, <strong><code>title</code></strong>)</p>
+<h4 id="msk_show" class="doc_header"><code>msk_show</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L47" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>msk_show</code>(<strong><code>ax</code></strong>, <strong><code>msk</code></strong>, <strong><code>title</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -450,7 +378,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="GTEstimator" class="doc_header"><code>class</code> <code>GTEstimator</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L58" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GTEstimator</code>(<strong><code>exp_dir</code></strong>=<em><code>'expert_segmentations'</code></em>, <strong><code>config</code></strong>=<em><code>None</code></em>, <strong><code>path</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>=<em><code>1</code></em>) :: <code>GetAttr</code></p>
+<h2 id="GTEstimator" class="doc_header"><code>class</code> <code>GTEstimator</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L53" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GTEstimator</code>(<strong><code>exp_dir</code></strong>=<em><code>'expert_segmentations'</code></em>, <strong><code>config</code></strong>=<em><code>None</code></em>, <strong><code>path</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>=<em><code>1</code></em>) :: <code>GetAttr</code></p>
 </blockquote>
 <p>Class for ground truth estimation</p>
 
@@ -794,7 +722,7 @@ nb_path: "nbs/09_gt.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre> |████████████████████████████████--------| 80.00% [4/5 00:02&lt;00:00]</pre>
+<pre> |████████████████████████████████--------| 80.00% [4/5 00:01&lt;00:00]</pre>
 </div>
 </div>
 
@@ -917,7 +845,7 @@ nb_path: "nbs/09_gt.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre> |████████████████------------------------| 40.00% [2/5 00:00&lt;00:00]</pre>
+<pre> |████████████████------------------------| 40.00% [2/5 00:00&lt;00:01]</pre>
 </div>
 </div>
 

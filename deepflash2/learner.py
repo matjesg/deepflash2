@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 from fastcore.basics import patch, GetAttr
-from fastcore.foundation import add_docs
+from fastcore.foundation import add_docs, L
 from fastprogress import progress_bar
 from fastai import optimizer
 from fastai.torch_core import TensorImage
@@ -65,7 +65,6 @@ class Config:
     mpt:bool = False
     optim:str = 'ranger'
     n_iter:int = 1000
-    stats:tuple = None
 
     #Train Validation Settings
     tta:bool = True
@@ -221,16 +220,17 @@ def save_tmp(pth_tmp, files, results):
 class EnsembleLearner(GetAttr):
     _default = 'config'
     def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None,
-                 label_fn=None, metrics=None, loss_fn=None, cbs=None, ds_kwargs={}):
+                 label_fn=None, metrics=None, loss_fn=None, cbs=None, ds_kwargs={}, stats=None, files=None):
 
         self.config = config or Config()
+        self.stats = stats
         self.path = Path(path) if path is not None else Path('.')
         self.metrics = metrics or [Iou()] #Dice_f1()
         self.loss_fn = loss_fn or WeightedSoftmaxCrossEntropy(axis=1)
         self.cbs = cbs or [SaveModelCallback(monitor='iou'), ElasticDeformCallback] #ShowGraphCallback
         self.ensemble_dir = ensemble_dir or self.path/'ensemble'
 
-        self.files = get_image_files(self.path/image_dir, recurse=False)
+        self.files = L(files) or get_image_files(self.path/image_dir, recurse=False)
         assert len(self.files)>0, f'Found {len(self.files)} images in "{image_dir}". Please check your images and image folder'
         if any([mask_dir, label_fn]):
             if label_fn: self.label_fn = label_fn
@@ -254,14 +254,14 @@ class EnsembleLearner(GetAttr):
         self._set_splits()
         self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, create_weights=False, **self.mw_kwargs, **self.ds_kwargs)
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
-        print('Computing Stats...')
-        self.stats = self.stats or self.ds.compute_stats()
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
 
-
     def _set_splits(self):
-        kf = KFold(self.n_splits, shuffle=True, random_state=self.random_state)
-        self.splits = {key:(self.files[idx[0]], self.files[idx[1]]) for key, idx in zip(range(1,self.n_splits+1), kf.split(self.files))}
+        if self.n_splits>1:
+            kf = KFold(self.n_splits, shuffle=True, random_state=self.random_state)
+            self.splits = {key:(self.files[idx[0]], self.files[idx[1]]) for key, idx in zip(range(1,self.n_splits+1), kf.split(self.files))}
+        else:
+            self.splits = {1: (self.files[0], self.files[0])}
 
     def save_model(self, file, model, pickle_protocol=2):
         state = model.state_dict()
@@ -278,8 +278,8 @@ class EnsembleLearner(GetAttr):
             if with_meta:
                 self.config.arch = state['arch']
                 self.config.repo = state['repo']
-                self.config.stats = state['stats']
                 self.config.c  = state['c']
+                self.stats = state['stats']
         else:
             model_state = state
         model = torch.hub.load(self.repo, self.arch, pretrained=None, n_classes=self.c, in_channels=self.in_channels, pre_ssl=False)
@@ -290,6 +290,7 @@ class EnsembleLearner(GetAttr):
         n_iter = n_iter or self.n_iter
         lr_max = lr_max or self.lr
         bs = bs or self.bs
+        self.stats = self.stats or self.ds.compute_stats()
         name = self.ensemble_dir/f'{self.arch}_model-{i}.pth'
         files_train, files_val = self.splits[i]
         train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, **self.mw_kwargs, **self.ds_kwargs)
@@ -329,10 +330,10 @@ class EnsembleLearner(GetAttr):
     def predict(self, files, model_no, bs=None, **kwargs):
         bs = bs or self.bs
         model_path = self.models[model_no]
+        model = self.load_model(model_path)
         batch_tfms = Normalize.from_stats(*self.stats)
         ds = TileDataset(files, **self.ds_kwargs)
         dls = DataLoaders.from_dsets(ds, batch_size=bs, after_batch=batch_tfms, shuffle=False, drop_last=False)
-        model = self.load_model(model_path)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
         learn = Learner(dls, model, loss_func=self.loss_fn)
         if self.mpt: learn.to_fp16()

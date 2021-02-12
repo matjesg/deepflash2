@@ -287,15 +287,21 @@ class DeformationField:
 # Cell
 def _read_img(path, divide=None, **kwargs):
     "Read image and normalize to 0-1 range"
-    img = imageio.imread(path, **kwargs)
-    if divide is None and img.max()>0:
-        img = img/np.iinfo(img.dtype).max
-    if divide is not None:
-        img = img/divide
-    #assert img.max()<=1. and img.max()>.04, f'Check image loading, dividing by {divide}, max value is {img.max()}'
-    assert img.max()<=1., f'Check image loading, dividing by {divide}'
-    if img.ndim == 2:
-        img = np.expand_dims(img, axis=2)
+    if path.suffix == '.zarr':
+        import zarr
+        img = zarr.convenience.load(str(path)) # assuming shape (z_dim, n_channel, y_dim, x_dim)
+        img = np.max(img, axis=0) # max z projection
+        img = np.moveaxis(img, 0, -1)
+    else:
+        img = imageio.imread(path, **kwargs)
+        if divide is None and img.max()>0:
+            img = img/np.iinfo(img.dtype).max
+        if divide is not None:
+            img = img/divide
+        #assert img.max()<=1. and img.max()>.04, f'Check image loading, dividing by {divide}, max value is {img.max()}'
+        assert img.max()<=1., f'Check image loading, dividing by {divide}'
+        if img.ndim == 2:
+            img = np.expand_dims(img, axis=2)
     return img
 
 # Cell
@@ -413,6 +419,7 @@ class BaseDataset(Dataset):
     #https://stackoverflow.com/questions/60101240/finding-mean-and-standard-deviation-across-image-channels-pytorch/60803379#60803379
     def compute_stats(self, max_samples=50):
         "Computes mean and std from files"
+        print('Computing Stats...')
         mean_sum, var_sum = 0., 0.
         for i, f in enumerate(self.files, 1):
             img = _read_img(f, divide=self.divide)
