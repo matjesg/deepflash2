@@ -519,7 +519,9 @@ class EnsembleLearner(GetAttr):
             print('Error! Select valid joblib file (.pkl)')
 
     def clear_tmp(self):
-        try: shutil.rmtree(self.path/'.tmp')
+        try:
+            shutil.rmtree(self.path/'.tmp')
+            print(f'Deleted temporary files from {self.path/".tmp"}')
         except: print("No temporary files to delete")
 
 # Cell

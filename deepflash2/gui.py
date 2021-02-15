@@ -578,6 +578,7 @@ _dtrain = {
     's_val': ('Select', 'Select model for validation. Select "Ensemble" to validate all models.'),
     'mdl' : ('Model Folder', '(Optional) One folder containing the all models of the ensemble. If not selected, latest models from Training will be selected.'),
     'ood' : ('OOD Detection', '(Optional) For inference/prediction: Train a support-vector machine (SVM) for the detection of out-of-distribution (OOD) or anomalous data.'),
+    'cache'  : ('Clear Cache', 'Delete cached files used for validation and visualization. This will not affect the final results.'),
 }
 
 # Cell
@@ -720,7 +721,7 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     params['tta'].style.button_width = '50px'
 
     #Grid
-    grid = w.GridspecLayout(9, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(10, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['s_val']))
     grid[1, 0] = w.HTML(_html_wrap(*_dtrain['tta']))
     grid[1, 1:]= params['tta']
@@ -730,6 +731,7 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     grid[6, 0] = w.HTML(_html_wrap(*_dtrain['ood']))
     grid[7, :] = w.HTML('<hr>')
     grid[8, 0] = w.HTML('Downloads')
+    grid[9, 0] = w.HTML(_html_wrap(*_dtrain['cache']))
 
     #Model
     sel = w.Dropdown(continuous_update=True, layout=w.Layout(width='auto', min_width='1px'))
@@ -742,6 +744,9 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     #Res
     ood = w.Button(description='Train OOD Model', layout=w.Layout(width='auto'))
     grid[6, 1:] = ood
+
+    cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
+    grid[9, 1:] = cache
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -1004,6 +1009,7 @@ _dpred = {
     'up_pred' : ('Upload Data', 'Upload a zip file with images or models.'),
     'ood_model' : ('OOD Model', '(Optional) Select model for out-of-distribution detection. If not selected, latest models from training will be used.'),
     's_pred'  : ('Select', 'Ensemble or model to be used for prediction.'),
+    'cache'  : ('Clear Cache', 'Delete cached files used for ensembling and visualization. This will not affect the final results.'),
 }
 
 # Cell
@@ -1054,7 +1060,7 @@ class PredSB(BaseParamWidget, GetAttr):
     params['pred_tta'].style.button_width = '50px'
 
     #Grid
-    grid = w.GridspecLayout(8, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(9, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #grid[0, 0] = w.HTML(_html_wrap(*_dpred['s_pred']))
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['tta']))
     grid[0, 1:] = params['pred_tta']
@@ -1063,6 +1069,7 @@ class PredSB(BaseParamWidget, GetAttr):
     grid[4, 0] = w.HTML(_html_wrap(*_dpred['ood_model']))
     grid[6, :] = w.HTML('<hr>')
     grid[7, 0] = w.HTML('Downloads')
+    grid[8, 0] = w.HTML(_html_wrap(*_dpred['cache']))
 
     #Res
     run = w.Button(description='Run Prediction*', layout=w.Layout(width='auto'))
@@ -1071,6 +1078,10 @@ class PredSB(BaseParamWidget, GetAttr):
     #OOD
     ood = w.Button(description='Score Predictions', layout=w.Layout(width='auto'))
     grid[5, 1:] = ood
+
+    #OOD
+    cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
+    grid[8, 1:] = cache
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -1180,6 +1191,7 @@ class GUI(GetAttr):
         self.train.sb['valid'].run.on_click(self.train_valid_run_clicked)
         self.train.sb['valid'].ens.button_select.on_click(self.train_valid_ens_save_clicked)
         self.train.sb['valid'].ood.on_click(self.train_valid_ood_clicked)
+        self.train.sb['valid'].cache.on_click(self.train_valid_cache_clicked)
         self.train.xtr['lr'].run.on_click(self.lr_start_clicked)
         self.train.xtr['mw'].show.on_click(self.mw_show_clicked)
 
@@ -1188,6 +1200,7 @@ class GUI(GetAttr):
         self.pred.sb['pred'].run.on_click(self.pred_run_clicked)
         self.pred.sb['pred'].ood_path.button_select.on_click(self.pred_ood_load_clicked)
         self.pred.sb['pred'].ood.on_click(self.pred_ood_score_clicked)
+        self.pred.sb['pred'].cache.on_click(self.pred_cache_clicked)
 
         # Init Project
         self._init_proj()
@@ -1296,15 +1309,16 @@ class GUI(GetAttr):
         with out:
             assert type(self.gt_est)==GTEstimator, 'Please load data first!'
             print('Please watch the logs below. The final results will be printed here.')
-            if COLAB:
-                with colab.output.temporary():
-                    print('Temporary Logs:')
-                    self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
-            else:
-                with self.tmp:
-                    print('Temporary Logs:')
-                    self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
-                    self.tmp.clear_output()
+        if COLAB:
+            with colab.output.temporary():
+                print('Temporary Logs:')
+                self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
+        else:
+            with self.tmp:
+                print('Temporary Logs:')
+                self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
+                self.tmp.clear_output()
+        with out:
             print('Ground Truth Estimation finished:')
             print(f'- {b.name} segmentation masks saved to folder: {self.gt_save_dir}.')
             print(f'- {b.name} similiarity results are saved to folder: {self.gt_dir}.')
@@ -1439,6 +1453,9 @@ class GUI(GetAttr):
             ipp = ItemsPerPage(self.proj_path,self.el.show_ensemble_results, items=items)
             display(ipp.widget)
 
+    def train_valid_cache_clicked(self, b):
+        with self.train.main['valid']: self.el.clear_tmp()
+
     #Lr finder
     def lr_open(self,b):
         self.lrfinder.widget.layout.display = "block"
@@ -1552,3 +1569,6 @@ class GUI(GetAttr):
             print(f'A lower OOD score indicates out-of-distribution (OOD) or anomalous data.')
             ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', unc_metric='ood_score')
             display(ipp.widget)
+
+    def pred_cache_clicked(self, b):
+        with self.pred.main['pred']: self.el_pred.clear_tmp()

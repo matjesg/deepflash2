@@ -331,7 +331,7 @@ def _get_cached_data(path):
 # Cell
 class BaseDataset(Dataset):
     def __init__(self, files, label_fn=None, create_weights=True, instance_labels = False, n_classes=2, divide=None, ignore={},
-                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, bws=6, fds=1, bwf=50, fbr=.1, n_jobs=1, verbose=0, **kwargs):
+                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, bws=6, fds=1, bwf=50, fbr=.1, n_jobs=1, verbose=10, **kwargs):
         store_attr('files, label_fn, instance_labels, create_weights, divide, n_classes, ignore, tile_shape, \
                     padding, bws, fds, bwf, fbr')
         self.c = n_classes
