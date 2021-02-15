@@ -6,7 +6,7 @@ __all__ = ['import_sitk', 'staple', 'm_voting', 'msk_show', 'GTEstimator']
 import imageio, pandas as pd, numpy as np
 from pathlib import Path
 from fastcore.basics import GetAttr
-from fastprogress.fastprogress import ConsoleProgressBar
+from fastprogress import progress_bar
 from fastai.data.transforms import get_image_files
 import matplotlib.pyplot as plt
 
@@ -45,14 +45,16 @@ def m_voting(segmentations, labelForUndecidedPixels = 0):
 
 # Cell
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-def msk_show(ax, msk, title, cbar=None, **kwargs):
+def msk_show(ax, msk, title, cbar=None, ticks=None, **kwargs):
     img = ax.imshow(msk, **kwargs)
     if cbar is not None:
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         if cbar=='plot':
-            cbr = plt.colorbar(img, cax=cax)
+            cbr = plt.colorbar(img, cax=cax, ticks=[i for i in range(1, ticks+1)])
             cbr.set_label('# of experts', rotation=270, labelpad=+15, fontsize="larger")
+            #bounds = [str(i) for i in range(5)]
+            #cbr.set_ticks(bounds)
         else: cax.set_axis_off()
     ax.set_axis_off()
     ax.set_title(title)
@@ -108,7 +110,7 @@ class GTEstimator(GetAttr):
         res = []
         refs = {}
         print(f'Starting ground truth estimation - {method}')
-        for m, exps in ConsoleProgressBar(self.masks.items()):
+        for m, exps in progress_bar(self.masks.items()):
             masks = [_read_msk(self.mask_fn(exp,m)) for exp in exps]
             if method=='STAPLE':
                 ref = staple(masks, self.staple_fval, self.staple_thres)
@@ -138,7 +140,7 @@ class GTEstimator(GetAttr):
             # Experts
             masks = [_read_msk(self.mask_fn(exp,f)) for exp in self.masks[f]]
             masks_av = np.array(masks).sum(axis=0)#/len(masks)
-            msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', cmap=plt.cm.get_cmap(self.cmap, len(masks)))
+            msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)))
             # Results
             av_df = pd.DataFrame([self.df_res[self.df_res.file==f][['iou']].mean()], index=['average'], columns=['iou'])
             plt_df = self.df_res[self.df_res.file==f].set_index('exp')[['iou']].append(av_df)

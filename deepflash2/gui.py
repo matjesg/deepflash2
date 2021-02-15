@@ -1293,21 +1293,29 @@ class GUI(GetAttr):
         out = self.gt.main['gt']
         out.clear_output()
         self.gt_save_dir = (self.proj_path/self.gt_dir/b.name).relative_to(self.proj_path)
-        res_out = w.Output()
         with out:
             assert type(self.gt_est)==GTEstimator, 'Please load data first!'
-            display(res_out)
-            self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
-            items = {x:x for x in self.gt_est.masks.keys()}
-            ipp = ItemsPerPage(self.proj_path, self.gt_est.show_gt, items=items)
-            display(ipp.widget)
-        with res_out:
+            print('Please watch the logs below. The final results will be printed here.')
+            if COLAB:
+                with colab.output.temporary():
+                    print('Temporary Logs:')
+                    self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
+            else:
+                with self.tmp:
+                    print('Temporary Logs:')
+                    self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
+                    self.tmp.clear_output()
             print('Ground Truth Estimation finished:')
             print(f'- {b.name} segmentation masks saved to folder: {self.gt_save_dir}.')
             print(f'- {b.name} similiarity results are saved to folder: {self.gt_dir}.')
             print(f'- You can download masks and results in the "Downloads" Section.')
             display(self.gt_to_train)
             print(f'--------------------------------------------------------------')
+
+            items = {x:x for x in self.gt_est.masks.keys()}
+            ipp = ItemsPerPage(self.proj_path, self.gt_est.show_gt, items=items, method=b.name)
+            display(ipp.widget)
+
 
     # Train
     def train_data_run_clicked(self, b):
