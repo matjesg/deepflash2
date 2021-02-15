@@ -1447,7 +1447,8 @@ class GUI(GetAttr):
         out = self.train.xtr['lr'].output
         out.clear_output()
         with out:
-            print('Starting Learning Rate Finder. Please Wait.')
+            print('Starting Learning Rate Finder.')
+            print('Please watch the logs below. The final results will be printed here.')
         if COLAB:
             with colab.output.temporary():
                 print('Temporary Logs:')
