@@ -14,9 +14,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
+from fastprogress import progress_bar
 from fastcore.basics import patch, GetAttr
 from fastcore.foundation import add_docs, L
-from fastprogress import progress_bar
 from fastai import optimizer
 from fastai.torch_core import TensorImage
 from fastai.learner import Learner
@@ -59,7 +59,7 @@ class Config:
     il:bool = False
 
     #Train Settings
-    lr:float = 0.005
+    lr:float = 0.001
     bs:int = 4
     wd:float = 0.001
     mpt:bool = False
@@ -342,9 +342,16 @@ class EnsembleLearner(GetAttr):
         save_tmp(pth_tmp, files, results)
         return results
 
-    def get_valid_results(self, model_no=None, **kwargs):
+    def get_valid_results(self, model_no=None, save_dir=None, filetype='.png', **kwargs):
         res_list = []
         model_list = self.models if not model_no else [model_no]
+        if save_dir:
+            save_dir = self.path/save_dir
+            pred_path = save_dir/'masks'
+            pred_path.mkdir(parents=True, exist_ok=True)
+            if self.tta:
+                unc_path = save_dir/'uncertainties'
+                unc_path.mkdir(parents=True, exist_ok=True)
         for i in model_list:
             _, files_val = self.splits[i]
             res = self.predict(files_val, i, **kwargs)
@@ -360,21 +367,18 @@ class EnsembleLearner(GetAttr):
                         'iou': iou(msk, res[1][j]),
                         'energy_max': res[3][j].numpy()})
                 res_list.append(df_tmp)
+                if save_dir:
+                    save_mask(res[1][j], pred_path/f'{df_tmp.file}_{df_tmp.model}_mask', filetype)
+                    if self.tta:
+                        save_unc(res[2][j], unc_path/f'{df_tmp.file}_{df_tmp.model}_unc', filetype)
         self.df_val = pd.DataFrame(res_list)
+        if save_dir: self.df_val.to_csv(save_dir/f'val_results.csv', index=False)
 
-    def show_valid_results(self, model_no=None, file=None, save_dir=None, filetype='.png', **kwargs):
+    def show_valid_results(self, model_no=None, files=None, **kwargs):
         if self.df_val is None: self.get_validresults(**kwargs)
         df = self.df_val
-        if file is not None: df = df[df.file==file]
+        if files is not None: df = df.set_index('file', drop=False).loc[files]
         if model_no is not None: df = df[df.model_no==model_no]
-        if save_dir:
-            save_dir = self.path/save_dir
-            pred_path = save_dir/'masks'
-            pred_path.mkdir(parents=True, exist_ok=True)
-            df.to_csv(save_dir/f'val_results.csv', index=False)
-            if self.tta:
-                unc_path = save_dir/'uncertainties'
-                unc_path.mkdir(parents=True, exist_ok=True)
         for _, r in df.iterrows():
             img = self.ds.get_data(r.img_path)[0]
             msk = self.ds.get_data(r.img_path, mask=True)[0]
@@ -382,13 +386,9 @@ class EnsembleLearner(GetAttr):
                 tmp = np.load(res)
                 pred = tmp['seg']
                 std = tmp['std']
-            print(f'Validation image {r.file} for {r.model}:')
-            if self.tta: plot_results(img, msk, pred, std, df=r)
-            else: plot_results(img, msk, pred, np.zeros_like(pred), df=r)
-            if save_dir:
-                save_mask(pred, pred_path/f'{r.file}_{r.model}_mask', filetype)
-                if self.tta:
-                    save_unc(std, unc_path/f'{r.file}_{r.model}_unc', filetype)
+            _d_model = f'Model {r.model_no}'
+            if self.tta: plot_results(img, msk, pred, std, df=r, model=_d_model)
+            else: plot_results(img, msk, pred, np.zeros_like(pred), df=r, model=_d_model)
 
     def get_models(self, path=None):
         path = path or self.ensemble_dir

@@ -42,7 +42,7 @@ def ensemble_results(res_dict, file, std=False):
     return a
 
 # Cell
-def plot_results(*args, df, unc_metric=None, figsize=(20, 20), **kwargs):
+def plot_results(*args, df, model=None, unc_metric=None, figsize=(20, 20), **kwargs):
     "Plot images, (masks), predictions and uncertainties side-by-side."
     if len(args)==4:
         img, msk, pred, pred_std = args
@@ -58,27 +58,28 @@ def plot_results(*args, df, unc_metric=None, figsize=(20, 20), **kwargs):
     axs[0].set_axis_off()
     axs[0].set_title(f'File {df.file}')
     unc_title = f'Uncertainty \n {unc_metric}: {df[unc_metric]:.3f}' if unc_metric else 'Uncertainty'
+    pred_title = 'Prediction' if model is None else f'Prediction {model}'
     if len(args)==4:
         axs[1].imshow(msk)
         axs[1].set_axis_off()
         axs[1].set_title('Target')
         axs[2].imshow(pred)
         axs[2].set_axis_off()
-        axs[2].set_title(f'Prediction \n IoU: {df.iou:.2f}')
+        axs[2].set_title(f'{pred_title} \n IoU: {df.iou:.2f}')
         axs[3].imshow(pred_std)
         axs[3].set_axis_off()
         axs[3].set_title(unc_title)
     elif len(args)==3:
         axs[1].imshow(pred)
         axs[1].set_axis_off()
-        axs[1].set_title('Prediction')
+        axs[1].set_title(pred_title)
         axs[2].imshow(pred_std)
         axs[2].set_axis_off()
         axs[2].set_title(unc_title)
     elif len(args)==2:
         axs[1].imshow(pred)
         axs[1].set_axis_off()
-        axs[1].set_title('Prediction')
+        axs[1].set_title(pred_title)
     plt.show()
 
 # Cell
@@ -195,12 +196,12 @@ def get_label_fn(img_path, msk_dir_path):
 
 # Cell
 def save_mask(mask, path, filetype='.png'):
-    mask = mask.astype(np.uint8) if np.max(mask)>1 else mask.astype(np.uint8)*255
+    mask = mask.astype(np.uint8) if np.max(mask)>1 else (mask*255).astype(np.uint8)
     imageio.imsave(path.with_suffix(filetype), mask)
 
 # Cell
 def save_unc(unc, path, filetype='.png'):
-    unc = (unc/unc.max()).astype(np.uint8)*255
+    unc = (unc/unc.max()*255).astype(np.uint8)
     imageio.imsave(path.with_suffix(filetype), unc)
 
 # Cell

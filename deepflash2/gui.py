@@ -8,6 +8,7 @@ __all__ = ['GRID_COLS', 'set_css_in_cell_output', 'tooltip_css', 'query_yes_no',
 # Cell
 import os, sys, shutil, time, zipfile, urllib, subprocess
 import ipywidgets as w, numpy as np, pandas as pd, IPython.display as d
+from ipywidgets.embed import embed_minimal_html
 from pathlib import Path
 from fastcore.foundation import store_attr
 from fastcore.basics import GetAttr
@@ -162,8 +163,9 @@ class ZipUpload():
 class ItemsPerPage:
     "Dropdown to show n items per page"
 
-    def __init__(self, plot_fn=None, items=dict(), srt=True, srt_by='name', srt_index=0, **kwargs):
+    def __init__(self, path=None, plot_fn=None, items=dict(), srt=True, srt_by='name', srt_index=0, **kwargs):
 
+        self.path = path or Path('.')
         self.plot_fn = plot_fn
         self.items = items
         self.kwargs = kwargs
@@ -174,13 +176,14 @@ class ItemsPerPage:
         drp_lbl = w.HTML('&emsp;Items per Page')
         self.srt = w.Dropdown(index=srt_index, options=['ascending', 'descending'], layout=w.Layout(width='auto', min_width='1px'))
         self.srt.layout.display = "none"
-        up_left = w.HBox([self.srt, drp_lbl, self.drp])
+        up_right = w.HBox([self.srt, drp_lbl, self.drp])
         lyt = w.Layout(width='100px')
         self.nxt = w.Button(description='Next', layout=lyt)
         self.prv = w.Button(description='Previous', layout=lyt)
         self.lbl = w.Label()
-        up_right = w.HBox([self.prv, self.lbl, self.nxt])
-        up = w.HBox([up_right, up_left], layout=w.Layout(justify_content='space-between'))
+        self.exp = w.Button(description='Export View', layout=lyt)
+        up_left = w.HBox([self.prv, self.lbl, self.nxt, self.exp])
+        up = w.HBox([up_left, up_right], layout=w.Layout(justify_content='space-between'))
         self.out = w.Output()
         self.widget = w.VBox([up, self.out])
 
@@ -188,6 +191,7 @@ class ItemsPerPage:
         self.drp.observe(self.on_value_change, 'value')
         self.nxt.on_click(self.on_button_clicked)
         self.prv.on_click(self.on_button_clicked)
+        self.exp.on_click(self.on_export_clicked)
         self.lbl.value = self.page_lbl
         self.on_srt_change({'new': self.srt.options[srt_index]})
 
@@ -226,6 +230,11 @@ class ItemsPerPage:
             if self.plot_fn:
                 self.plot_fn(files=list(self.items.keys())[slc], **self.kwargs)
                 plt.show()
+
+    def on_export_clicked(self, b):
+        embed_minimal_html(self.path/'export.html', views=[self.out], title='Output export')
+        with self.out: print(f'Saved current view to {self.path/"export.html"}')
+        if COLAB: colab.files.download(self.path/'export.html')
 
 # Cell
 class BaseParamWidget:
@@ -558,7 +567,7 @@ _dtrain = {
     'pretrained': ('Pretrained*', 'Select pretrained weights from the model libray or "new" to use an untrained model (random initialization).', 'https://matjesg.github.io/deepflash2/model_library.html'),
     'n'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
     's'   : ('Select', 'Train all models (ensemble) or (re-)train specific model.'),
-    'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.'),
+    'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
     'lr'  : ('Learning Rate', '''The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset'''),
     'lrf' : ('LR Finder', 'Click "Open" to get more information.'),
     'mw'  : ('Mask Weights', 'Click "Customize" to get more information.'),
@@ -762,7 +771,7 @@ class LRWidget:
     button_close = w.Button(description='Close', tooltip=tt_close)
 
     #Lbl
-    html = _html_wrap('More information', 'Click here for more information on the learning rate finder',
+    html = _html_wrap('More information', '',
                       'https://docs.fast.ai/callback.schedule.html#Learner.lr_find')
     lbl = w.HTML(html)
 
@@ -799,6 +808,20 @@ class BasePopUpParamWidget(BaseParamWidget):
         self.button_close.on_click(self.on_close_clicked)
 
 # Cell
+_dparam= {
+    'arch' : ('Model Architecture', 'The architecture of the deep learning model.', 'https://matjesg.github.io/deepflash2/models.html'),
+    'bs' : ('Mini-Batch Size', 'The number of samples that will be propagated through the network during one iteration; 4 works best in our experiements; 4-8 works good for mixed precision training'),
+    'mpt'   : ('Mixed Precision Training', 'Mixed Precision Training', 'https://docs.fast.ai/callback.fp16.html'),
+    'wd'  : ('Weight Decay', 'Weight Decay.', 'https://arxiv.org/abs/1711.05101'),
+    'opt'  : ('Optimizer', 'Optimizer.', 'https://docs.fast.ai/optimizer.html'),
+    'flip'  : ('Flip', 'Randomly flip a training image.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
+    'rot': ('Rotation (max. degrees)', 'Randomly rotate a training image up to max. degrees.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
+    'def_grid'   : ('Deformation Grid Size', "Size of the deformation grid.", 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
+    'def_mag'   : ('Deformation Magnitude', 'Magnitude of the deformation within the deformation grid', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
+    'light': ('Brightness (max. lighting)', 'Brightness refers to the amount of light in the image.', 'https://docs.fast.ai/vision.augment.html'),
+}
+
+# Cell
 class ParamWidget(BasePopUpParamWidget, GetAttr):
     'Widget for custom training parameters'
     _default = 'config'
@@ -829,27 +852,27 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
 
     #Grid
     grid = w.GridspecLayout(12, 2, width='400px',  grid_gap="0px", align_items='center')
-    grid[0, 0] = w.Label('Model Architecture')
+    grid[0, 0] = w.HTML(_html_wrap(*_dparam['arch']))
     grid[0, 1] = params['arch']
-    grid[1, 0] = w.Label('Mini-Batch Size')
+    grid[1, 0] = w.HTML(_html_wrap(*_dparam['bs']))
     grid[1, 1] = params['bs']
-    grid[2, 0] = w.HTML('<a href="https://docs.fast.ai/callback.fp16.html">Mixed Precision Training </a>')
+    grid[2, 0] = w.HTML(_html_wrap(*_dparam['mpt']))
     grid[2, 1] = params['mpt']
-    grid[3, 0] = w.HTML('<a href="https://arxiv.org/abs/1711.05101">Weight Decay</a>')
+    grid[3, 0] = w.HTML(_html_wrap(*_dparam['wd']))
     grid[3, 1] = params['wd']
-    grid[4, 0] = w.HTML('<a href="https://docs.fast.ai/optimizer.html">Optimizer</a>')
+    grid[4, 0] = w.HTML(_html_wrap(*_dparam['opt']))
     grid[4, 1] = params['optim']
     grid[5, :] = w.HTML('<hr>')
     grid[6, :] = w.HTML('<b>Data Augmentation</b>')
-    grid[7, 0] = w.HTML('<a href="https://matjesg.github.io/deepflash2/data.html#Data-augmentation">Flip</a>')
+    grid[7, 0] = w.HTML(_html_wrap(*_dparam['flip']))
     grid[7, 1] = params['flip']
-    grid[8, 0] = w.HTML('<a href="https://matjesg.github.io/deepflash2/data.html#Data-augmentation">Rotation (max. degrees)</a>')
+    grid[8, 0] = w.HTML(_html_wrap(*_dparam['rot']))
     grid[8, 1] = params['rot']
-    grid[9, 0] = w.HTML('<a href="https://matjesg.github.io/deepflash2/data.html#Data-augmentation">Deformation Grid Size</a>')
+    grid[9, 0] = w.HTML(_html_wrap(*_dparam['def_grid']))
     grid[9, 1] = params['def_grid']
-    grid[10, 0] = w.HTML('<a href="https://matjesg.github.io/deepflash2/data.html#Data-augmentation">Deformation Magnitude</a>')
+    grid[10, 0] = w.HTML(_html_wrap(*_dparam['def_mag']))
     grid[10, 1] = params['def_mag']
-    grid[11, 0] = w.HTML('<a href="https://docs.fast.ai/vision.augment.html">Brightness (max. lighting)</a>')
+    grid[11, 0] = w.HTML(_html_wrap(*_dparam['light']))
     grid[11, 1] = params['light']
 
     def __init__(self, **kwargs):
@@ -858,6 +881,14 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
         self.widget = w.Accordion(children=[w.VBox([w.HBox([self.button_reset, self.button_close]),self.lbl,self.grid])])
         self.widget.set_title(0, 'Training Parameters')
         self.widget.layout.display = "none"
+
+# Cell
+_dmw= {
+    'bwf' : ('Border Weight Factor', 'Choose a high value to focus on instance separation (separation between foreground objects).', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
+    'bws' : ('Border Weight Sigma', 'Standard deviation of the Gaussian function to focus on the area between foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
+    'fbr' : ('Forground-Background Ratio', 'Ratio between forground and background. Choose a low value to focus on foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
+    'fds' : ('Forground Distance Sigma', 'Standard deviation of the Gaussian function to focus on the area around foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
+}
 
 # Cell
 class MWWidget(BasePopUpParamWidget, GetAttr):
@@ -871,17 +902,17 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
     out = w.Output()
 
     #Hint
-    lbl = w.HTML('Settings are saved automatically. Click <a href="https://matjesg.github.io/deepflash2/data.html#Weight-Calculation">here</a> for detailed information.')
+    lbl = w.HTML('Settings are saved automatically.')
 
     #Grid
     grid = w.GridspecLayout(6, 2, width='400px',  grid_gap="0px", align_items='center')
-    grid[0, 0] = w.Label('Border Weight Factor')
+    grid[0, 0] = w.HTML(_html_wrap(*_dmw['bwf']))
     grid[0, 1] = params['bwf']
-    grid[1, 0] = w.Label('Border Weight Sigma')
+    grid[1, 0] = w.HTML(_html_wrap(*_dmw['bws']))
     grid[1, 1] = params['bws']
-    grid[2, 0] = w.Label('Forground-Background Ratio')
+    grid[2, 0] = w.HTML(_html_wrap(*_dmw['fbr']))
     grid[2, 1] = params['fbr']
-    grid[3, 0] = w.Label('Forground Distance Sigma')
+    grid[3, 0] = w.HTML(_html_wrap(*_dmw['fds']))
     grid[3, 1] = params['fds']
     grid[4, :] = w.HTML('<hr>')
     grid[5, 0] = w.HTML('Visualization')
@@ -1117,7 +1148,8 @@ class GUI(GetAttr):
         self.config.proj_dir = str(self.base_path/self.proj_dir) if self.proj_dir=='deepflash2' else self.proj_dir
 
         #Project Dir
-        self.proj = PathSelector(self.base_path, 'Project Folder', tooltip='Project Folder \ndefault: <deepflash2>')
+        self.proj = PathSelector(self.base_path, 'Select Project Folder', tooltip='Project Folder \ndefault: <deepflash2>')
+        self.proj.button.button_style='info'
         self.proj.button_select.on_click(self.set_project_dir)
 
         #Click Category Buttons
@@ -1166,8 +1198,9 @@ class GUI(GetAttr):
         box_sb = w.VBox(children=[x.sb_acc for x in self.cat.values()]+[self.star_info], layout=w.Layout(grid_area='sidebar'))
         box_main = w.VBox(children=[x.main_box for x in self.cat.values()], layout=w.Layout(grid_area='main'))
         box_proj = w.VBox(children=[self.proj.button, self.proj.dialog], layout=w.Layout(grid_area='proj', flex_flow='column', align_items='flex-start'))
+        self.tmp = w.Output(layout=w.Layout(grid_area='tmp'))
 
-        self.gb = w.GridBox(children=[self.header, self.cat_btns_box, box_proj, box_sb, box_main, self.footer],
+        self.gb = w.GridBox(children=[self.header, self.cat_btns_box, box_proj, box_sb, box_main, self.footer, self.tmp],
                        layout=w.Layout(
                            width='100%',
                            grid_template_columns='350px auto',
@@ -1177,6 +1210,7 @@ class GUI(GetAttr):
                            "cat_btns proj"
                            "sidebar main"
                            "footer footer"
+                           "tmp tmp"
                            '''))
         display(self.gb)
 
@@ -1209,6 +1243,7 @@ class GUI(GetAttr):
         self._set_download_dirs()
 
     def set_project_dir(self, b):
+        self.proj.button.button_style=''
         self.config.proj_dir = str(self.proj.path)
         self._set_selection_dirs()
         self._init_proj()
@@ -1236,7 +1271,7 @@ class GUI(GetAttr):
         with out:
             self.gt_est = GTEstimator(exp_folder, config=self.config, path=self.proj_path)
             items = {x:x for x in self.gt_est.masks.keys()}
-            ipp = ItemsPerPage(self.gt_est.show_data, items=items)
+            ipp = ItemsPerPage(self.proj_path, self.gt_est.show_data, items=items)
             display(ipp.widget)
 
     def gt_data_sd_clicked(self, b):
@@ -1244,7 +1279,7 @@ class GUI(GetAttr):
         out.clear_output()
         with out:
             path = self.proj_path/'sample_data'/'expert_segmentations'
-            print(f'Dowloading expert sample data into {path.relative_to(self.proj_path)}')
+            print(f'Dowloading expert sample data into {path.relative_to(self.proj_path)}...')
             _get_expert_sample_masks(path)
             self.gt.sb['data'].msk.path = path
             self.gt_data_run_clicked('')
@@ -1263,6 +1298,9 @@ class GUI(GetAttr):
             assert type(self.gt_est)==GTEstimator, 'Please load data first!'
             display(res_out)
             self.gt_est.gt_estimation(method=b.name, save_dir=self.gt_save_dir)
+            items = {x:x for x in self.gt_est.masks.keys()}
+            ipp = ItemsPerPage(self.proj_path, self.gt_est.show_gt, items=items)
+            display(ipp.widget)
         with res_out:
             print('Ground Truth Estimation finished:')
             print(f'- {b.name} segmentation masks saved to folder: {self.gt_save_dir}.')
@@ -1283,7 +1321,7 @@ class GUI(GetAttr):
         with out:
             self.el = EnsembleLearner(image_folder, mask_folder, self.config, self.proj_path, ens_folder)
             items = {x:x for x in self.el.files}
-            ipp = ItemsPerPage(self.el.ds.show_data, items=items, overlay=True if self.c==2 else False)
+            ipp = ItemsPerPage(self.proj_path, self.el.ds.show_data, items=items, overlay=True if self.c==2 else False)
             display(ipp.widget)
 
     def train_data_sd_clicked(self, b):
@@ -1330,7 +1368,10 @@ class GUI(GetAttr):
                     print('Temporary Logs:')
                     self.el.fit(i)
             else:
-                self.el.fit(i)
+                with self.tmp:
+                    print('Temporary Logs:')
+                    self.el.fit(i)
+                    self.tmp.clear_output()
             with out:
                 print(f'Metrics for model {i} of {self.n}')
                 self.el.recorder[i].plot_metrics()
@@ -1340,6 +1381,7 @@ class GUI(GetAttr):
         out.clear_output()
         sel = self.train.sb['valid'].sel.value
         model_no = None if sel == 'ensemble' else int(sel[6:])
+        save_dir = (self.proj_path/self.train_dir/self.val_dir).relative_to(self.proj_path)
         with out:
             assert type(self.el)==EnsembleLearner, 'Please load data first!'
             assert len(self.el.models)>0, 'Please train models first!'
@@ -1347,12 +1389,19 @@ class GUI(GetAttr):
         if COLAB:
             with colab.output.temporary():
                 print('Temporary Logs:')
-                self.el.get_valid_results(model_no, use_tta=self.tta)
+                self.el.get_valid_results(model_no, save_dir=save_dir, use_tta=self.tta)
         else:
-            self.el.get_valid_results(model_no, use_tta=self.tta)
+            with self.tmp:
+                print('Temporary Logs:')
+                self.el.get_valid_results(model_no, save_dir=save_dir, use_tta=self.tta)
+                self.tmp.clear_output()
+
         out.clear_output()
-        save_dir = (self.proj_path/self.train_dir/self.val_dir).relative_to(self.proj_path)
-        with out: self.el.show_valid_results(model_no, save_dir=save_dir)
+
+        with out:
+            items = {x.file:f'{x.model_no}_{x.file}' for _,x in self.el.df_val.iterrows()}
+            ipp = ItemsPerPage(self.proj_path,self.el.show_valid_results, items=items, srt_by='model/name')
+            display(ipp.widget)
 
     def train_valid_ens_save_clicked(self, b):
         path = self.train.sb['valid'].ens.path
@@ -1377,7 +1426,7 @@ class GUI(GetAttr):
             self.el.ood_save(ood_path)
             print(f'Showing ensemble results.')
             items = {x.name:x.name for x in self.el.files}
-            ipp = ItemsPerPage(self.el.show_ensemble_results, items=items)
+            ipp = ItemsPerPage(self.proj_path,self.el.show_ensemble_results, items=items)
             display(ipp.widget)
 
     #Lr finder
@@ -1394,7 +1443,10 @@ class GUI(GetAttr):
                 print('Temporary Logs:')
                 sug_lrs, rec = self.el.lr_find(show_plot=False)
         else:
-            sug_lrs, rec = self.el.lr_find(show_plot=False)
+            with self.tmp:
+                print('Temporary Logs:')
+                sug_lrs, rec = self.el.lr_find(show_plot=False)
+                self.tmp.clear_output()
         with out:
             print(sug_lrs)
             rec.plot_lr_find()
@@ -1414,7 +1466,7 @@ class GUI(GetAttr):
         with out:
             print('Loading data. Please wait...')
             items = {x:x for x in self.el.files}
-            ipp = ItemsPerPage(self.el.show_mask_weights, items=items)
+            ipp = ItemsPerPage(self.proj_path, elf.el.show_mask_weights, items=items)
             out.clear_output()
             display(ipp.widget)
 
@@ -1430,7 +1482,7 @@ class GUI(GetAttr):
             self.el_pred = EnsembleLearner(image_folder, config=self.config, path=self.proj_path, ensemble_dir=ens_folder)
             self.el_pred.get_models()
             items = {x:x for x in self.el_pred.files}
-            ipp = ItemsPerPage(self.el_pred.ds.show_data, items=items, figsize = (5,5))
+            ipp = ItemsPerPage(self.proj_path, self.el_pred.ds.show_data, items=items, figsize = (5,5))
             display(ipp.widget)
 
     def pred_run_clicked(self, b, use_tta=None, show=True):
@@ -1448,11 +1500,14 @@ class GUI(GetAttr):
                 print('Temporary Logs:')
                 self.el_pred.get_ensemble_results(self.el_pred.files, save_dir=save_dir, use_tta=use_tta)
         else:
-            self.el_pred.get_ensemble_results(self.el_pred.files, save_dir=save_dir, use_tta=use_tta)
+            with self.tmp:
+                print('Temporary Logs:')
+                self.el_pred.get_ensemble_results(self.el_pred.files, save_dir=save_dir, use_tta=use_tta)
+                self.tmp.clear_output()
         if show:
             with out:
                 items = {x.name:x.name for x in self.el_pred.files}
-                ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, unc=use_tta)
+                ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
                 display(ipp.widget)
 
     def pred_ood_load_clicked(self, b):
@@ -1484,5 +1539,5 @@ class GUI(GetAttr):
             self.el_pred.df_ens.to_csv(save_dir/f'prediction_with_ood_score.csv', index=False)
             items = {r.file:r.ood_score for _, r in self.el_pred.df_ens.iterrows()}
             print(f'A lower OOD score indicates out-of-distribution (OOD) or anomalous data.')
-            ipp = ItemsPerPage(self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', unc_metric='ood_score')
+            ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', unc_metric='ood_score')
             display(ipp.widget)

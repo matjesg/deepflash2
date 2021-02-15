@@ -157,6 +157,23 @@ nb_path: "nbs/add_information.ipynb"
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training-Epochs-and-Iterations">Training Epochs and Iterations<a class="anchor-link" href="#Training-Epochs-and-Iterations"> </a></h2><p>To streamline the training process and allow an easier comparison across differently sized datasets, we decided to use the number of training <em>iterations</em> instead of <em>epochs</em> to define the lenght of a <a href="https://matjesg.github.io/deepflash2/utils.html#calc_iterations">training cycle</a>.</p>
+<p>Some useful definitions (adapted from <a href="https://stackoverflow.com/questions/4752626/epoch-vs-iteration-when-training-neural-networks">stackoverflow</a>):</p>
+<ul>
+<li>Epoch: one training pass (forward pass and one backward pass) of all the training examples</li>
+<li>Batch size: the number of training examples in one forward/backward pass. The higher the batch size, the more memory space you'll need.</li>
+<li>Iteration: One forward pass and one backward pass using [batch size] number of examples.</li>
+</ul>
+<p><em>Example:</em>
+Your dataset comprises 20 images and you want to train for 1000 iterations given a batch size of 4. The <a href="https://matjesg.github.io/deepflash2/utils.html#calc_iterations">algorithm</a> calculates the minimum of epochs needed to train 1000 iterations):</p>
+<p>$Epochs = \frac{iterations}{\frac{\#images}{batch size}} = \frac{1000}{\frac{20}{4}} = 200$</p>
+<p>The number of epochs will be ceiled to the next integer.</p>
+
+</div>
+</div>
+</div>
 </div>
  
 

@@ -44,8 +44,16 @@ def m_voting(segmentations, labelForUndecidedPixels = 0):
     return sitk.GetArrayFromImage(mv_segmentation)
 
 # Cell
-def msk_show(ax, msk, title):
-    ax.imshow(msk)
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+def msk_show(ax, msk, title, cbar=None, **kwargs):
+    img = ax.imshow(msk, **kwargs)
+    if cbar is not None:
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        if cbar=='plot':
+            cbr = plt.colorbar(img, cax=cax)
+            cbr.set_label('# of experts', rotation=270, labelpad=+15, fontsize="larger")
+        else: cax.set_axis_off()
     ax.set_axis_off()
     ax.set_title(title)
 
@@ -54,11 +62,13 @@ class GTEstimator(GetAttr):
     "Class for ground truth estimation"
     _default = 'config'
 
-    def __init__(self, exp_dir='expert_segmentations', config=None, path=None, verbose=1):
+    def __init__(self, exp_dir='expert_segmentations', config=None, path=None, cmap='viridis' , verbose=1):
         self.exp_dir = exp_dir
         self.config = config or Config()
         self.path = Path(path) if path is not None else Path('.')
         self.mask_fn = lambda exp,msk: self.path/self.exp_dir/exp/msk
+        self.cmap = cmap
+        self.gt = {}
 
         f_list = get_image_files(self.path/self.exp_dir)
         assert len(f_list)>0, f'Found {len(f_list)} masks in "{self.path/self.exp_dir}". Please check your masks and expert folders.'
@@ -88,14 +98,15 @@ class GTEstimator(GetAttr):
             fig, axs = plt.subplots(nrows=1, ncols=len(exps), figsize=figsize, **kwargs)
             for i, exp in enumerate(exps):
                 msk = _read_msk(self.mask_fn(exp,m))
-                msk_show(axs[i], msk, exp)
+                msk_show(axs[i], msk, exp, cmap=self.cmap)
             fig.text(0, .5, m, ha='center', va='center', rotation=90)
             plt.tight_layout()
             plt.show()
 
-    def gt_estimation(self, method='STAPLE', show=True, save_dir=None, filetype='.png', figsize = (10,5), **kwargs):
+    def gt_estimation(self, method='STAPLE', save_dir=None, filetype='.png', **kwargs):
         assert method in ['STAPLE', 'majority_voting']
         res = []
+        refs = {}
         print(f'Starting ground truth estimation - {method}')
         for m, exps in ConsoleProgressBar(self.masks.items()):
             masks = [_read_msk(self.mask_fn(exp,m)) for exp in exps]
@@ -103,29 +114,39 @@ class GTEstimator(GetAttr):
                 ref = staple(masks, self.staple_fval, self.staple_thres)
             elif method=='majority_voting':
                 ref = m_voting(masks, self.mv_undec)
+            refs[m] = ref
             #assert ref.mean() > 0, 'Please try again!'
             df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'iou': [iou(ref, msk) for msk in masks]})
             res.append(df_tmp)
-            if show:
-                fig, ax = plt.subplots(ncols=2, figsize=figsize, **kwargs)
-                msk_show(ax[0], ref, method)
-                av_df = pd.DataFrame([df_tmp[['iou']].mean()], index=['average'], columns=['iou'])
-                plt_df = df_tmp.set_index('exp')[['iou']].append(av_df)
-                plt_df.columns = [f'Similarity (iou)']
-                tbl = pd.plotting.table(ax[1], np.round(plt_df,3), loc='center', colWidths=[.5])
-                tbl.set_fontsize(14)
-                tbl.scale(1, 2)
-                ax[1].set_axis_off()
-                fig.text(0, .5, m, ha='center', va='center', rotation=90)
-                plt.tight_layout()
-                plt.show()
             if save_dir:
                 path = self.path/save_dir
                 path.mkdir(exist_ok=True, parents=True)
                 save_mask(ref, path/Path(m).stem, filetype)
-
+        self.gt[method] = refs
         self.df_res = pd.concat(res)
         self.df_agg = self.df_res.groupby('exp').agg(average_iou=('iou', 'mean'), std_iou=('iou', 'std'))
         if save_dir:
             self.df_res.to_csv(path.parent/f'{method}_vs_experts.csv', index=False)
             self.df_agg.to_csv(path.parent/f'{method}_vs_experts_agg.csv', index=False)
+
+    def show_gt(self, method='STAPLE', max_n=6, files=None, figsize=(15,5), **kwargs):
+        if not files: files = list(t.masks.keys())[:max_n]
+        for f in files:
+            fig, ax = plt.subplots(ncols=3, figsize=figsize, **kwargs)
+            # GT
+            msk_show(ax[0], self.gt[method][f], f'{method} (binary mask)', cbar='', cmap=self.cmap)
+            # Experts
+            masks = [_read_msk(self.mask_fn(exp,f)) for exp in self.masks[f]]
+            masks_av = np.array(masks).sum(axis=0)#/len(masks)
+            msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', cmap=plt.cm.get_cmap(self.cmap, len(masks)))
+            # Results
+            av_df = pd.DataFrame([self.df_res[self.df_res.file==f][['iou']].mean()], index=['average'], columns=['iou'])
+            plt_df = self.df_res[self.df_res.file==f].set_index('exp')[['iou']].append(av_df)
+            plt_df.columns = [f'Similarity (iou)']
+            tbl = pd.plotting.table(ax[2], np.round(plt_df,3), loc='center', colWidths=[.5])
+            tbl.set_fontsize(14)
+            tbl.scale(1, 2)
+            ax[2].set_axis_off()
+            fig.text(0, .5, f, ha='center', va='center', rotation=90)
+            plt.tight_layout()
+            plt.show()
