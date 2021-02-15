@@ -2,6 +2,10 @@
 
 <!-- do not remove -->
 
+## 0.1.1
+
+- Bud fixes and minor improvements.
+
 ## 0.1.0
 
 ### New Features
