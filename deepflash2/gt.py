@@ -51,10 +51,10 @@ def msk_show(ax, msk, title, cbar=None, ticks=None, **kwargs):
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         if cbar=='plot':
-            cbr = plt.colorbar(img, cax=cax, ticks=[i for i in range(1, ticks+1)])
+            scale = ticks/(ticks+1)
+            cbr = plt.colorbar(img, cax=cax, ticks=[i*(scale)+(scale/2) for i in range(0, ticks+1)])
+            cbr.set_ticklabels([i for i in range(0, ticks+1)])
             cbr.set_label('# of experts', rotation=270, labelpad=+15, fontsize="larger")
-            #bounds = [str(i) for i in range(5)]
-            #cbr.set_ticks(bounds)
         else: cax.set_axis_off()
     ax.set_axis_off()
     ax.set_title(title)
@@ -140,7 +140,7 @@ class GTEstimator(GetAttr):
             # Experts
             masks = [_read_msk(self.mask_fn(exp,f)) for exp in self.masks[f]]
             masks_av = np.array(masks).sum(axis=0)#/len(masks)
-            msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)))
+            msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)+1))
             # Results
             av_df = pd.DataFrame([self.df_res[self.df_res.file==f][['iou']].mean()], index=['average'], columns=['iou'])
             plt_df = self.df_res[self.df_res.file==f].set_index('exp')[['iou']].append(av_df)
