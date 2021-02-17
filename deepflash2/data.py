@@ -3,13 +3,9 @@
 __all__ = ['show', 'calculate_weights', 'DeformationField', 'BaseDataset', 'RandomTileDataset', 'TileDataset']
 
 # Cell
-import os
-import numpy as np
-import imageio
-import shutil
+import os, zarr, cv2, imageio, shutil, numpy as np
 from joblib import Parallel, delayed
 
-import cv2
 from scipy import ndimage
 from scipy.interpolate import Rbf
 from scipy.interpolate import interp1d
@@ -28,6 +24,9 @@ from fastai.vision.all import *
 from fastcore.all import *
 
 from .utils import import_package
+
+import gc
+gc.enable()
 
 # Cell
 def show(*obj, file_name=None, overlay=False, pred=False,
@@ -149,9 +148,12 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
         clabels = (instlabels > 0).astype(int)
 
     # Initialize label and weights arrays with background
+    labels = np.zeros_like(clabels)
     wghts = fbr * np.ones_like(clabels)
     frgrd_dist = np.zeros_like(clabels, dtype='float32')
     classes = np.unique(clabels)[1:]
+
+    #assert len(classes)==clabels.max(), "Provide consecutive classes, e.g. pixel label 1 and 2 for two classes"
 
     # If no instance labels are given, generate them now
     if instlabels is None:
@@ -174,7 +176,8 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
         # of that class, avoid overlapping instances
         dil = cv2.morphologyEx(il, cv2.MORPH_CLOSE, kernel=np.ones((3,) * n_dims))
         overlap_cand = np.unique(np.where(dil!=il, dil, 0))
-        labels = np.where(np.isin(il, overlap_cand), 0, 1)
+        labels[np.isin(il, overlap_cand, invert=True)] = c
+
         for instance in overlap_cand[1:]:
             objectMaskDil = cv2.dilate((labels == c).astype('uint8'), kernel=np.ones((3,) * n_dims),iterations = 1)
             labels[(instlabels == instance) & (objectMaskDil == 0)] = c
@@ -214,6 +217,7 @@ class DeformationField:
     def __init__(self, shape=(540, 540)):
         self.shape = shape
         self.deformationField = np.meshgrid(*[np.arange(d) - d / 2 for d in shape])[::-1]
+        self.orders = [cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_CUBIC]
 
     def rotate(self, theta=0, phi=0, psi=0):
         "Rotate deformation field"
@@ -272,32 +276,41 @@ class DeformationField:
         deform = [d[sliceDef] for d in self.deformationField]
         return [d + offs for (d, offs) in zip(deform, offset)]
 
-    def apply(self, data, offset=(0, 0), pad=(0, 0), order=1):
+    def apply_(self, data, offset=(0, 0), pad=(0, 0), order=1):
         "Apply deformation field to image using interpolation"
         coords = [d.flatten() for d in self.get(offset, pad)]
         outshape = tuple(int(s - p) for (s, p) in zip(self.shape, pad))
         if len(data.shape) == len(self.shape) + 1:
-            tile = np.empty((*outshape, data.shape[-1]))
+            tile = np.empty((data.shape[-1], *outshape))
             for c in range(data.shape[-1]):
-                tile[..., c] = ndimage.interpolation.map_coordinates(
-                    data[..., c], coords, order=order, mode="reflect"
-                ).reshape(outshape)
-            return tile.astype(data.dtype)
+                tile[c,...] = ndimage.interpolation.map_coordinates(data[..., c], coords, order=order, mode="reflect").reshape(outshape)
         else:
-            return (
-                ndimage.interpolation.map_coordinates(
-                    data, coords, order=order, mode="reflect")
-                .reshape(outshape)
-                .astype(data.dtype))
+            tile = ndimage.interpolation.map_coordinates(data, coords, order=order, mode="reflect").reshape(outshape)
+        return tile.astype(data.dtype)
+
+    def apply(self, data, offset=(0, 0), pad=(0, 0), order=1):
+        "Apply deformation field to image using interpolation"
+        outshape = tuple(int(s - p) for (s, p) in zip(self.shape, pad))
+        coords = [d.flatten().reshape(outshape).astype('float32') for d in self.get(offset, pad)]
+        print(coords[0].shape, coords[1].shape)
+        if len(data.shape) == len(self.shape) + 1:
+            tile = np.empty((data.shape[-1], *outshape))
+            for c in range(data.shape[-1]):
+                tile[c,...] = cv2.remap(data[..., c], coords[0], coords[1], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+        else:
+            tile = cv2.remap(data, coords[0], coords[1], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+
+        return tile#.astype('float32')
 
 # Cell
 def _read_img(path, divide=None, **kwargs):
     "Read image and normalize to 0-1 range"
     if path.suffix == '.zarr':
         zarr = import_package('zarr')
-        img = zarr.convenience.load(str(path)) # assuming shape (z_dim, n_channel, y_dim, x_dim)
-        img = np.max(img, axis=0) # max z projection
-        img = np.moveaxis(img, 0, -1)
+        img = zarr.convenience.open(str(path))
+        if len(img.shape)==4: # assuming shape (z_dim, n_channel, y_dim, x_dim)
+            img = np.max(img, axis=0) # max z projection
+            img = np.moveaxis(img, 0, -1)
     else:
         img = imageio.imread(path, **kwargs)
         if divide is None and img.max()>0:
@@ -306,8 +319,8 @@ def _read_img(path, divide=None, **kwargs):
             img = img/divide
         #assert img.max()<=1. and img.max()>.04, f'Check image loading, dividing by {divide}, max value is {img.max()}'
         assert img.max()<=1., f'Check image loading, dividing by {divide}'
-        if img.ndim == 2:
-            img = np.expand_dims(img, axis=2)
+    if img.ndim == 2:
+        img = np.expand_dims(img, axis=2)
     return img
 
 # Cell
@@ -477,12 +490,12 @@ class RandomTileDataset(BaseDataset):
         # Random center
         center = np.unravel_index(np.argmax(cumulatedPdf > np.random.random()), pdf.shape)
         X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((*self.tile_shape, n_channels))
-        X = np.moveaxis(X, -1, 0)
+        #X = np.moveaxis(X, -1, 0)
         Y = self.deformationField.apply(labels, center, self.padding, 0)
         # To categorical
         W = self.deformationField.apply(weights, center, self.padding, 1)
 
-        X = X.astype('float32')
+        X = X#.astype('float32')
         Y = Y.astype('int64')
         W = W.astype('float32')
 
@@ -531,13 +544,16 @@ class TileDataset(BaseDataset):
         super().__init__(*args, **kwargs)
         self.output_shape = tuple(int(t - p) for (t, p) in zip(self.tile_shape, self.padding))
         tiler = DeformationField(self.tile_shape)
-        self.tile_data = []
-        self.tile_labels = [] if self.label_fn is not None else None
-        self.tile_weights = [] if self.label_fn is not None else None
+        root = zarr.group(store=zarr.storage.TempStore(), overwrite=True)
+        grps = root.create_groups('tile_data', 'tile_labels', 'tile_weights')
+        tile_data = grps[0]
+        tile_labels = grps[1] if self.label_fn is not None else None
+        tile_weights = grps[2] if self.label_fn is not None else None
         self.image_indices = []
         self.image_shapes = []
         self.in_slices = []
         self.out_slices = []
+        self.loader = zarr.load(root.store)
 
         for i, file in enumerate(progress_bar(self.files, leave=False)):
             img = _read_img(file, divide=self.divide)
@@ -546,44 +562,36 @@ class TileDataset(BaseDataset):
 
             # Tiling
             data_shape = img.shape[:-1]
+            j = 0
             for ty in range(int(np.ceil(data_shape[0] / self.output_shape[0]))):
                 for tx in range(int(np.ceil(data_shape[1] / self.output_shape[1]))):
                     centerPos = (
                         int((ty + 0.5) * self.output_shape[0]),
                         int((tx + 0.5) * self.output_shape[1]),
                     )
-                    self.tile_data.append(tiler.apply(img, centerPos))
+                    tile_data[j] = tiler.apply(img, centerPos)
                     if self.label_fn is not None:
-                        self.tile_labels.append(
-                            tiler.apply(lbl, centerPos, self.padding, order=0)
-                        )
-                        self.tile_weights.append(
-                            tiler.apply(wgt, centerPos, self.padding, order=1)
-                        )
+                        tile_labels[j] = tiler.apply(lbl, centerPos, self.padding, order=0).astype('int64')
+                        tile_weights[j] = tiler.apply(wgt, centerPos, self.padding, order=1).astype('float32')
                     self.image_indices.append(i)
                     self.image_shapes.append(data_shape)
-                    sliceDef = tuple(
-                        slice(tIdx * o, min((tIdx + 1) * o, s))
-                        for (tIdx, o, s) in zip((ty, tx), self.output_shape, data_shape)
-                    )
+                    sliceDef = tuple(slice(tIdx * o, min((tIdx + 1) * o, s)) for (tIdx, o, s) in zip((ty, tx), self.output_shape, data_shape))
                     self.out_slices.append(sliceDef)
-                    sliceDef = tuple(
-                        slice(0, min((tIdx + 1) * o, s) - tIdx * o)
-                        for (tIdx, o, s) in zip((ty, tx), self.output_shape, data_shape)
-                    )
+                    sliceDef = tuple(slice(0, min((tIdx + 1) * o, s) - tIdx * o) for (tIdx, o, s) in zip((ty, tx), self.output_shape, data_shape))
                     self.in_slices.append(sliceDef)
+                    j += 1
 
     def __len__(self):
-        return len(self.tile_data)
+        return len(self.image_shapes)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-        X = np.moveaxis(self.tile_data[idx] , -1, 0).astype('float32')
-
+        if idx >= len(self): raise IndexError
+        X = self.loader[f'tile_data/{idx}']
         if self.label_fn is not None:
-            Y = self.tile_labels[idx].astype('int64')
-            W = self.tile_weights[idx].astype('float32')
+            Y = self.loader[f'tile_labels/{idx}']
+            W = self.loader[f'tile_weights/{idx}']
             return TensorImage(X), TensorMask(Y), W
         else:
             return TensorImage(X)
