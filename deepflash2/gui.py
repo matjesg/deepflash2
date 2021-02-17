@@ -9,6 +9,7 @@ __all__ = ['GRID_COLS', 'set_css_in_cell_output', 'tooltip_css', 'ZipUpload', 'I
 import os, sys, shutil, time, zipfile, urllib, subprocess
 import ipywidgets as w, numpy as np, pandas as pd, IPython.display as d
 from IPython.utils.io import ask_yes_no
+from IPython.core.getipython import get_ipython
 from ipywidgets.embed import embed_minimal_html
 from pathlib import Path
 from fastcore.foundation import store_attr

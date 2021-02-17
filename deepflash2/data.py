@@ -276,10 +276,10 @@ class DeformationField:
         deform = [d[sliceDef] for d in self.deformationField]
         return [d + offs for (d, offs) in zip(deform, offset)]
 
-    def apply_(self, data, offset=(0, 0), pad=(0, 0), order=1):
+    def apply_slow(self, data, offset=(0, 0), pad=(0, 0), order=1):
         "Apply deformation field to image using interpolation"
-        coords = [d.flatten() for d in self.get(offset, pad)]
         outshape = tuple(int(s - p) for (s, p) in zip(self.shape, pad))
+        coords = [d.flatten() for d in self.get(offset, pad)]
         if len(data.shape) == len(self.shape) + 1:
             tile = np.empty((data.shape[-1], *outshape))
             for c in range(data.shape[-1]):
@@ -291,22 +291,19 @@ class DeformationField:
     def apply(self, data, offset=(0, 0), pad=(0, 0), order=1):
         "Apply deformation field to image using interpolation"
         outshape = tuple(int(s - p) for (s, p) in zip(self.shape, pad))
-        coords = [d.flatten().reshape(outshape).astype('float32') for d in self.get(offset, pad)]
-        print(coords[0].shape, coords[1].shape)
+        coords = [np.squeeze(d).astype('float32').reshape(*outshape) for d in self.get(offset, pad)]
         if len(data.shape) == len(self.shape) + 1:
             tile = np.empty((data.shape[-1], *outshape))
             for c in range(data.shape[-1]):
-                tile[c,...] = cv2.remap(data[..., c], coords[0], coords[1], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+                tile[c,...] = cv2.remap(data[..., c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         else:
-            tile = cv2.remap(data, coords[0], coords[1], interpolation=order, borderMode=cv2.BORDER_REFLECT)
-
-        return tile#.astype('float32')
+            tile = cv2.remap(data[:], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+        return tile
 
 # Cell
 def _read_img(path, divide=None, **kwargs):
     "Read image and normalize to 0-1 range"
     if path.suffix == '.zarr':
-        zarr = import_package('zarr')
         img = zarr.convenience.open(str(path))
         if len(img.shape)==4: # assuming shape (z_dim, n_channel, y_dim, x_dim)
             img = np.max(img, axis=0) # max z projection
@@ -326,7 +323,10 @@ def _read_img(path, divide=None, **kwargs):
 # Cell
 def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
     "Read image and check classes"
-    msk = imageio.imread(path, **kwargs)
+    if path.suffix == '.zarr':
+        msk = zarr.convenience.open(str(path))
+    else:
+        msk = imageio.imread(path, **kwargs)
     if not instance_labels:
         if np.max(msk)>n_classes:
             msk = msk//np.iinfo(msk.dtype).max
@@ -339,13 +339,6 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
     return msk
 
 # Cell
-def _get_cached_data(path):
-    "Loads preprocessed and compressed label (mask), weight, and pdf data."
-    with open(path, 'rb') as f:
-        tmp = np.load(f)
-        return tmp['lbl'], tmp['wgt'], tmp['pdf']
-
-# Cell
 class BaseDataset(Dataset):
     def __init__(self, files, label_fn=None, create_weights=True, instance_labels = False, n_classes=2, divide=None, ignore={},
                  tile_shape=(540,540), padding=(184,184),preproc_dir=None, bws=6, fds=1, bwf=50, fbr=.1, n_jobs=1, verbose=10, **kwargs):
@@ -354,14 +347,23 @@ class BaseDataset(Dataset):
         self.c = n_classes
         if self.label_fn is None: self.create_weights=False
         if label_fn is not None:
-            if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
+            if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache.zarr'
             else: self.preproc_dir = Path(preproc_dir)
-            self.preproc_dir.mkdir(exist_ok=True, parents=True)
+            self.root = zarr.group(str(self.preproc_dir))# self.preproc_dir.mkdir(exist_ok=True, parents=True)
+            self.weight_loader = zarr.load(self.root.store)
             if create_weights: self._create_weights(n_jobs, verbose)
 
-    def _cache_fn(self, o):
+    def _name_fn(self, g, n=None):
         "Creates path to preprocessed and compressed data."
-        return self.preproc_dir/f'{o}_{self.bws}_{self.fds}_{self.bwf}_{self.fbr}.npz'
+        g = f'{g}_{self.bws}_{self.fds}_{self.bwf}_{self.fbr}'
+        return f'{g}/{n}' if n else g
+
+    def _save_cache(self, fname, lbl, wgt, pdf):
+        name = self._name_fn(fname)
+        grp = self.root.create_group(name)
+        grp['lbl'] = lbl
+        grp['wgt'] = wgt
+        grp['pdf'] = pdf
 
     def _preproc(self, file):
         "Preprocesses and saves labels (msk), weights, and pdf."
@@ -373,16 +375,16 @@ class BaseDataset(Dataset):
             clabels = _read_msk(label_path, self.c)
             instlabels = None
         ign = self.ignore[file.name] if file.name in self.ignore else None
-        lbl, wgt, pdf = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c,
-                                          bws=self.bws, fds=self.fds, bwf=self.bwf, fbr=self.fbr)
-        np.savez_compressed(self._cache_fn(file.name), lbl=lbl, wgt=wgt, pdf=pdf)
+        res = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, bws=self.bws, fds=self.fds, bwf=self.bwf, fbr=self.fbr)
+        self._save_cache(file.name, *res)
 
     def _create_weights(self, n_jobs=1, verbose=0):
         using_cache = False
         preproc_queue=L()
         for f in self.files:
             try:
-                lbl, wgt, pdf = _get_cached_data(self._cache_fn(f.name))
+                #lbl, wgt, pdf = _get_cached_data(self._cache_fn(f.name))
+                self.weight_loader[self._name_fn(f.name, 'lbl')]
                 if not using_cache:
                     if verbose>0: print(f'Using cached mask weights from {self.preproc_dir}')
                     using_cache = True
@@ -406,7 +408,7 @@ class BaseDataset(Dataset):
             files = self.files
         data_list = L()
         for f in files:
-            if mask: d, _, _ = _get_cached_data(self._cache_fn(f.name))
+            if mask: d = self.weight_loader[self._name_fn(f.name, 'lbl')]
             else: d = _read_img(f, divide=self.divide)
             data_list.append(d)
         return data_list
@@ -422,7 +424,7 @@ class BaseDataset(Dataset):
         for f in files:
             img = _read_img(f, divide=self.divide)
             if self.create_weights and (self.label_fn is not None):
-                lbl, wgt, _ = _get_cached_data(self._cache_fn(f.name))
+                lbl, wgt = [self.weight_loader[self._name_fn(f.name, n)] for n in ['lbl', 'wgt']]
                 show(img, lbl, wgt, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
             elif self.label_fn is not None:
                 lbl = _read_msk(self.label_fn(f), instance_labels=self.instance_labels)
@@ -432,8 +434,10 @@ class BaseDataset(Dataset):
 
     def clear_cached_weights(self):
         "Clears cache directory with pretrained weights."
-        print(f"Deleting all cache at {self.preproc_dir}")
-        shutil.rmtree(self.preproc_dir)
+        try:
+            shutil.rmtree(self.preproc_dir)
+            print(f"Deleting all cache at {self.preproc_dir}")
+        except: print(f"No temporary files to delete at {self.preproc_dir}")
 
     #https://stackoverflow.com/questions/60101240/finding-mean-and-standard-deviation-across-image-channels-pytorch/60803379#60803379
     def compute_stats(self, max_samples=50):
@@ -484,16 +488,16 @@ class RandomTileDataset(BaseDataset):
         img = _read_img(img_path, divide=self.divide)
         n_channels = img.shape[-1]
 
-        labels, weights, pdf = _get_cached_data(self._cache_fn(img_path.name))
+        lbl, wgt, pdf  = [zarr.open(str(self.preproc_dir/self._name_fn(img_path.name, n))) for n in ['lbl', 'wgt', 'pdf']]
 
         cumulatedPdf = np.cumsum(pdf/np.sum(pdf))
         # Random center
         center = np.unravel_index(np.argmax(cumulatedPdf > np.random.random()), pdf.shape)
         X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((*self.tile_shape, n_channels))
-        #X = np.moveaxis(X, -1, 0)
-        Y = self.deformationField.apply(labels, center, self.padding, 0)
+        X = np.moveaxis(X, -1, 0)
+        Y = self.deformationField.apply(lbl, center, self.padding, 0)
         # To categorical
-        W = self.deformationField.apply(weights, center, self.padding, 1)
+        W = self.deformationField.apply(wgt, center, self.padding, 1)
 
         X = X#.astype('float32')
         Y = Y.astype('int64')
@@ -553,16 +557,16 @@ class TileDataset(BaseDataset):
         self.image_shapes = []
         self.in_slices = []
         self.out_slices = []
-        self.loader = zarr.load(root.store)
+        self.tile_loader = zarr.load(root.store)
 
+        j = 0
         for i, file in enumerate(progress_bar(self.files, leave=False)):
             img = _read_img(file, divide=self.divide)
             if self.label_fn is not None:
-                lbl, wgt, _ = _get_cached_data(self._cache_fn(file.name))
+                lbl, wgt = [zarr.open(str(self.preproc_dir/self._name_fn(file.name, n))) for n in ['lbl', 'wgt']]
 
             # Tiling
             data_shape = img.shape[:-1]
-            j = 0
             for ty in range(int(np.ceil(data_shape[0] / self.output_shape[0]))):
                 for tx in range(int(np.ceil(data_shape[1] / self.output_shape[1]))):
                     centerPos = (
@@ -587,11 +591,11 @@ class TileDataset(BaseDataset):
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-        if idx >= len(self): raise IndexError
-        X = self.loader[f'tile_data/{idx}']
+        try: X = self.tile_loader[f'tile_data/{idx}']
+        except: raise IndexError
         if self.label_fn is not None:
-            Y = self.loader[f'tile_labels/{idx}']
-            W = self.loader[f'tile_weights/{idx}']
+            Y = self.tile_loader[f'tile_labels/{idx}']
+            W = self.tile_loader[f'tile_weights/{idx}']
             return TensorImage(X), TensorMask(Y), W
         else:
             return TensorImage(X)

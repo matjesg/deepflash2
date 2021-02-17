@@ -375,7 +375,7 @@ class EnsembleLearner(GetAttr):
         if save_dir: self.df_val.to_csv(save_dir/f'val_results.csv', index=False)
 
     def show_valid_results(self, model_no=None, files=None, **kwargs):
-        if self.df_val is None: self.get_validresults(**kwargs)
+        if self.df_val is None: self.get_valid_results(**kwargs)
         df = self.df_val
         if files is not None: df = df.set_index('file', drop=False).loc[files]
         if model_no is not None: df = df[df.model_no==model_no]
