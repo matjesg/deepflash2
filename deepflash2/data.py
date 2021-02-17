@@ -9,6 +9,7 @@ import imageio
 import shutil
 from joblib import Parallel, delayed
 
+import cv2
 from scipy import ndimage
 from scipy.interpolate import Rbf
 from scipy.interpolate import interp1d
@@ -148,7 +149,6 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
         clabels = (instlabels > 0).astype(int)
 
     # Initialize label and weights arrays with background
-    labels = np.zeros_like(clabels)
     wghts = fbr * np.ones_like(clabels)
     frgrd_dist = np.zeros_like(clabels, dtype='float32')
     classes = np.unique(clabels)[1:]
@@ -159,35 +159,39 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
         instlabels = np.zeros_like(clabels)
         nextInstance = 1
         for c in classes:
-            comps, nInstances = ndimage.measurements.label(clabels == c)
+            #comps2, nInstances2 = ndimage.measurements.label(clabels == c)
+            nInstances, comps = cv2.connectedComponents((clabels == c).astype('uint8'), connectivity=4)
+            nInstances -=1
             instlabels[comps > 0] = comps[comps > 0] + nextInstance
             nextInstance += nInstances
 
     for c in classes:
         # Extract all instance labels of class c
-        instances = np.unique(instlabels * (clabels == c))[1:]
+        il = (instlabels * (clabels == c)).astype(np.int16)
+        instances = np.unique(il)[1:]
 
         # Generate background ridges between touching instances
         # of that class, avoid overlapping instances
-        for instance in instances:
-            objectMaskDil = ndimage.morphology.binary_dilation(
-                labels == c, structure=np.ones((3,) * n_dims))
+        dil = cv2.morphologyEx(il, cv2.MORPH_CLOSE, kernel=np.ones((3,) * n_dims))
+        overlap_cand = np.unique(np.where(dil!=il, dil, 0))
+        labels = np.where(np.isin(il, overlap_cand), 0, 1)
+        for instance in overlap_cand[1:]:
+            objectMaskDil = cv2.dilate((labels == c).astype('uint8'), kernel=np.ones((3,) * n_dims),iterations = 1)
             labels[(instlabels == instance) & (objectMaskDil == 0)] = c
 
         # Generate weights
         min1dist = 1e10 * np.ones(labels.shape)
         min2dist = 1e10 * np.ones(labels.shape)
         for instance in instances:
-            dt = ndimage.morphology.distance_transform_edt(instlabels != instance)
-
+            #dt2 = ndimage.morphology.distance_transform_edt(instlabels != instance)
+            dt = cv2.distanceTransform((instlabels != instance).astype('uint8'), cv2.DIST_L2, cv2.DIST_MASK_PRECISE)
             frgrd_dist += np.exp(-dt ** 2 / (2*fds ** 2))
             min2dist = np.minimum(min2dist, dt)
             newMin1 = np.minimum(min1dist, min2dist)
             newMin2 = np.maximum(min1dist, min2dist)
             min1dist = newMin1
             min2dist = newMin2
-        wghts += bwf * np.exp(
-            -(min1dist + min2dist) ** 2 / (2*bws ** 2))
+        wghts += bwf * np.exp(-(min1dist + min2dist) ** 2 / (2*bws ** 2))
 
     # Set weight for distance to the closest foreground object
     wghts[labels == 0] += (1-fbr)*frgrd_dist[labels == 0]

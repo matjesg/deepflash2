@@ -1330,8 +1330,8 @@ class GUI(GetAttr):
         with cfg.output:
             path = cfg.cwd/cfg.select.value[0]
             self.config.load(path)
-        for ui in [*t.train.sb.values(),*t.train.xtr.values()]:
-            if hasattr(ui, 'set_config'): ui.set_config(t.config)
+        for ui in [*self.train.sb.values(),*self.train.xtr.values()]:
+            if hasattr(ui, 'set_config'): ui.set_config(self.config)
         time.sleep(3)
         cfg.output.clear_output()
 
