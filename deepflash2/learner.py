@@ -236,7 +236,7 @@ class EnsembleLearner(GetAttr):
             if label_fn: self.label_fn = label_fn
             else: self.label_fn = get_label_fn(self.files[0], self.path/mask_dir)
             #Check if corresponding masks exist
-            mask_check = [self.label_fn(x).is_file() for x in self.files]
+            mask_check = [self.label_fn(x).exists() for x in self.files]
             chk_str = f'Found {len(self.files)} images in "{image_dir}" and {sum(mask_check)} masks in "{mask_dir}".'
             assert len(self.files)==sum(mask_check) and len(self.files)>0, f'Please check your images and masks (and folders). {chk_str}'
             print(chk_str)
