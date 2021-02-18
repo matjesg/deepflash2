@@ -353,6 +353,12 @@ class BaseDataset(Dataset):
             self.weight_loader = zarr.load(self.root.store)
             if create_weights: self._create_weights(n_jobs, verbose)
 
+    def read_img(self, *args, **kwargs):
+        return _read_img(*args, **kwargs)
+
+    def read_mask(self, *args, **kwargs):
+        return _read_msk(*args, **kwargs)
+
     def _name_fn(self, g, n=None):
         "Creates path to preprocessed and compressed data."
         g = f'{g}_{self.bws}_{self.fds}_{self.bwf}_{self.fbr}'
@@ -370,9 +376,9 @@ class BaseDataset(Dataset):
         label_path = self.label_fn(file)
         if self.instance_labels:
             clabels = None
-            instlabels = _read_msk(label_path, instance_labels=True)
+            instlabels = self.read_mask(label_path,  self.c, instance_labels=True)
         else:
-            clabels = _read_msk(label_path, self.c)
+            clabels = self.read_mask(label_path, self.c)
             instlabels = None
         ign = self.ignore[file.name] if file.name in self.ignore else None
         res = calculate_weights(clabels, instlabels, ignore=ign, n_dims=self.c, bws=self.bws, fds=self.fds, bwf=self.bwf, fbr=self.fbr)
@@ -409,7 +415,7 @@ class BaseDataset(Dataset):
         data_list = L()
         for f in files:
             if mask: d = self.weight_loader[self._name_fn(f.name, 'lbl')]
-            else: d = _read_img(f, divide=self.divide)
+            else: d = self.read_img(f, divide=self.divide)
             data_list.append(d)
         return data_list
 
@@ -422,12 +428,12 @@ class BaseDataset(Dataset):
             files = self.files[:max_n]
         if figsize is None: figsize = (ncols*12, max_n//ncols * 5)
         for f in files:
-            img = _read_img(f, divide=self.divide)
+            img = self.read_img(f, divide=self.divide)
             if self.create_weights and (self.label_fn is not None):
                 lbl, wgt = [self.weight_loader[self._name_fn(f.name, n)] for n in ['lbl', 'wgt']]
                 show(img, lbl, wgt, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
             elif self.label_fn is not None:
-                lbl = _read_msk(self.label_fn(f), instance_labels=self.instance_labels)
+                lbl = self.read_mask(self.label_fn(f), instance_labels=self.instance_labels)
                 show(img, lbl, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
             else:
                 show(img, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
@@ -445,7 +451,7 @@ class BaseDataset(Dataset):
         print('Computing Stats...')
         mean_sum, var_sum = 0., 0.
         for i, f in enumerate(self.files, 1):
-            img = _read_img(f, divide=self.divide)
+            img = self.read_img(f, divide=self.divide)
             mean_sum += img.mean((0,1))
             var_sum += img.var((0,1))
             if i==max_samples:
@@ -485,7 +491,7 @@ class RandomTileDataset(BaseDataset):
             idx = idx.tolist()
 
         img_path = self.files[idx]
-        img = _read_img(img_path, divide=self.divide)
+        img = self.read_img(img_path, divide=self.divide)
         n_channels = img.shape[-1]
 
         lbl, wgt, pdf  = [zarr.open(str(self.preproc_dir/self._name_fn(img_path.name, n))) for n in ['lbl', 'wgt', 'pdf']]
@@ -561,7 +567,7 @@ class TileDataset(BaseDataset):
 
         j = 0
         for i, file in enumerate(progress_bar(self.files, leave=False)):
-            img = _read_img(file, divide=self.divide)
+            img = self.read_img(file, divide=self.divide)
             if self.label_fn is not None:
                 lbl, wgt = [zarr.open(str(self.preproc_dir/self._name_fn(file.name, n))) for n in ['lbl', 'wgt']]
 
