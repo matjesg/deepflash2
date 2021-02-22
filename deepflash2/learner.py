@@ -3,7 +3,7 @@
 __all__ = ['Config', 'energy_max', 'save_tmp', 'EnsembleLearner']
 
 # Cell
-import shutil, gc, joblib, json, numpy as np, pandas as pd
+import shutil, gc, joblib, json, zarr, numpy as np, pandas as pd
 import torch, torch.nn as nn, torch.nn.functional as F
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
@@ -154,6 +154,59 @@ def energy_max(e, ks=20, dim=None):
     e = torch.as_tensor(e).resize_((1,1,*e.shape))
     e = F.avg_pool2d(e, ks)
     return torch.max(e)
+
+# Cell
+@patch
+def predict_tiles_zarr(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1, use_tta=False,
+                  tta_merge='mean', energy_T=1, energy_ks=20, padding=(0,0,0,0)): #(-52,-52,-52,-52)
+    "Make predictions and reconstruct tiles, optional with dropout and/or tta applied."
+
+    if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
+    if use_tta: tfms=[tta.HorizontalFlip(), tta.Rotate90(angles=[90,180,270])]
+    else: tfms=[]
+
+    self.model.eval()
+    if mc_dropout: self.apply_dropout()
+
+    root = zarr.group(store=zarr.storage.TempStore(), overwrite=True)
+    grps = root.create_groups('smx_tiles', 'std_tiles', 'energy_tiles')
+    smx_tiles, std_tiles, energy_tiles = grps[0], grps[1], grps[2]
+
+    i = 0
+    for data in progress_bar(dl, leave=False):
+        if isinstance(data, TensorImage): images = data
+        else: images, _, _ = data
+        m_smx = tta.Merger()
+        m_energy = tta.Merger()
+        out_list_smx = []
+        for t in tta.Compose(tfms):
+            for _ in range(n_times):
+                aug_images = t.augment_image(images)
+                with torch.no_grad():
+                    out = self.model(aug_images)
+                out = t.deaugment_mask(out)
+                if sum(padding)>0: out = F.pad(out, padding)
+                m_smx.append(F.softmax(out, dim=1))
+                e = (energy_T*torch.logsumexp(out/energy_T, dim=1)) #negative energy score
+                m_energy.append(e)
+
+        smx_ll = [x for x in m_smx.result().permute(0,2,3,1).cpu().numpy()]
+        std_ll = [x for x in m_smx.result('std').permute(0,2,3,1).cpu().numpy()]
+        eng_ll = [x for x in m_energy.result().cpu().numpy()]
+        for j,(smx,std,eng) in enumerate(zip(smx_ll, std_ll, eng_ll)):
+            k = i+j
+            smx_tiles[k], std_tiles[k], energy_tiles[k] = smx,std,eng
+        i += dl.bs
+
+    smxcores, segmentations = dl.reconstruct_from_tiles_zarr(smx_tiles, create_masks=True)
+    std_deviations = dl.reconstruct_from_tiles_zarr(std_tiles)
+    e_scores = dl.reconstruct_from_tiles_zarr(energy_tiles)
+
+    if energy_ks is not None:
+        loader = zarr.load(e_scores.chunk_store)
+        energy_scores = [energy_max(loader[f'{e_scores.basename}/{e}'], energy_ks) for e in e_scores]
+
+    return smxcores, segmentations, std_deviations, energy_scores
 
 # Cell
 @patch
@@ -520,9 +573,10 @@ class EnsembleLearner(GetAttr):
 
     def clear_tmp(self):
         try:
+            shutil.rmtree('/tmp/*', ignore_errors=True)
             shutil.rmtree(self.path/'.tmp')
             print(f'Deleted temporary files from {self.path/".tmp"}')
-        except: print("No temporary files to delete")
+        except: print(f'No temporary files to delete at {self.path/".tmp"}')
 
 # Cell
 add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with `n` models",
