@@ -551,13 +551,14 @@ class BaseDataset(Dataset):
 @patch
 def _weights_from_labels(self:BaseDataset, instlabels):
     n_classes = instlabels.shape[0]
-    wghts = self.fbr * np.ones_like(instlabels[0])
-    frgrd_dist = np.zeros_like(instlabels[0], dtype='float32')
+    labels = np.sum(instlabels>0, axis=0)
+    wghts = self.fbr * np.ones_like(labels)
+    frgrd_dist = np.zeros_like(labels, dtype='float32')
     for c in range(n_classes):
         instances = np.unique(instlabels[c])[1:]
         # Generate weights
-        min1dist = 1e10 * np.ones(instlabels[0].shape)
-        min2dist = 1e10 * np.ones(instlabels[0].shape)
+        min1dist = 1e10 * np.ones(labels.shape)
+        min2dist = 1e10 * np.ones(labels.shape)
 
         for instance in instances:
             #dt2 = ndimage.morphology.distance_transform_edt(instlabels != instance)
@@ -571,8 +572,8 @@ def _weights_from_labels(self:BaseDataset, instlabels):
         wghts += self.bwf * np.exp(-(min1dist + min2dist) ** 2 / (2*self.bws ** 2))
 
     # Set weight for distance to the closest foreground object
-    labels = np.sum(instlabels, axis=0)
     wghts[labels == 0] += (1-self.fbr)*frgrd_dist[labels == 0]
+    wghts[labels > 0] = 1.
     return labels, wghts.astype(np.float32)
 
 # Cell
