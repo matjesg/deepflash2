@@ -273,7 +273,7 @@ def save_tmp(pth_tmp, files, results):
 # Cell
 class EnsembleLearner(GetAttr):
     _default = 'config'
-    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None,
+    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None, remove_overlap=True,
                  label_fn=None, metrics=None, loss_fn=None, cbs=None, ds_kwargs={}, stats=None, files=None):
 
         self.config = config or Config()
@@ -307,7 +307,7 @@ class EnsembleLearner(GetAttr):
         self.models = {}
         self.recorder = {}
         self._set_splits()
-        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, create_weights=False, **self.mw_kwargs, **self.ds_kwargs)
+        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, remove_overlap=remove_overlap, **self.mw_kwargs, **self.ds_kwargs)
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
 
