@@ -211,23 +211,25 @@ class DeformationField:
         outshape = tuple(int(s - p) for (s, p) in zip(self.shape, pad))
         coords = [np.squeeze(d).astype('float32').reshape(*outshape) for d in self.get(offset, pad)]
         # Get slices to avoid loading all data (.zarr files)
-        xmin, xmax = int(np.floor(coords[0].min())), int(np.ceil(coords[0].max()))
-        if xmax>outshape[0]: xmin -= xmax-outshape[0]
-        xmin = max(0, xmin)
-        coords[0] -= xmin
-        ymin, ymax = int(np.floor(coords[1].min())), int(np.ceil(coords[1].max()))
-        if ymax>outshape[1]: ymin -= ymax-outshape[1]
-        ymin = max(0, ymin)
-        coords[1] -= ymin
-        xs, ys = slice(xmin, xmax), slice(ymin, ymax)
-
+        sl = []
+        for i in range(len(coords)):
+            cmin, cmax = int(coords[i].min()), int(coords[i].max())
+            dmax = data.shape[i]
+            if cmin<0:
+                cmax = max(-cmin, cmax)
+                cmin = 0
+            elif cmax>dmax:
+                cmin = min(cmin, 2*dmax-cmax)
+                cmax = dmax
+                coords[i] -= cmin
+            else: coords[i] -= cmin
+            sl.append(slice(cmin, cmax))
         if len(data.shape) == len(self.shape) + 1:
             tile = np.empty((data.shape[-1], *outshape))
             for c in range(data.shape[-1]):
-                tile[c,...] = cv2.remap(data[xs, ys, c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+                tile[c,...] = cv2.remap(data[sl[0],sl[1], c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         else:
-            tile = cv2.remap(data[xs, ys], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
-            #tile = cv2.remap(data[:], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+            tile = cv2.remap(data[sl[0], sl[1]], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         return tile
 
 # Cell
