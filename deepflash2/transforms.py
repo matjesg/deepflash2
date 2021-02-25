@@ -32,14 +32,14 @@ def preprocess_mask(clabels=None, instlabels=None, ignore=None, remove_overlap=T
             nextInstance = 1
             for c in classes:
                 #comps2, nInstances2 = ndimage.measurements.label(clabels == c)
-                nInstances, comps = cv2.connectedComponents((clabels == c).astype('uint8'), connectivity=4)
+                nInstances, comps = cv2.connectedComponents((clabels[:] == c).astype('uint8'), connectivity=4)
                 nInstances -=1
                 instlabels[comps > 0] = comps[comps > 0] + nextInstance
                 nextInstance += nInstances
 
         for c in classes:
             # Extract all instance labels of class c
-            il = (instlabels * (clabels == c)).astype(np.int16)
+            il = (instlabels * (clabels[:] == c)).astype(np.int16)
             instances = np.unique(il)[1:]
 
             # Generate background ridges between touching instances
@@ -60,7 +60,7 @@ def preprocess_mask(clabels=None, instlabels=None, ignore=None, remove_overlap=T
 def create_pdf(labels, ignore=None, fbr=.1, scale=512):
     'Creates a cumulated probability density function (PDF) for weighted sampling '
 
-    pdf = (labels > 0) + (labels == 0) * fbr
+    pdf = (labels[:] > 0) + (labels[:] == 0) * fbr
 
     # Set weight and sampling probability for ignored regions to 0
     if ignore is not None:

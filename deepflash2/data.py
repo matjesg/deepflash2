@@ -259,9 +259,9 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
 
 # Cell
 class BaseDataset(Dataset):
-    def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, divide=None, ignore={},
+    def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, divide=None, ignore={},remove_overlap=True,
                  tile_shape=(540,540), padding=(184,184),preproc_dir=None, bws=6, fds=1, bwf=50, fbr=.1, n_jobs=-1, verbose=1, **kwargs):
-        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, \
+        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, remove_overlap,\
                     padding, bws, fds, bwf, fbr')
         self.c = n_classes
         if label_fn is not None:
@@ -298,7 +298,7 @@ class BaseDataset(Dataset):
             clabels = self.read_mask(label_path, self.c)
             instlabels = None
         ign = self.ignore[file.name] if file.name in self.ignore else None
-        lbl = preprocess_mask(clabels, instlabels, n_dims=self.c)
+        lbl = preprocess_mask(clabels, instlabels, n_dims=self.c, remove_overlap=self.remove_overlap)
         pdf = create_pdf(lbl, ignore=ign, fbr=self.fbr, scale=512)
         self._save_cache(file.name, lbl, pdf)
 
@@ -367,7 +367,7 @@ class BaseDataset(Dataset):
         print('Computing Stats...')
         mean_sum, var_sum = 0., 0.
         for i, f in enumerate(self.files, 1):
-            img = self.read_img(f, divide=self.divide)
+            img = self.read_img(f, divide=self.divide)[:]
             mean_sum += img.mean((0,1))
             var_sum += img.var((0,1))
             if i==max_samples:
