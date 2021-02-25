@@ -20,7 +20,7 @@ from torch.utils.data import Dataset, DataLoader
 from fastai.vision.all import *
 from fastcore.all import *
 
-from .transforms import WeightTransform, preprocess_mask, create_pdf
+from .transforms import WeightTransform, preprocess_mask, create_pdf, random_center
 
 import gc
 gc.enable()
@@ -411,9 +411,7 @@ class RandomTileDataset(BaseDataset):
         n_channels = img.shape[-1]
 
         lbl, pdf  = [zarr.open(str(self.preproc_dir/self._name_fn(img_path.name, n))) for n in ['lbl', 'pdf']]
-
-        # Random center
-        center = np.unravel_index(np.argmax(pdf[:] > np.random.random()), lbl.shape)
+        #center = random_center(pdf[:], lbl.shape)
         X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((*self.tile_shape, n_channels))
         X = np.moveaxis(X, -1, 0)
         Y = self.deformationField.apply(lbl, center, self.padding, 0)
