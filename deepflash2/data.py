@@ -411,7 +411,7 @@ class RandomTileDataset(BaseDataset):
         n_channels = img.shape[-1]
 
         lbl, pdf  = [zarr.open(str(self.preproc_dir/self._name_fn(img_path.name, n))) for n in ['lbl', 'pdf']]
-        #center = random_center(pdf[:], lbl.shape)
+        center = random_center(pdf[:], lbl.shape)
         X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((*self.tile_shape, n_channels))
         X = np.moveaxis(X, -1, 0)
         Y = self.deformationField.apply(lbl, center, self.padding, 0)
