@@ -6,7 +6,7 @@ __all__ = ['preprocess_mask', 'create_pdf', 'random_center', 'calculate_weights'
 # Cell
 import torch, cv2, numpy as np
 import torch.nn.functional as F
-from fastcore.transform import Transform
+from fastcore.transform import DisplayedTransform
 from fastai.torch_core import TensorImage, TensorMask
 
 # Cell
@@ -193,7 +193,7 @@ class SeparableConv2D(torch.nn.Module):
         return inp#.contiguous()
 
 # Cell
-class WeightTransformSingle(Transform):
+class WeightTransformSingle(DisplayedTransform):
     def __init__(self, channels, bws=10, fds=10, bwf=1, fbr=.1, lmbda=0.35, ks=73):
         self.bws, self.fds, self.bwf, self.fbr= bws, fds, bwf, fbr
         self.channels, self.lmbda = channels, lmbda
@@ -206,7 +206,7 @@ class WeightTransformSingle(Transform):
         return -self.lmbda*torch.log(x)
 
     def encodes(self, x:torch.Tensor):
-        if isinstance(x, TensorImage) or isinstance(x, TensorMask): return x
+        #if isinstance(x, TensorImage) or isinstance(x, TensorMask): return x
 
         labels = (torch.sum(x, dim=0)>0)
         wghts = self.fbr * torch.ones((self.channels,)*2).to(x)
@@ -233,27 +233,26 @@ class WeightTransform(WeightTransformSingle):
 
     def encodes(self, b:torch.Tensor):
         if isinstance(b, TensorImage) or isinstance(b, TensorMask): return b
-
         w_ll = []
         for x in b:
             x = (torch.eye(int(x.max()+1))[x.type(torch.long)][...,1:]).to(x)
             x = x.permute(2,0,1)
             labels = (torch.sum(x, dim=0)>0)
             wghts = self.fbr * torch.ones((self.channels,)*2).to(x)
-            if x.size(0)==0: return wghts
-            dt = self._distance_transform(x)
+            if x.size(0)>0:
+                dt = self._distance_transform(x)
 
-            # Foreground_dist
-            fd = torch.sum(torch.exp(-dt**2/(2*self.fds**2)), dim=0)
-            wghts[labels == 0] += (1-self.fbr)*fd[labels == 0]
+                # Foreground_dist
+                fd = torch.sum(torch.exp(-dt**2/(2*self.fds**2)), dim=0)
+                wghts[labels == 0] += (1-self.fbr)*fd[labels == 0]
 
-            # Border Weights
-            bw_max = torch.max(dt, dim=0)[0]
-            bw_min = torch.min(dt, dim=0)[0]
-            wghts += self.bwf * torch.exp(-(bw_max + bw_min)**2/ (2*self.bws ** 2))
+                # Border Weights
+                bw_max = torch.max(dt, dim=0)[0]
+                bw_min = torch.min(dt, dim=0)[0]
+                wghts += self.bwf * torch.exp(-(bw_max + bw_min)**2/ (2*self.bws ** 2))
 
-            # Set foreground weights to 1
-            wghts[labels > 0] = 1.
+                # Set foreground weights to 1
+                wghts[labels > 0] = 1.
             w_ll.append(wghts)
         #assert x.device==torch.device(type='cpu')
         return torch.stack(w_ll).to(x)

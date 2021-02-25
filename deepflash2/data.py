@@ -19,8 +19,7 @@ from torch.utils.data import Dataset, DataLoader
 
 from fastai.vision.all import *
 from fastcore.all import *
-
-from .transforms import WeightTransform, preprocess_mask, create_pdf, random_center
+from .transforms import random_center, WeightTransform, preprocess_mask, create_pdf
 
 import gc
 gc.enable()
@@ -211,11 +210,14 @@ class DeformationField:
         "Apply deformation field to image using interpolation"
         outshape = tuple(int(s - p) for (s, p) in zip(self.shape, pad))
         coords = [np.squeeze(d).astype('float32').reshape(*outshape) for d in self.get(offset, pad)]
-
         # Get slices to avoid loading all data (.zarr files)
-        xmin, xmax = int(np.floor(max(0, coords[0].min()))), int(np.ceil(coords[0].max()))
+        xmin, xmax = int(np.floor(coords[0].min())), int(np.ceil(coords[0].max()))
+        if xmax>outshape[0]: xmin -= xmax-outshape[0]
+        xmin = max(0, xmin)
         coords[0] -= xmin
-        ymin, ymax = int(np.floor(max(0, coords[1].min()))), int(np.ceil(coords[1].max()))
+        ymin, ymax = int(np.floor(coords[1].min())), int(np.ceil(coords[1].max()))
+        if ymax>outshape[1]: ymin -= ymax-outshape[1]
+        ymin = max(0, ymin)
         coords[1] -= ymin
         xs, ys = slice(xmin, xmax), slice(ymin, ymax)
 
@@ -225,6 +227,7 @@ class DeformationField:
                 tile[c,...] = cv2.remap(data[xs, ys, c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         else:
             tile = cv2.remap(data[xs, ys], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+            #tile = cv2.remap(data[:], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         return tile
 
 # Cell
@@ -474,19 +477,19 @@ class TileDataset(BaseDataset):
         tiler = DeformationField(self.tile_shape)
         root = zarr.group(store=zarr.storage.TempStore(), overwrite=True)
         grps = root.create_groups('tile_data', 'tile_labels')
-        tile_data = grps[0]
-        tile_labels = grps[1] if self.label_fn is not None else None
+        self.tile_data = grps[0]
+        self.tile_labels = grps[1] if self.label_fn is not None else None
         self.image_indices = []
         self.image_shapes = []
         self.in_slices = []
         self.out_slices = []
-        self.tile_loader = zarr.load(root.store)
+        #self.tile_loader = zarr.load(root.store)
 
         j = 0
         for i, file in enumerate(progress_bar(self.files, leave=False)):
             img = self.read_img(file, divide=self.divide)
             if self.label_fn is not None:
-                lbl, wgt = [zarr.open(str(self.preproc_dir/self._name_fn(file.name, n))) for n in ['lbl', 'wgt']]
+                lbl = zarr.open(str(self.preproc_dir/self._name_fn(file.name, 'lbl')))
 
             # Tiling
             data_shape = img.shape[:-1]
@@ -496,9 +499,9 @@ class TileDataset(BaseDataset):
                         int((ty + 0.5) * self.output_shape[0]),
                         int((tx + 0.5) * self.output_shape[1]),
                     )
-                    tile_data[j] = tiler.apply(img, centerPos)
+                    self.tile_data[j] = tiler.apply(img, centerPos)
                     if self.label_fn is not None:
-                        tile_labels[j] = tiler.apply(lbl, centerPos, self.padding, order=0).astype('int64')
+                        self.tile_labels[j] = tiler.apply(lbl, centerPos, self.padding, order=0).astype('int64')
                     self.image_indices.append(i)
                     self.image_shapes.append(data_shape)
                     sliceDef = tuple(slice(tIdx * o, min((tIdx + 1) * o, s)) for (tIdx, o, s) in zip((ty, tx), self.output_shape, data_shape))
@@ -513,11 +516,11 @@ class TileDataset(BaseDataset):
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-        try: X = self.tile_loader[f'tile_data/{idx}']
+        try: X =  self.tile_data[f'{idx}']
         except: raise IndexError
         X = X.astype('float32')
         if self.label_fn is not None:
-            Y = self.tile_loader[f'tile_labels/{idx}']
+            Y = self.tile_labels[f'{idx}'][:] #self.tile_loader[f'tile_labels/{idx}']
             _, W = cv2.connectedComponents((Y > 0).astype('uint8'), connectivity=4)
             return TensorImage(X), TensorMask(Y), torch.Tensor(W)
         else:
