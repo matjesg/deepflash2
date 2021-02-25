@@ -211,12 +211,20 @@ class DeformationField:
         "Apply deformation field to image using interpolation"
         outshape = tuple(int(s - p) for (s, p) in zip(self.shape, pad))
         coords = [np.squeeze(d).astype('float32').reshape(*outshape) for d in self.get(offset, pad)]
+
+        # Get slices to avoid loading all data (.zarr files)
+        xmin, xmax = int(np.floor(max(0, coords[0].min()))), int(np.ceil(coords[0].max()))
+        coords[0] -= xmin
+        ymin, ymax = int(np.floor(max(0, coords[1].min()))), int(np.ceil(coords[1].max()))
+        coords[1] -= ymin
+        xs, ys = slice(xmin, xmax), slice(ymin, ymax)
+
         if len(data.shape) == len(self.shape) + 1:
             tile = np.empty((data.shape[-1], *outshape))
             for c in range(data.shape[-1]):
-                tile[c,...] = cv2.remap(data[..., c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+                tile[c,...] = cv2.remap(data[xs, ys, c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         else:
-            tile = cv2.remap(data[:], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+            tile = cv2.remap(data[xs, ys], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         return tile
 
 # Cell
