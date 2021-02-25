@@ -29,9 +29,10 @@ from .metrics import Dice_f1, Iou
 from .losses import WeightedSoftmaxCrossEntropy
 from .callbacks import ElasticDeformCallback
 from .models import get_default_shapes
-from .data import TileDataset, RandomTileDataset, _read_img, _read_msk, calculate_weights
+from .data import TileDataset, RandomTileDataset, _read_img, _read_msk
 from .utils import iou, plot_results, get_label_fn, calc_iterations, save_mask, save_unc
 import deepflash2.tta as tta
+from .transforms import WeightTransform, calculate_weights
 
 # Cell
 @dataclass
@@ -301,6 +302,7 @@ class EnsembleLearner(GetAttr):
         for key, value in get_default_shapes(self.arch).items():
             ds_kwargs.setdefault(key, value)
         self.ds_kwargs = ds_kwargs
+        self.out_size = self.ds_kwargs['tile_shape'][0]-self.ds_kwargs['padding'][0]
         self.item_tfms=[Brightness(max_lighting=self.light)]
         self.models = {}
         self.recorder = {}
@@ -348,7 +350,7 @@ class EnsembleLearner(GetAttr):
         files_train, files_val = self.splits[i]
         train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, **self.mw_kwargs, **self.ds_kwargs)
         valid_ds = TileDataset(files_val, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, **self.mw_kwargs,**self.ds_kwargs)
-        batch_tfms = Normalize.from_stats(*self.stats)
+        batch_tfms = [Normalize.from_stats(*self.stats), WeightTransform(self.out_size, **self.mw_kwargs)]
         dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=batch_tfms)
         pre = None if self.pretrained=='new' else self.pretrained
         model = torch.hub.load(self.repo, self.arch, pretrained=pre, n_classes=dls.c, in_channels=self.in_channels, **kwargs)
@@ -384,7 +386,7 @@ class EnsembleLearner(GetAttr):
         bs = bs or self.bs
         model_path = self.models[model_no]
         model = self.load_model(model_path)
-        batch_tfms = Normalize.from_stats(*self.stats)
+        batch_tfms = [Normalize.from_stats(*self.stats), WeightTransform(self.out_size, **self.mw_kwargs)]
         ds = TileDataset(files, **self.ds_kwargs)
         dls = DataLoaders.from_dsets(ds, batch_size=bs, after_batch=batch_tfms, shuffle=False, drop_last=False)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
