@@ -158,22 +158,25 @@ def energy_max(e, ks=20, dim=None):
 
 # Cell
 @patch
-def predict_tiles_zarr(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_times=1, use_tta=False,
-                  tta_merge='mean', energy_T=1, energy_ks=20, padding=(0,0,0,0)): #(-52,-52,-52,-52)
+def predict_tiles_zarr(self:Learner, ds_idx=1, dl=None, path=None, mc_dropout=False, n_times=1, use_tta=False,
+                       tta_merge='mean', energy_T=1, energy_ks=20, padding=(0,0,0,0)):
     "Make predictions and reconstruct tiles, optional with dropout and/or tta applied."
 
     if dl is None: dl = self.dls[ds_idx].new(shuffled=False, drop_last=False)
+    assert isinstance(dl.dataset, TileDataset), "Provide dataloader containing a TileDataset"
     if use_tta: tfms=[tta.HorizontalFlip(), tta.Rotate90(angles=[90,180,270])]
     else: tfms=[]
 
     self.model.eval()
     if mc_dropout: self.apply_dropout()
 
-    root = zarr.group(store=zarr.storage.TempStore(), overwrite=True)
-    grps = root.create_groups('smx_tiles', 'std_tiles', 'energy_tiles')
-    smx_tiles, std_tiles, energy_tiles = grps[0], grps[1], grps[2]
+    store = str(path) or zarr.storage.TempStore()
+    root = zarr.group(store=store, overwrite=True)
+    grps = root.create_groups('smx', 'seg', 'std', 'energy')
+    g_smx, g_seg, g_std, g_eng = grps[0], grps[1], grps[2], grps[3]
 
     i = 0
+    last_file = None
     for data in progress_bar(dl, leave=False):
         if isinstance(data, TensorImage): images = data
         else: images, _, _ = data
@@ -195,19 +198,28 @@ def predict_tiles_zarr(self:Learner, ds_idx=1, dl=None, mc_dropout=False, n_time
         std_ll = [x for x in m_smx.result('std').permute(0,2,3,1).cpu().numpy()]
         eng_ll = [x for x in m_energy.result().cpu().numpy()]
         for j,(smx,std,eng) in enumerate(zip(smx_ll, std_ll, eng_ll)):
-            k = i+j
-            smx_tiles[k], std_tiles[k], energy_tiles[k] = smx,std,eng
+            idx = i+j
+            f = dl.files[dl.image_indices[idx]]
+            outShape = dl.image_shapes[idx]
+            outShape_c = (*outShape, dl.c)
+            outSlice = dl.out_slices[idx]
+            inSlice = dl.in_slices[idx]
+            if last_file!=f:
+                z_smx = g_smx.empty(f.name, shape=outShape_c, dtype='float32')
+                z_seg = g_seg.empty(f.name, shape=outShape, dtype='uint8')
+                z_std = g_std.empty(f.name, shape=outShape_c, dtype='float32')
+                z_eng = g_eng.empty(f.name, shape=outShape, dtype='float32')
+                last_file = f
+            z_smx[outSlice] = smx[inSlice]
+            z_seg[outSlice] = np.argmax(smx, axis=-1)[inSlice]
+            z_std[outSlice] = smx[inSlice]
+            z_eng[outSlice] = eng[inSlice]
         i += dl.bs
 
-    smxcores, segmentations = dl.reconstruct_from_tiles_zarr(smx_tiles, create_masks=True)
-    std_deviations = dl.reconstruct_from_tiles_zarr(std_tiles)
-    e_scores = dl.reconstruct_from_tiles_zarr(energy_tiles)
-
     if energy_ks is not None:
-        loader = zarr.load(e_scores.chunk_store)
-        energy_scores = [energy_max(loader[f'{e_scores.basename}/{e}'], energy_ks) for e in e_scores]
+        g_eng = [energy_max(g_eng[e][:], energy_ks) for e in g_eng]
 
-    return smxcores, segmentations, std_deviations, energy_scores
+    return g_smx, g_seg, g_std, g_eng
 
 # Cell
 @patch
