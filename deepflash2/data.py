@@ -273,15 +273,14 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
 # Cell
 class BaseDataset(Dataset):
     def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, divide=None, ignore={},remove_overlap=True,
-                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, bws=6, fds=1, bwf=50, fbr=.1, n_jobs=-1, verbose=1, **kwargs):
-        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, remove_overlap,\
-                    padding, bws, fds, bwf, fbr')
+                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, fbr=.1, n_jobs=-1, verbose=1, **kwargs):
+        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, remove_overlap, padding, fbr')
         self.c = n_classes
         if label_fn is not None:
-            if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache.zarr'
+            if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
             else: self.preproc_dir = Path(preproc_dir)
-            self.root = zarr.group(str(self.preproc_dir))# self.preproc_dir.mkdir(exist_ok=True, parents=True)
-            self.weight_loader = zarr.load(self.root.store)
+            self.labels = zarr.group(str(self.preproc_dir/'labels'))
+            self.pdfs = zarr.group(str(self.preproc_dir/'pdfs'))
             self._preproc(n_jobs, verbose)
 
     def read_img(self, *args, **kwargs):
@@ -290,16 +289,9 @@ class BaseDataset(Dataset):
     def read_mask(self, *args, **kwargs):
         return _read_msk(*args, **kwargs)
 
-    def _name_fn(self, g, n=None):
-        "Creates path to preprocessed and compressed data."
-        g = f'{g}_{self.fbr}'
-        return f'{g}/{n}' if n else g
-
-    def _save_cache(self, fname, lbl, pdf):
-        name = self._name_fn(fname)
-        grp = self.root.create_group(name)
-        grp['lbl'] = lbl
-        grp['pdf'] = pdf
+    def _name_fn(self, g):
+        "Name of preprocessed and compressed data."
+        return f'{g}_{self.fbr}'
 
     def _preproc_file(self, file):
         "Preprocesses and saves labels (msk), weights, and pdf."
@@ -312,8 +304,8 @@ class BaseDataset(Dataset):
             instlabels = None
         ign = self.ignore[file.name] if file.name in self.ignore else None
         lbl = preprocess_mask(clabels, instlabels, n_dims=self.c, remove_overlap=self.remove_overlap)
-        pdf = create_pdf(lbl, ignore=ign, fbr=self.fbr, scale=512)
-        self._save_cache(file.name, lbl, pdf)
+        self.labels[file.name] = lbl
+        self.pdfs[self._name_fn(file.name)] = create_pdf(lbl, ignore=ign, fbr=self.fbr, scale=512)
 
     def _preproc(self, n_jobs=-1, verbose=0):
         using_cache = False
@@ -321,7 +313,8 @@ class BaseDataset(Dataset):
         for f in self.files:
             try:
                 #lbl, wgt, pdf = _get_cached_data(self._cache_fn(f.name))
-                self.weight_loader[self._name_fn(f.name, 'lbl')]
+                self.labels[f.name]
+                self.pdfs[self._name_fn(f.name)]
                 if not using_cache:
                     if verbose>0: print(f'Using preprocessed masks from {self.preproc_dir}')
                     using_cache = True
@@ -345,7 +338,7 @@ class BaseDataset(Dataset):
             files = self.files
         data_list = L()
         for f in files:
-            if mask: d = self.weight_loader[self._name_fn(f.name, 'lbl')]
+            if mask: d = self.labels[f.name]
             else: d = self.read_img(f, divide=self.divide)
             data_list.append(d)
         return data_list
@@ -361,8 +354,7 @@ class BaseDataset(Dataset):
         for f in files:
             img = self.read_img(f, divide=self.divide)
             if self.label_fn is not None:
-                lbl = self.weight_loader[self._name_fn(f.name, 'lbl')]
-                #self.read_mask(self.label_fn(f), instance_labels=self.instance_labels)
+                lbl = self.labels[f.name]
                 show(img, lbl, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
             else:
                 show(img, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
@@ -423,7 +415,7 @@ class RandomTileDataset(BaseDataset):
         img = self.read_img(img_path, divide=self.divide)
         n_channels = img.shape[-1]
 
-        lbl, pdf  = [zarr.open(str(self.preproc_dir/self._name_fn(img_path.name, n))) for n in ['lbl', 'pdf']]
+        lbl, pdf  = self.labels[img_path.name], self.pdfs[self._name_fn(img_path.name)]
         center = random_center(pdf[:], lbl.shape)
         X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((n_channels, *self.tile_shape))
         Y = self.deformationField.apply(lbl, center, self.padding, 0)
@@ -473,37 +465,35 @@ class RandomTileDataset(BaseDataset):
 class TileDataset(BaseDataset):
     "Pytorch Dataset that creates random tiles for validation and prediction on new data."
     n_inp = 1
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, val_length=None, val_seed=42, **kwargs):
         super().__init__(*args, **kwargs)
         self.output_shape = tuple(int(t - p) for (t, p) in zip(self.tile_shape, self.padding))
-        tiler = DeformationField(self.tile_shape)
-        root = zarr.group(store=zarr.storage.TempStore(), overwrite=True)
-        grps = root.create_groups('tile_data', 'tile_labels')
-        self.tile_data = grps[0]
-        self.tile_labels = grps[1] if self.label_fn is not None else None
+        self.tiler = DeformationField(self.tile_shape)
         self.image_indices = []
         self.image_shapes = []
         self.in_slices = []
         self.out_slices = []
-        #self.tile_loader = zarr.load(root.store)
+        self.centers = []
+        self.valid_indices = None
+        convert_data = False
+
+        if self.files[0].suffix != '.zarr':
+            root = zarr.group(store=zarr.storage.TempStore(), overwrite=True)
+            self.data = root.create_group('data')
+            convert_data = True
+        else:
+            self.data = zarr.group(str(self.files[0].parent))
 
         j = 0
         for i, file in enumerate(progress_bar(self.files, leave=False)):
             img = self.read_img(file, divide=self.divide)
-            if self.label_fn is not None:
-                lbl = zarr.open(str(self.preproc_dir/self._name_fn(file.name, 'lbl')))
-
+            if convert_data: self.data[file.name] = img
             # Tiling
             data_shape = img.shape[:-1]
             for ty in range(int(np.ceil(data_shape[0] / self.output_shape[0]))):
                 for tx in range(int(np.ceil(data_shape[1] / self.output_shape[1]))):
-                    centerPos = (
-                        int((ty + 0.5) * self.output_shape[0]),
-                        int((tx + 0.5) * self.output_shape[1]),
-                    )
-                    self.tile_data[j] = tiler.apply(img, centerPos)
-                    if self.label_fn is not None:
-                        self.tile_labels[j] = tiler.apply(lbl, centerPos, self.padding, order=0).astype('int64')
+                    self.centers.append((int((ty + 0.5) * self.output_shape[0]),
+                                        int((tx + 0.5) * self.output_shape[1])))
                     self.image_indices.append(i)
                     self.image_shapes.append(data_shape)
                     sliceDef = tuple(slice(tIdx * o, min((tIdx + 1) * o, s)) for (tIdx, o, s) in zip((ty, tx), self.output_shape, data_shape))
@@ -512,17 +502,27 @@ class TileDataset(BaseDataset):
                     self.in_slices.append(sliceDef)
                     j += 1
 
+        if val_length:
+            np.random.seed(val_seed)
+            choice = np.random.choice(len(self.image_indices), val_length, replace=False)
+            self.valid_indices = {i:idx for i, idx in  enumerate(choice)}
+
     def __len__(self):
-        return len(self.image_shapes)
+        if self.valid_indices: return len(self.valid_indices)
+        else: return len(self.image_shapes)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-        try: X =  self.tile_data[f'{idx}']
-        except: raise IndexError
+        if self.valid_indices: idx = self.valid_indices[idx]
+        img_path = self.files[self.image_indices[idx]]
+        img = self.data[img_path.name]
+        centerPos = self.centers[idx]
+        X = self.tiler.apply(img, centerPos)
         X = X.astype('float32')
         if self.label_fn is not None:
-            Y = self.tile_labels[f'{idx}'][:] #self.tile_loader[f'tile_labels/{idx}']
+            lbl = self.labels[img_path.name]
+            Y = self.tiler.apply(lbl, centerPos, self.padding, order=0).astype('int64')
             _, W = cv2.connectedComponents((Y > 0).astype('uint8'), connectivity=4)
             return TensorImage(X), TensorMask(Y), torch.Tensor(W)
         else:
