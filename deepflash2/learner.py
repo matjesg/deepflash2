@@ -220,12 +220,12 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, path=None, mc_dropout=False, 
 # Cell
 class EnsembleLearner(GetAttr):
     _default = 'config'
-    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None, remove_overlap=True,
-                 label_fn=None, metrics=None, loss_fn=None, cbs=None, ds_kwargs={}, stats=None, files=None, preproc_dir=None):
+    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None,
+                 label_fn=None, metrics=None, loss_fn=None, cbs=None, ds_kwargs={}, dl_kwargs={}, stats=None, files=None):
 
         self.config = config or Config()
         self.stats = stats
-        self.preproc_dir = preproc_dir
+        self.dl_kwargs = dl_kwargs
         self.path = Path(path) if path is not None else Path('.')
         self.metrics = metrics or [Iou()] #Dice_f1()
         self.loss_fn = loss_fn or WeightedSoftmaxCrossEntropy(axis=1)
@@ -255,7 +255,7 @@ class EnsembleLearner(GetAttr):
         self.models = {}
         self.recorder = {}
         self._set_splits()
-        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, remove_overlap=remove_overlap, preproc_dir=self.preproc_dir, **self.mw_kwargs, **self.ds_kwargs)
+        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
 
@@ -289,17 +289,17 @@ class EnsembleLearner(GetAttr):
         model.load_state_dict(model_state, strict=strict)
         return model
 
-    def fit(self, i, n_iter=None, lr_max=None, bs=None , n_jobs=-1, verbose=1, **kwargs):
+    def fit(self, i, n_iter=None, lr_max=None, bs=None, **kwargs):
         n_iter = n_iter or self.n_iter
         lr_max = lr_max or self.lr
         bs = bs or self.bs
         self.stats = self.stats or self.ds.compute_stats()
         name = self.ensemble_dir/f'{self.arch}_model-{i}.pth'
         files_train, files_val = self.splits[i]
-        train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, preproc_dir=self.preproc_dir, **self.mw_kwargs, **self.ds_kwargs)
-        valid_ds = TileDataset(files_val, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, preproc_dir=self.preproc_dir, **self.mw_kwargs,**self.ds_kwargs)
+        train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
+        valid_ds = TileDataset(files_val, label_fn=self.label_fn, **self.mw_kwargs,**self.ds_kwargs)
         batch_tfms = [Normalize.from_stats(*self.stats), WeightTransform(self.out_size, **self.mw_kwargs)]
-        dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=batch_tfms)
+        dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=batch_tfms, **self.dl_kwargs)
         pre = None if self.pretrained=='new' else self.pretrained
         model = torch.hub.load(self.repo, self.arch, pretrained=pre, n_classes=dls.c, in_channels=self.in_channels, **kwargs)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
@@ -336,7 +336,7 @@ class EnsembleLearner(GetAttr):
         model = self.load_model(model_path)
         batch_tfms = [Normalize.from_stats(*self.stats), WeightTransform(self.out_size, **self.mw_kwargs)]
         ds = TileDataset(files, **self.ds_kwargs)
-        dls = DataLoaders.from_dsets(ds, batch_size=bs, after_batch=batch_tfms, shuffle=False, drop_last=False)
+        dls = DataLoaders.from_dsets(ds, batch_size=bs, after_batch=batch_tfms, shuffle=False, drop_last=False, **self.dl_kwargs)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
         learn = Learner(dls, model, loss_func=self.loss_fn)
         if self.mpt: learn.to_fp16()
@@ -482,11 +482,11 @@ class EnsembleLearner(GetAttr):
             if unc: plot_results(img, pred, std, df=r, unc_metric=unc_metric)
             else: plot_results(img, pred, df=r)
 
-    def lr_find(self, files=None, bs=None, n_jobs=-1, verbose=1, **kwargs):
+    def lr_find(self, files=None, bs=None, **kwargs):
         bs = bs or self.bs
         files = files or self.files
-        train_ds = RandomTileDataset(files, label_fn=self.label_fn, n_jobs=n_jobs, verbose=verbose, preproc_dir=self.preproc_dir, **self.mw_kwargs, **self.ds_kwargs)
-        dls = DataLoaders.from_dsets(train_ds,train_ds, bs=bs)
+        train_ds = RandomTileDataset(files, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
+        dls = DataLoaders.from_dsets(train_ds, train_ds, bs=bs, **self.dl_kwargs)
         pre = None if self.pretrained=='new' else self.pretrained
         model = torch.hub.load(self.repo, self.arch, pretrained=pre, n_classes=dls.c, in_channels=self.in_channels)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
