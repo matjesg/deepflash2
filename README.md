@@ -10,7 +10,7 @@ __The best of two worlds:__
 Combining state of the art deep learning with a barrier free environment for life science researchers.
 
 - End-to-end process for life science researchers
-    - no coding skills required
+    - graphical user interface - no coding skills required
     - free usage on _Google Colab_ at no costs
     - easy deployment on own hardware
 - Rigorously evaluated deep learning models

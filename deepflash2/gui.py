@@ -9,6 +9,7 @@ __all__ = ['GRID_COLS', 'set_css_in_cell_output', 'tooltip_css', 'ZipUpload', 'I
 import os, sys, shutil, time, zipfile, urllib, subprocess
 import ipywidgets as w, numpy as np, pandas as pd, IPython.display as d
 from IPython.utils.io import ask_yes_no
+from IPython.core.getipython import get_ipython
 from ipywidgets.embed import embed_minimal_html
 from pathlib import Path
 from fastcore.foundation import store_attr
@@ -1330,8 +1331,8 @@ class GUI(GetAttr):
         with cfg.output:
             path = cfg.cwd/cfg.select.value[0]
             self.config.load(path)
-        for ui in [*t.train.sb.values(),*t.train.xtr.values()]:
-            if hasattr(ui, 'set_config'): ui.set_config(t.config)
+        for ui in [*self.train.sb.values(),*self.train.xtr.values()]:
+            if hasattr(ui, 'set_config'): ui.set_config(self.config)
         time.sleep(3)
         cfg.output.clear_output()
 
@@ -1372,7 +1373,7 @@ class GUI(GetAttr):
         out.clear_output()
         sel = self.train.sb['valid'].sel.value
         model_no = None if sel == 'ensemble' else int(sel[6:])
-        save_dir = (self.proj_path/self.train_dir/self.val_dir).relative_to(self.proj_path)
+        export_dir = self.proj_path/self.train_dir/self.val_dir
         with out:
             assert type(self.el)==EnsembleLearner, 'Please load data first!'
             assert len(self.el.models)>0, 'Please train models first!'
@@ -1380,17 +1381,16 @@ class GUI(GetAttr):
         if COLAB:
             with colab.output.temporary():
                 print('Temporary Logs:')
-                self.el.get_valid_results(model_no, save_dir=save_dir, use_tta=self.tta)
+                df_val = self.el.get_valid_results(model_no, export_dir=export_dir, use_tta=self.tta)
         else:
             with self.tmp:
                 print('Temporary Logs:')
-                self.el.get_valid_results(model_no, save_dir=save_dir, use_tta=self.tta)
+                df_val = self.el.get_valid_results(model_no, export_dir=export_dir, use_tta=self.tta)
                 self.tmp.clear_output()
 
         out.clear_output()
-
         with out:
-            items = {x.file:f'{x.model_no}_{x.file}' for _,x in self.el.df_val.iterrows()}
+            items = {x.file:f'{x.model_no}_{x.file}' for _,x in df_val.iterrows()}
             ipp = ItemsPerPage(self.proj_path,self.el.show_valid_results, items=items, srt_by='model/name')
             display(ipp.widget)
 
@@ -1484,7 +1484,7 @@ class GUI(GetAttr):
         use_tta = use_tta or self.pred_tta
         out = self.pred.main['pred']
         out.clear_output()
-        save_dir = self.pred.sb['pred'].down.path
+        export_dir = self.pred.sb['pred'].down.path
 
         with out:
             assert type(self.el_pred)==EnsembleLearner, 'Please load data first!'
@@ -1493,11 +1493,11 @@ class GUI(GetAttr):
         if COLAB:
             with colab.output.temporary():
                 print('Temporary Logs:')
-                self.el_pred.get_ensemble_results(self.el_pred.files, save_dir=save_dir, use_tta=use_tta)
+                self.el_pred.get_ensemble_results(self.el_pred.files, export_dir=export_dir, use_tta=use_tta)
         else:
             with self.tmp:
                 print('Temporary Logs:')
-                self.el_pred.get_ensemble_results(self.el_pred.files, save_dir=save_dir, use_tta=use_tta)
+                self.el_pred.get_ensemble_results(self.el_pred.files, export_dir=export_dir, use_tta=use_tta)
                 self.tmp.clear_output()
         if show:
             with out:
@@ -1529,9 +1529,9 @@ class GUI(GetAttr):
         with out:
             print('Scoring predictions')
             self.el_pred.ood_score()
-            save_dir = self.pred.sb['pred'].down.path
-            print(f'Saving scoring results to {save_dir}')
-            self.el_pred.df_ens.to_csv(save_dir/f'prediction_with_ood_score.csv', index=False)
+            export_dir = self.pred.sb['pred'].down.path
+            print(f'Saving scoring results to {export_dir}')
+            self.el_pred.df_ens.to_csv(export_dir/f'prediction_with_ood_score.csv', index=False)
             items = {r.file:r.ood_score for _, r in self.el_pred.df_ens.iterrows()}
             print(f'A lower OOD score indicates out-of-distribution (OOD) or anomalous data.')
             ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', unc_metric='ood_score')
