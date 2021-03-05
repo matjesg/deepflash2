@@ -250,7 +250,6 @@ class EnsembleLearner(GetAttr):
         for key, value in get_default_shapes(self.arch).items():
             ds_kwargs.setdefault(key, value)
         self.ds_kwargs = ds_kwargs
-        self.out_size = self.ds_kwargs['tile_shape'][0]-self.ds_kwargs['padding'][0]
         self.item_tfms=[Brightness(max_lighting=self.light)]
         self.models = {}
         self.recorder = {}
@@ -258,6 +257,10 @@ class EnsembleLearner(GetAttr):
         self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
+
+    @property
+    def out_size(self):
+        return self.ds_kwargs['tile_shape'][0]-self.ds_kwargs['padding'][0]
 
     def _set_splits(self):
         if self.n_splits>1:
@@ -303,21 +306,21 @@ class EnsembleLearner(GetAttr):
         pre = None if self.pretrained=='new' else self.pretrained
         model = torch.hub.load(self.repo, self.arch, pretrained=pre, n_classes=dls.c, in_channels=self.in_channels, **kwargs)
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
-        learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim], cbs=self.cbs)
-        learn.model_dir = self.ensemble_dir.parent/'.tmp'
-        if self.mpt: learn.to_fp16()
+        self.learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim], cbs=self.cbs)
+        self.learn.model_dir = self.ensemble_dir.parent/'.tmp'
+        if self.mpt: self.learn.to_fp16()
         print(f'Starting training for {name.name}')
         epochs = calc_iterations(n_iter=n_iter,ds_length=len(train_ds), bs=bs)
-        learn.fit_one_cycle(epochs, lr_max)
+        self.learn.fit_one_cycle(epochs, lr_max)
 
         print(f'Saving model at {name}')
         name.parent.mkdir(exist_ok=True, parents=True)
-        self.save_model(name, learn.model)
+        self.save_model(name, self.learn.model)
         self.models[i]=name
-        self.recorder[i]=learn.recorder
-        del model
-        gc.collect()
-        torch.cuda.empty_cache()
+        self.recorder[i]=self.learn.recorder
+        #del model
+        #gc.collect()
+        #torch.cuda.empty_cache()
 
 
     def fit_ensemble(self, n_iter, skip=False, **kwargs):
@@ -330,7 +333,7 @@ class EnsembleLearner(GetAttr):
             self.models.pop(i+1, None)
         self.n = n
 
-    def predict(self, files, model_no, bs=None, **kwargs):
+    def predict(self, files, model_no, bs=None, path=None, **kwargs):
         bs = bs or self.bs
         model_path = self.models[model_no]
         model = self.load_model(model_path)
@@ -340,7 +343,8 @@ class EnsembleLearner(GetAttr):
         if torch.cuda.is_available(): dls.cuda(), model.cuda()
         learn = Learner(dls, model, loss_func=self.loss_fn)
         if self.mpt: learn.to_fp16()
-        return learn.predict_tiles(dl=dls.train, **kwargs)
+        if path: path = path/f'model_{model_no}'
+        return learn.predict_tiles(dl=dls.train, path=path, **kwargs)
 
     def get_valid_results(self, model_no=None, export_dir=None, filetype='.png', **kwargs):
         res_list = []
@@ -416,10 +420,10 @@ class EnsembleLearner(GetAttr):
                 unc_path = export_dir/'uncertainties'
                 unc_path.mkdir(parents=True, exist_ok=True)
 
-        store = str(path) if path else zarr.storage.TempStore()
+        store = str(path/'ensemble') if path else zarr.storage.TempStore()
         root = zarr.group(store=store, overwrite=True)
         chunk_store = root.chunk_store.path
-        g_smx, g_seg, g_std, g_eng  = root.create_groups('smx', 'seg', 'std', 'energy')
+        g_smx, g_seg, g_std, g_eng  = root.create_groups('ens_smx', 'ens_seg', 'ens_std', 'ens_energy')
         res_list = []
         for f in files:
             df_fil = self.df_models[self.df_models.file==f.name]
@@ -469,6 +473,7 @@ class EnsembleLearner(GetAttr):
                 res_list.append(df_tmp)
         self.df_models = pd.DataFrame(res_list)
         self.df_ens  = self.ensemble_results(new_files, export_dir=export_dir, filetype=filetype, **kwargs)
+        return self.df_ens
 
     def show_ensemble_results(self, files=None, model_no=None, unc=True, unc_metric=None):
         if self.df_ens is None: assert print("Please run `get_ensemble_results` first.")
