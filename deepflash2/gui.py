@@ -61,7 +61,8 @@ tooltip_css = """<style>
 def set_css_in_cell_output():
     d.display(d.HTML(tooltip_css))
 
-get_ipython().events.register('pre_run_cell', set_css_in_cell_output)
+try: get_ipython().events.register('pre_run_cell', set_css_in_cell_output)
+except: pass
 
 # Cell
 def _html_wrap(name, tooltip='', url=None):

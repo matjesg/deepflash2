@@ -428,8 +428,8 @@ class EnsembleLearner(GetAttr):
         for f in files:
             df_fil = self.df_models[self.df_models.file==f.name]
             assert len(df_fil)==len(self.models), "Predictions and models to not match."
+            m_smx, m_std, m_eng = tta.Merger(), tta.Merger(), tta.Merger()
             for idx, r in df_fil.iterrows():
-                m_smx, m_std, m_eng = tta.Merger(), tta.Merger(), tta.Merger()
                 m_smx.append(zarr.load(r.smx_path))
                 m_std.append(zarr.load(r.std_path))
                 m_eng.append(zarr.load(r.eng_path))
