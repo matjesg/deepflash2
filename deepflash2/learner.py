@@ -189,7 +189,7 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, path=None, mc_dropout=False, 
                 with torch.no_grad():
                     out = self.model(aug_images)
                 out = t.deaugment_mask(out)
-                if sum(padding)>0: out = F.pad(out, padding)
+                if sum(padding)!=0: out = F.pad(out, padding)
                 m_smx.append(F.softmax(out, dim=1))
                 e = (energy_T*torch.logsumexp(out/energy_T, dim=1)) #negative energy score
                 m_energy.append(e)
