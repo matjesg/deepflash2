@@ -237,7 +237,8 @@ class DeformationField:
     "Creates a deformation field for data augmentation"
     def __init__(self, shape=(540, 540), scale=1):
         self.shape, self.scale = shape, scale
-        grid_range = [np.arange(d*self.scale, step=scale) - (d*self.scale) / 2 for d in shape]
+        #grid_range = [np.arange(d*self.scale, step=scale) - (d*self.scale) / 2 for d in shape]
+        grid_range = [np.linspace(-(d*self.scale)/2, (d*self.scale)/2, d) for d in shape]
         self.deformationField = np.meshgrid(*grid_range)[::-1]
         self.orders = [cv2.INTER_NEAREST, cv2.INTER_LINEAR, cv2.INTER_CUBIC]
 
@@ -377,8 +378,8 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
 # Cell
 class BaseDataset(Dataset):
     def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, divide=None, ignore={},remove_overlap=True,
-                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, fbr=.1, n_jobs=-1, verbose=1, scale=1, **kwargs):
-        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, remove_overlap, padding, fbr, scale')
+                 tile_shape=(540,540), padding=(184,184),preproc_dir=None, fbr=.1, n_jobs=-1, verbose=1, scale=1, loss_weights=True, **kwargs):
+        store_attr('files, label_fn, instance_labels, divide, n_classes, ignore, tile_shape, remove_overlap, padding, fbr, scale, loss_weights')
         self.c = n_classes
         if label_fn is not None:
             if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
@@ -521,14 +522,13 @@ class RandomTileDataset(BaseDataset):
 
         lbl, pdf  = self.labels[img_path.name], self.pdfs[self._name_fn(img_path.name)]
         center = random_center(pdf[:], lbl.shape)
-        X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((n_channels, *self.tile_shape))
-        Y = self.deformationField.apply(lbl, center, self.padding, 0)
-        _, W = cv2.connectedComponents((Y > 0).astype('uint8'), connectivity=4)
-        # To categorical
-        X = X.astype('float32')
-        Y = Y.astype('int64')
-
-        return  TensorImage(X), TensorMask(Y), torch.Tensor(W)
+        X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((n_channels, *self.tile_shape)).astype('float32')
+        Y = self.deformationField.apply(lbl, center, self.padding, 0).astype('int64')
+        if self.loss_weights:
+            _, W = cv2.connectedComponents((Y > 0).astype('uint8'), connectivity=4)
+            return  TensorImage(X), TensorMask(Y), torch.Tensor(W)
+        else:
+            return  TensorImage(X), TensorMask(Y)
 
     def on_epoch_end(self, verbose=False):
 
@@ -627,8 +627,11 @@ class TileDataset(BaseDataset):
         if self.label_fn is not None:
             lbl = self.labels[img_path.name]
             Y = self.tiler.apply(lbl, centerPos, self.padding, order=0).astype('int64')
-            _, W = cv2.connectedComponents((Y > 0).astype('uint8'), connectivity=4)
-            return TensorImage(X), TensorMask(Y), torch.Tensor(W)
+            if self.loss_weights:
+                _, W = cv2.connectedComponents((Y > 0).astype('uint8'), connectivity=4)
+                return  TensorImage(X), TensorMask(Y), torch.Tensor(W)
+            else:
+                return  TensorImage(X), TensorMask(Y)
         else:
             return TensorImage(X)
 

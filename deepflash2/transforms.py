@@ -64,12 +64,15 @@ def create_pdf(labels, ignore=None, fbr=.1, scale=512):
 
     # Set weight and sampling probability for ignored regions to 0
     if ignore is not None:
-        pdf[ignore] = 0
+        pdf[ignore] = 0.0
 
     if scale:
         if pdf.shape[0]>scale:
             scale_w = int((pdf.shape[1]/pdf.shape[0])*scale)
-            pdf = cv2.resize(pdf, dsize=(scale, scale_w), interpolation=cv2.INTER_CUBIC)
+            pdf = cv2.resize(pdf, dsize=(scale_w, scale), interpolation=cv2.INTER_CUBIC)
+
+    plt.imshow(pdf)
+    plt.show()
 
     return np.cumsum(pdf/np.sum(pdf))
 
@@ -78,8 +81,8 @@ def random_center(pdf, orig_shape, scale=512):
     'Sample random center using PDF'
     scale_y = int((orig_shape[1]/orig_shape[0])*scale)
     cx, cy = np.unravel_index(np.argmax(pdf > np.random.random()), (scale,scale_y))
-    cx *= orig_shape[0]//scale
-    cy *= orig_shape[1]//scale_y
+    cx = int(cx*orig_shape[0]/scale)
+    cy = int(cy*orig_shape[1]/scale_y)
     return cx, cy
 
 # Cell
