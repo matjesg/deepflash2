@@ -71,9 +71,6 @@ def create_pdf(labels, ignore=None, fbr=.1, scale=512):
             scale_w = int((pdf.shape[1]/pdf.shape[0])*scale)
             pdf = cv2.resize(pdf, dsize=(scale_w, scale), interpolation=cv2.INTER_CUBIC)
 
-    plt.imshow(pdf)
-    plt.show()
-
     return np.cumsum(pdf/np.sum(pdf))
 
 # Cell
