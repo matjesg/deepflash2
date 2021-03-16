@@ -792,7 +792,10 @@ _dparam= {
     'rot': ('Rotation (max. degrees)', 'Randomly rotate a training image up to max. degrees.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'def_grid'   : ('Deformation Grid Size', "Size of the deformation grid.", 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'def_mag'   : ('Deformation Magnitude', 'Magnitude of the deformation within the deformation grid', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
-    'light': ('Brightness (max. lighting)', 'Brightness refers to the amount of light in the image.', 'https://docs.fast.ai/vision.augment.html'),
+    'brightness_max_lighting': ('Brightness (max. lighting)', 'Brightness refers to the amount of light in the image.', 'https://docs.fast.ai/vision.augment.html'),
+    'contrast_max_lighting': ('Contrast (max. lighting)', 'Contrast pushes pixels to either the maximum or minimum values.', 'https://docs.fast.ai/vision.augment.html'),
+    'saturation_max_lighting': ('Saturation (max. lighting)', 'Change in saturation of the image.', 'https://docs.fast.ai/vision.augment.html'),
+    'zoom_sigma': ('Zoom standard deviation', 'Standard deviation of the Guassian that zooms in or out of the image.', 'https://matjesg.github.io/deepflash2/data.html#RandomTileDataset'),
 }
 
 # Cell
@@ -806,11 +809,14 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
         'bs':w.IntSlider(min=2, max=16, step=2,layout=w.Layout(width='auto', min_width='1px')),
         'wd':w.FloatText(min=0, max=1,layout=w.Layout(width='auto', min_width='1px')),
         'optim':w.Dropdown(options=_optim_dict.keys(), layout=w.Layout(width='auto', min_width='1px')),
-        'light':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
+        'brightness_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
+        'contrast_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
+        'saturation_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
         'flip':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
         'rot':w.IntSlider( min=0, max=360, step=5, layout=w.Layout(width='auto', min_width='1px')),
         'def_grid':w.IntSlider(min=0, max=350, step=10, layout=w.Layout(width='auto', min_width='1px')),
-        'def_mag':w.IntSlider(min=0, max=100, layout=w.Layout(width='auto', min_width='1px'))
+        'def_mag':w.IntSlider(min=0, max=100, layout=w.Layout(width='auto', min_width='1px')),
+        'zoom_sigma':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),#w.FloatText(layout=w.Layout(width='auto', min_width='1px'))
     }
 
 
@@ -825,7 +831,7 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     lbl = w.Label('Settings are saved automatically')
 
     #Grid
-    grid = w.GridspecLayout(12, 2, width='400px',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(15, 2, width='400px',  grid_gap="0px", align_items='center')
     grid[0, 0] = w.HTML(_html_wrap(*_dparam['arch']))
     grid[0, 1] = params['arch']
     grid[1, 0] = w.HTML(_html_wrap(*_dparam['bs']))
@@ -846,8 +852,14 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     grid[9, 1] = params['def_grid']
     grid[10, 0] = w.HTML(_html_wrap(*_dparam['def_mag']))
     grid[10, 1] = params['def_mag']
-    grid[11, 0] = w.HTML(_html_wrap(*_dparam['light']))
-    grid[11, 1] = params['light']
+    grid[11, 0] = w.HTML(_html_wrap(*_dparam['brightness_max_lighting']))
+    grid[11, 1] = params['brightness_max_lighting']
+    grid[12, 0] = w.HTML(_html_wrap(*_dparam['contrast_max_lighting']))
+    grid[12, 1] = params['contrast_max_lighting']
+    grid[13, 0] = w.HTML(_html_wrap(*_dparam['saturation_max_lighting']))
+    grid[13, 1] = params['saturation_max_lighting']
+    grid[14, 0] = w.HTML(_html_wrap(*_dparam['zoom_sigma']))
+    grid[14, 1] = params['zoom_sigma']
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -1397,7 +1409,7 @@ class GUI(GetAttr):
 
     def train_valid_ens_save_clicked(self, b):
         path = self.train.sb['valid'].ens.path
-        with self.train.main['valid']: self.el.get_models(path)
+        with self.train.main['valid']: self.el.load_ensemble(path)
 
     def train_valid_ood_clicked(self, b):
         out = self.train.main['valid']
@@ -1476,7 +1488,7 @@ class GUI(GetAttr):
 
         with out:
             self.el_pred = EnsembleLearner(image_folder, config=self.config, path=self.proj_path, ensemble_dir=ens_folder)
-            self.el_pred.get_models()
+            self.el_pred.load_ensemble()
             items = {x:x for x in self.el_pred.files}
             ipp = ItemsPerPage(self.proj_path, self.el_pred.ds.show_data, items=items, figsize = (5,5))
             display(ipp.widget)

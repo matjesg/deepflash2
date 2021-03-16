@@ -64,7 +64,7 @@ def create_pdf(labels, ignore=None, fbr=.1, scale=512):
 
     # Set weight and sampling probability for ignored regions to 0
     if ignore is not None:
-        pdf[ignore] = 0.0
+        pdf[ignore[:]] = 0
 
     if scale:
         if pdf.shape[0]>scale:
