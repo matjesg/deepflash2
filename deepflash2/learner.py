@@ -26,7 +26,7 @@ from fastai.data.transforms import get_image_files, get_files, Normalize
 from fastai.vision.augment import Brightness, Contrast, Saturation
 
 from .metrics import Dice_f1, Iou
-from .losses import WeightedSoftmaxCrossEntropy
+from .losses import WeightedSoftmaxCrossEntropy,load_kornia_loss
 from .callbacks import ElasticDeformCallback
 from .models import get_default_shapes, load_smp_model
 from .data import TileDataset, RandomTileDataset, _read_img, _read_msk
@@ -69,6 +69,7 @@ class Config:
     wd:float = 0.001
     mpt:bool = False
     optim:str = 'ranger'
+    loss:str = 'WeightedSoftmaxCrossEntropy'
     n_iter:int = 1000
 
     # Train Validation Settings
@@ -81,10 +82,15 @@ class Config:
     zoom_sigma:float = 0.0
     flip:bool = True
     rot:int = 360
-    def_grid:int = 150
-    def_mag:int = 10
+    deformation_grid:int = 150
+    deformation_magnitude:int = 10
 
-    # Loss Mask Weights
+    # Loss Settings Kornia
+    loss_alpha:float = 0.5 # Twerksky/Focal loss
+    loss_beta:float = 0.5 # Twerksy Loss
+    loss_gamma:float = 2.0 # Focal loss
+
+    # Loss Mask Weights (WeightedSoftmaxCrossEntropy)
     bwf:int = 25
     bws:int = 10
     fds:int = 10
@@ -146,12 +152,6 @@ _optim_dict = {
     'SGD' : optimizer.SGD,
     'RMSProp' : optimizer.RMSProp,
 }
-
-# Cell
-_archs = ["unext50_deepflash2", "unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015"]
-
-# Cell
-_pretrained = ["new", "wue_cFOS", "wue_Parv", "wue_GFP", "wue_OPN3"]
 
 # Cell
 @patch
@@ -239,15 +239,17 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, path=None, mc_dropout=False, 
 class EnsembleLearner(GetAttr):
     _default = 'config'
     def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None,
-                 label_fn=None, metrics=None, loss_fn=None, cbs=None, ds_kwargs={}, dl_kwargs={}, model_kwargs={}, stats=None, files=None):
+                 label_fn=None, metrics=None, cbs=None, ds_kwargs={}, dl_kwargs={}, model_kwargs={}, loss_kwargs={}, stats=None, files=None):
 
         self.config = config or Config()
         self.stats = stats
         self.dl_kwargs = dl_kwargs
         self.model_kwargs = model_kwargs
+        self.loss_kwargs = loss_kwargs
+        self.add_ds_kwargs = ds_kwargs
         self.path = Path(path) if path is not None else Path('.')
-        self.metrics = metrics or [Iou()] #Dice_f1()
-        self.loss_fn = loss_fn or WeightedSoftmaxCrossEntropy(axis=1)
+        self.metrics = metrics or [Iou(), Dice_f1()]
+        self.loss_fn = self.get_loss()
         self.cbs = cbs or [SaveModelCallback(monitor='iou'), ElasticDeformCallback] #ShowGraphCallback
         self.ensemble_dir = ensemble_dir or self.path/'ensemble'
 
@@ -264,14 +266,7 @@ class EnsembleLearner(GetAttr):
 
         else:
             self.label_fn = label_fn
-
         self.n_splits=min(len(self.files), self.max_splits)
-
-        # Setting defaults for dataset kwargs
-        for key, value in get_default_shapes(self.arch).items():
-            ds_kwargs.setdefault(key, value)
-        ds_kwargs.setdefault('loss_weights', True if isinstance(self.loss_fn, WeightedSoftmaxCrossEntropy) else False)
-        self.ds_kwargs = ds_kwargs
 
         # Transforms (Data Augmentation)
         self.item_tfms=[Saturation(max_lighting=self.saturation_max_lighting, p=0.75, draw=None, batch=False),
@@ -295,9 +290,30 @@ class EnsembleLearner(GetAttr):
         else:
             self.splits = {1: (self.files[0], self.files[0])}
 
+    @property
+    def ds_kwargs(self):
+        # Setting default shapes and padding
+        ds_kwargs = self.add_ds_kwargs.copy()
+        for key, value in get_default_shapes(self.arch).items():
+            ds_kwargs.setdefault(key, value)
+        # Settings from config
+        ds_kwargs['loss_weights'] = True if self.loss=='WeightedSoftmaxCrossEntropy' else False
+        ds_kwargs['zoom_sigma'] = self.zoom_sigma
+        ds_kwargs['flip'] = self.flip
+        ds_kwargs['deformation_grid']= (self.deformation_grid,)*2
+        ds_kwargs['deformation_magnitude'] = (self.deformation_magnitude,)*2
+        return ds_kwargs
+
+    def get_loss(self):
+        if self.loss == 'WeightedSoftmaxCrossEntropy': return WeightedSoftmaxCrossEntropy(axis=1)
+        if self.loss == 'CrossEntropyLoss': return CrossEntropyLossFlat(axis=1)
+        else:
+            kwargs = {'alpha':self.loss_alpha, 'beta':self.loss_beta, 'gamma':self.loss_gamma}
+            return load_kornia_loss(self.loss, **kwargs)
+
     def get_model(self, pretrained):
         if self.arch in ["unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015", "unet_custom", "unext50_deepflash2"]:
-            model = torch.hub.load(self.repo, self.arch, pretrained=pre, n_classes=dls.c, in_channels=self.in_channels, **self.model_kwargs)
+            model = torch.hub.load(self.repo, self.arch, pretrained=pretrained, n_classes=dls.c, in_channels=self.in_channels, **self.model_kwargs)
         else:
             kwargs = dict(encoder_name=self.encoder_name, encoder_weights=self.encoder_weights,
                           in_channels=self.in_channels, classes=self.c, **self.model_kwargs)
@@ -599,6 +615,7 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          show_ensemble_results="Show result of ensemble or `model_no`",
          load_ensemble="Get models saved at `path`",
          get_model="Get model architecture",
+         get_loss="Get loss function from loss name (config)",
          get_batch_tfms="Get transform performed on batch level",
          set_n="Change to `n` models per ensemble",
          lr_find="Wrapper for learning rate finder",

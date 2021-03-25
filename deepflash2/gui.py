@@ -18,7 +18,7 @@ from fastai.data.transforms import get_files
 import matplotlib.pyplot as plt
 
 from .utils import unzip, get_label_fn
-from .learner import EnsembleLearner, Config, _optim_dict, _archs, _pretrained
+from .learner import EnsembleLearner, Config, _optim_dict
 from .gt import GTEstimator
 
 try:
@@ -28,6 +28,12 @@ except ImportError:
     COLAB = False
 
 GRID_COLS = 2
+
+# Cell
+_archs = ["unext50_deepflash2", "unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015",
+         'Unet', 'UnetPlusPlus', 'MAnet', 'FPN', 'PAN', 'PSPNet', 'Linknet', 'DeepLabV3', 'DeepLabV3Plus']
+_losses = ['WeightedSoftmaxCrossEntropy', 'FocalLoss', 'TverskyLoss', 'DiceLoss', 'CrossEntropyLoss']
+_pretrained = ["new", "wue_cFOS", "wue_Parv", "wue_GFP", "wue_OPN3"]
 
 # Cell
 tooltip_css = """<style>
@@ -539,7 +545,7 @@ _dtrain = {
     'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
     'lr'  : ('Learning Rate', '''The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset'''),
     'lrf' : ('LR Finder', 'Click "Open" to get more information.'),
-    'mw'  : ('Mask Weights', 'Click "Customize" to get more information.'),
+    'mw'  : ('Loss Function', 'Click "Customize" to get more information.'),
     'ts'  : ('Train Settings', 'Click "Customize" to get more information.'),
     'cfg_load' : ('Configuration', 'Select configuration file (.json) from previous experiments.'),
     'cfg_save' : ('Configuration', 'Save current configuration to file (.json).'),
@@ -784,14 +790,16 @@ class BasePopUpParamWidget(BaseParamWidget):
 # Cell
 _dparam= {
     'arch' : ('Model Architecture', 'The architecture of the deep learning model.', 'https://matjesg.github.io/deepflash2/models.html'),
+    'encoder_name' : ('Encoder', 'Encoders for architectures from Segmentation Models Pytorch.', 'https://github.com/qubvel/segmentation_models.pytorch#encoders-'),
+    'encoder_weights' : ('Encoder Weights', 'Pretrained encoders weights for architectures from Segmentation Models Pytorch.', 'https://github.com/qubvel/segmentation_models.pytorch#encoders-'),
     'bs' : ('Mini-Batch Size', 'The number of samples that will be propagated through the network during one iteration; 4 works best in our experiements; 4-8 works good for mixed precision training'),
     'mpt'   : ('Mixed Precision Training', 'Mixed Precision Training', 'https://docs.fast.ai/callback.fp16.html'),
     'wd'  : ('Weight Decay', 'Weight Decay.', 'https://arxiv.org/abs/1711.05101'),
-    'opt'  : ('Optimizer', 'Optimizer.', 'https://docs.fast.ai/optimizer.html'),
+    'optim'  : ('Optimizer', 'Optimizer.', 'https://docs.fast.ai/optimizer.html'),
     'flip'  : ('Flip', 'Randomly flip a training image.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'rot': ('Rotation (max. degrees)', 'Randomly rotate a training image up to max. degrees.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
-    'def_grid'   : ('Deformation Grid Size', "Size of the deformation grid.", 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
-    'def_mag'   : ('Deformation Magnitude', 'Magnitude of the deformation within the deformation grid', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
+    'deformation_grid'   : ('Deformation Grid Size', "Size of the deformation grid.", 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
+    'deformation_magnitude'   : ('Deformation Magnitude', 'Magnitude of the deformation within the deformation grid', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'brightness_max_lighting': ('Brightness (max. lighting)', 'Brightness refers to the amount of light in the image.', 'https://docs.fast.ai/vision.augment.html'),
     'contrast_max_lighting': ('Contrast (max. lighting)', 'Contrast pushes pixels to either the maximum or minimum values.', 'https://docs.fast.ai/vision.augment.html'),
     'saturation_max_lighting': ('Saturation (max. lighting)', 'Change in saturation of the image.', 'https://docs.fast.ai/vision.augment.html'),
@@ -804,18 +812,20 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     _default = 'config'
     params = {
         'arch' : w.Dropdown(options=_archs, layout=w.Layout(width='auto', min_width='1px')),
+        'encoder_name' : w.Text(layout=w.Layout(width='auto', min_width='1px'), disabled=True),
+        'encoder_weights' : w.Text(layout=w.Layout(width='auto', min_width='1px'), disabled=True),
+        'bs':w.IntSlider(min=2, max=16, step=2,layout=w.Layout(width='auto', min_width='1px')),
         'mpt': w.ToggleButtons(options=[('Yes', True), ('No', False)],
                               tooltips=['Enable Mixed-Precision Training','Disable Mixed-Precision Training']),
-        'bs':w.IntSlider(min=2, max=16, step=2,layout=w.Layout(width='auto', min_width='1px')),
         'wd':w.FloatText(min=0, max=1,layout=w.Layout(width='auto', min_width='1px')),
         'optim':w.Dropdown(options=_optim_dict.keys(), layout=w.Layout(width='auto', min_width='1px')),
+        'flip':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
+        'rot':w.IntSlider(min=0, max=360, step=5, layout=w.Layout(width='auto', min_width='1px')),
+        'deformation_grid':w.IntSlider(min=0, max=350, step=10, layout=w.Layout(width='auto', min_width='1px')),
+        'deformation_magnitude':w.IntSlider(min=0, max=100, layout=w.Layout(width='auto', min_width='1px')),
         'brightness_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
         'contrast_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
         'saturation_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
-        'flip':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
-        'rot':w.IntSlider( min=0, max=360, step=5, layout=w.Layout(width='auto', min_width='1px')),
-        'def_grid':w.IntSlider(min=0, max=350, step=10, layout=w.Layout(width='auto', min_width='1px')),
-        'def_mag':w.IntSlider(min=0, max=100, layout=w.Layout(width='auto', min_width='1px')),
         'zoom_sigma':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),#w.FloatText(layout=w.Layout(width='auto', min_width='1px'))
     }
 
@@ -831,35 +841,18 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     lbl = w.Label('Settings are saved automatically')
 
     #Grid
-    grid = w.GridspecLayout(15, 2, width='400px',  grid_gap="0px", align_items='center')
-    grid[0, 0] = w.HTML(_html_wrap(*_dparam['arch']))
-    grid[0, 1] = params['arch']
-    grid[1, 0] = w.HTML(_html_wrap(*_dparam['bs']))
-    grid[1, 1] = params['bs']
-    grid[2, 0] = w.HTML(_html_wrap(*_dparam['mpt']))
-    grid[2, 1] = params['mpt']
-    grid[3, 0] = w.HTML(_html_wrap(*_dparam['wd']))
-    grid[3, 1] = params['wd']
-    grid[4, 0] = w.HTML(_html_wrap(*_dparam['opt']))
-    grid[4, 1] = params['optim']
-    grid[5, :] = w.HTML('<hr>')
-    grid[6, :] = w.HTML('<b>Data Augmentation</b>')
-    grid[7, 0] = w.HTML(_html_wrap(*_dparam['flip']))
-    grid[7, 1] = params['flip']
-    grid[8, 0] = w.HTML(_html_wrap(*_dparam['rot']))
-    grid[8, 1] = params['rot']
-    grid[9, 0] = w.HTML(_html_wrap(*_dparam['def_grid']))
-    grid[9, 1] = params['def_grid']
-    grid[10, 0] = w.HTML(_html_wrap(*_dparam['def_mag']))
-    grid[10, 1] = params['def_mag']
-    grid[11, 0] = w.HTML(_html_wrap(*_dparam['brightness_max_lighting']))
-    grid[11, 1] = params['brightness_max_lighting']
-    grid[12, 0] = w.HTML(_html_wrap(*_dparam['contrast_max_lighting']))
-    grid[12, 1] = params['contrast_max_lighting']
-    grid[13, 0] = w.HTML(_html_wrap(*_dparam['saturation_max_lighting']))
-    grid[13, 1] = params['saturation_max_lighting']
-    grid[14, 0] = w.HTML(_html_wrap(*_dparam['zoom_sigma']))
-    grid[14, 1] = params['zoom_sigma']
+    grid = w.GridspecLayout(17, 2, width='400px',  grid_gap="0px", align_items='center')
+    i=0
+    for k in params:
+        grid[i, 0] = w.HTML(_html_wrap(*_dparam[k]))
+        grid[i, 1] = params[k]
+        i += 1
+        if i==7:
+            grid[i, :] = w.HTML('<hr>')
+            i += 1
+            grid[i, :] = w.HTML('<b>Data Augmentation</b>')
+            i += 1
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -867,9 +860,22 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
         self.widget = w.Accordion(children=[w.VBox([w.HBox([self.button_reset, self.button_close]),self.lbl,self.grid])])
         self.widget.set_title(0, 'Training Parameters')
         self.widget.layout.display = "none"
+        self.params['arch'].observe(self.on_arch_change, 'value')
+
+    def on_arch_change(self, change):
+        if change['new'] not in ["unext50_deepflash2", "unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015"]:
+            self.params['encoder_name'].disabled = False
+            self.params['encoder_weights'].disabled = False
+        else:
+            self.params['encoder_name'].disabled = True
+            self.params['encoder_weights'].disabled = True
 
 # Cell
 _dmw= {
+    'loss': ('Loss Function', 'Objective function to minimize during training.', 'https://matjesg.github.io/deepflash2/losses.html'),
+    'loss_alpha' :('alpha', 'Loss coefficient for FocalLoss and TverskyLoss.', 'https://kornia.readthedocs.io/en/latest/losses.html#kornia.losses.TverskyLoss'),
+    'loss_beta' :('beta', 'Loss coefficient for TverskyLoss.', 'https://kornia.readthedocs.io/en/latest/losses.html#kornia.losses.TverskyLoss'),
+    'loss_gamma' :('gamma', 'Focusing parameter for FocalLoss.', 'https://kornia.readthedocs.io/en/latest/losses.html#kornia.losses.FocalLoss'),
     'bwf' : ('Border Weight Factor', 'Choose a high value to focus on instance separation (separation between foreground objects).', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
     'bws' : ('Border Weight Sigma', 'Standard deviation of the Gaussian function to focus on the area between foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
     'fbr' : ('Forground-Background Ratio', 'Ratio between forground and background. Choose a low value to focus on foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
@@ -878,32 +884,38 @@ _dmw= {
 
 # Cell
 class MWWidget(BasePopUpParamWidget, GetAttr):
-    'Widget to customize mask weights'
+    'Widget to customize loss functions'
     _default = 'config'
     params = {
-    'bwf':w.IntSlider(min=1, max=50, continuous_update=True, layout= w.Layout(width='auto')),
-    'fbr':w.FloatSlider(min=0, max=1, continuous_update=True, layout= w.Layout(width='auto')),
-    'bws':w.IntSlider(min=1, max=20, continuous_update=True, layout= w.Layout(width='auto')),
-    'fds':w.IntSlider(min=1, max=20, continuous_update=True, layout= w.Layout(width='auto'))}
+        'loss' : w.Dropdown(options=_losses, layout=w.Layout(width='auto', min_width='1px')),
+        'loss_alpha' : w.FloatText(layout= w.Layout(width='auto')), # w.FloatSlider(min=0, max=1, continuous_update=True, layout= w.Layout(width='auto')),
+        'loss_beta' : w.FloatText(layout= w.Layout(width='auto')),#w.FloatSlider(min=0, max=1, continuous_update=True, layout= w.Layout(width='auto')),
+        'loss_gamma' : w.FloatText(layout= w.Layout(width='auto')),#w.FloatSlider(min=0, max=10, continuous_update=True, layout= w.Layout(width='auto')),
+        'bwf': w.IntText(layout= w.Layout(width='auto')),#w.IntSlider(min=1, max=50, continuous_update=True, layout= w.Layout(width='auto')),
+        'fbr':w.FloatText(layout= w.Layout(width='auto')),#w.FloatSlider(min=0, max=1, continuous_update=True, layout= w.Layout(width='auto')),
+        'bws':w.IntText(layout= w.Layout(width='auto')),#w.IntSlider(min=1, max=20, continuous_update=True, layout= w.Layout(width='auto')),
+        'fds':w.IntText(layout= w.Layout(width='auto'))#:w.IntSlider(min=1, max=20, continuous_update=True, layout= w.Layout(width='auto'))
+    }
     out = w.Output()
 
     #Hint
     lbl = w.HTML('Settings are saved automatically.')
 
     #Grid
-    grid = w.GridspecLayout(6, 2, width='400px',  grid_gap="0px", align_items='center')
-    grid[0, 0] = w.HTML(_html_wrap(*_dmw['bwf']))
-    grid[0, 1] = params['bwf']
-    grid[1, 0] = w.HTML(_html_wrap(*_dmw['bws']))
-    grid[1, 1] = params['bws']
-    grid[2, 0] = w.HTML(_html_wrap(*_dmw['fbr']))
-    grid[2, 1] = params['fbr']
-    grid[3, 0] = w.HTML(_html_wrap(*_dmw['fds']))
-    grid[3, 1] = params['fds']
-    grid[4, :] = w.HTML('<hr>')
-    grid[5, 0] = w.HTML('Visualization')
+    grid = w.GridspecLayout(11, 2, width='400px',  grid_gap="0px", align_items='center')
+    i=0
+    for k in params:
+        grid[i, 0] = w.HTML(_html_wrap(*_dmw[k]))
+        grid[i, 1] = params[k]
+        i += 1
+        if i==4:
+            grid[i, :] = w.HTML('<hr>')
+            i += 1
+            grid[i, :] = w.HTML('<b>Mask Weights</b>')
+            i += 1
+    grid[10, 0] = w.HTML('Visualization')
     show = w.Button(description='Show', tooltip='Show example', layout= w.Layout(width='auto'))
-    grid[5, 1:] = show
+    grid[10, 1:] = show
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -913,8 +925,22 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
                                            self.grid,
                                            self.out])]
                          )
-        self.widget.set_title(0, 'Custom Mask Weights')
+        self.widget.set_title(0, 'Loss Function')
         self.widget.layout.display = "none"
+        self.params['loss'].observe(self.on_arch_change, 'value')
+        self.on_arch_change({'new':'WeightedSoftmaxCrossEntropy'})
+
+    def on_arch_change(self, change):
+        enable = ['loss']
+        self.show.disabled = True
+        if change['new'] ==  'WeightedSoftmaxCrossEntropy':
+            enable += ['bwf', 'fbr', 'bws', 'fds']
+            self.show.disabled = False
+        elif change['new'] ==  'FocalLoss': enable += ['loss_gamma', 'loss_alpha']
+        elif change['new'] ==  'TverskyLoss': enable +=  ['loss_beta', 'loss_alpha']
+        for k,v in self.params.items():
+            if k in enable: v.disabled = False
+            else: v.disabled = True
 
 # Cell
 class TrainUI(BaseUI):

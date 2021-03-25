@@ -229,9 +229,9 @@ class DeformationField:
             else: coords[i] -= cmin
             sl.append(slice(cmin, cmax))
         if len(data.shape) == len(self.shape) + 1:
-            tile = np.empty((data.shape[-1], *outshape))
+            tile = np.empty((*outshape, data.shape[-1]))
             for c in range(data.shape[-1]):
-                tile[c,...] = cv2.remap(data[sl[0],sl[1], c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+                tile[..., c] = cv2.remap(data[sl[0],sl[1], c], coords[1],coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         else:
             tile = cv2.remap(data[sl[0], sl[1]], coords[1], coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
         return tile
@@ -393,10 +393,10 @@ class RandomTileDataset(BaseDataset):
     """
     n_inp = 1
     def __init__(self, *args, sample_mult=None, flip=True, rotation_range_deg=(0, 360), deformation_grid=(150, 150), deformation_magnitude=(10, 10),
-                 value_minimum_range=(0, 0), value_maximum_range=(1, 1), value_slope_range=(1, 1), p_zoom=0.75, zoom_sigma=0.1, **kwargs):
+                 value_minimum_range=(0, 0), value_maximum_range=(1, 1), value_slope_range=(1, 1), p_zoom=0.75, zoom_sigma=0.1,
+                 albumentations_tfms=None, **kwargs):
         super().__init__(*args, **kwargs)
-        store_attr('sample_mult, flip, rotation_range_deg, deformation_grid, deformation_magnitude, value_minimum_range, \
-                    value_maximum_range, value_slope_range, zoom_sigma, p_zoom')
+        store_attr('sample_mult, flip, rotation_range_deg, deformation_grid, deformation_magnitude, value_minimum_range, value_maximum_range, value_slope_range, zoom_sigma, p_zoom, albumentations_tfms')
 
         # Sample mulutiplier: Number of random samplings from augmented image
         if self.sample_mult is None:
@@ -421,8 +421,20 @@ class RandomTileDataset(BaseDataset):
 
         lbl, pdf  = self.labels[img_path.name], self.pdfs[self._name_fn(img_path.name)]
         center = random_center(pdf[:], lbl.shape)
-        X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((n_channels, *self.tile_shape)).astype('float32')
-        Y = self.deformationField.apply(lbl, center, self.padding, 0).astype('int64')
+        X = self.gammaFcn(self.deformationField.apply(img, center).flatten()).reshape((*self.tile_shape, n_channels))
+        Y = self.deformationField.apply(lbl, center, self.padding, 0)
+        X1 = X.copy()
+
+        if self.albumentations_tfms:
+            print('Augmenting')
+            augmented = self.albumentations_tfms(image=(X*255).astype('uint8'),mask=Y.astype('uint8'))
+            X = (augmented['image']/255)
+            Y = augmented['mask']
+
+        print(np.array_equal(X, X1))
+        X = X.transpose(2, 0, 1).astype('float32')
+        Y = Y.astype('int64')
+
         if self.loss_weights:
             _, W = cv2.connectedComponents((Y > 0).astype('uint8'), connectivity=4)
             return  TensorImage(X), TensorMask(Y), torch.Tensor(W)
