@@ -533,7 +533,7 @@ class TileDataset(BaseDataset):
         img = self.data[img_path.name]
         centerPos = self.centers[idx]
         X = self.tiler.apply(img, centerPos)
-        X = X.astype('float32')
+        X = X.transpose(2, 0, 1).astype('float32')
         if self.label_fn is not None:
             lbl = self.labels[img_path.name]
             Y = self.tiler.apply(lbl, centerPos, self.padding, order=0).astype('int64')
