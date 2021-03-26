@@ -215,5 +215,5 @@ def import_package(package):
         importlib.import_module(package)
     except:
         print(f'Installing {package}. Please wait.')
-        install_package("package")
+        install_package(package)
     return importlib.import_module(package)
