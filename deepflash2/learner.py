@@ -24,6 +24,7 @@ from fastai.callback.tracker import SaveModelCallback
 from fastai.data.core import DataLoaders
 from fastai.data.transforms import get_image_files, get_files, Normalize
 from fastai.vision.augment import Brightness, Contrast, Saturation
+from fastai.losses import CrossEntropyLossFlat
 
 from .metrics import Dice_f1, Iou
 from .losses import WeightedSoftmaxCrossEntropy,load_kornia_loss

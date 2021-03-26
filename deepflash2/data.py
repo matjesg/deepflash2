@@ -426,12 +426,10 @@ class RandomTileDataset(BaseDataset):
         X1 = X.copy()
 
         if self.albumentations_tfms:
-            print('Augmenting')
             augmented = self.albumentations_tfms(image=(X*255).astype('uint8'),mask=Y.astype('uint8'))
             X = (augmented['image']/255)
             Y = augmented['mask']
 
-        print(np.array_equal(X, X1))
         X = X.transpose(2, 0, 1).astype('float32')
         Y = Y.astype('int64')
 

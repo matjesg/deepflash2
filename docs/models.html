@@ -60,7 +60,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetConvBlock" class="doc_header"><code>class</code> <code>UNetConvBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L18" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetConvBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
+<h2 id="UNetConvBlock" class="doc_header"><code>class</code> <code>UNetConvBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L19" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetConvBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -115,7 +115,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetUpBlock" class="doc_header"><code>class</code> <code>UNetUpBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L44" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetUpBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>up_mode</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
+<h2 id="UNetUpBlock" class="doc_header"><code>class</code> <code>UNetUpBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetUpBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>up_mode</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -170,7 +170,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNet2D" class="doc_header"><code>class</code> <code>UNet2D</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L80" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNet2D</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>depth</code></strong>=<em><code>5</code></em>, <strong><code>wf</code></strong>=<em><code>6</code></em>, <strong><code>padding</code></strong>=<em><code>False</code></em>, <strong><code>batch_norm</code></strong>=<em><code>False</code></em>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.0</code></em>, <strong><code>up_mode</code></strong>=<em><code>'upconv'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
+<h2 id="UNet2D" class="doc_header"><code>class</code> <code>UNet2D</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L81" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNet2D</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>depth</code></strong>=<em><code>5</code></em>, <strong><code>wf</code></strong>=<em><code>6</code></em>, <strong><code>padding</code></strong>=<em><code>False</code></em>, <strong><code>batch_norm</code></strong>=<em><code>False</code></em>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.0</code></em>, <strong><code>up_mode</code></strong>=<em><code>'upconv'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
 </blockquote>
 <p>Pytorch U-Net Implementation</p>
 
@@ -237,7 +237,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_ronneberger2015" class="doc_header"><code>unet_ronneberger2015</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L186" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_ronneberger2015</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="unet_ronneberger2015" class="doc_header"><code>unet_ronneberger2015</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L187" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_ronneberger2015</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Original U-Net architecture based on Ronnberger et al. (2015)</p>
 
@@ -276,7 +276,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_falk2019" class="doc_header"><code>unet_falk2019</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L196" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_falk2019</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="unet_falk2019" class="doc_header"><code>unet_falk2019</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L197" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_falk2019</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>U-Net architecture based on Falk et al. (2019)</p>
 
@@ -315,7 +315,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_deepflash2" class="doc_header"><code>unet_deepflash2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L206" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_deepflash2</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong><code>dropout</code></strong>=<em><code>0.5</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="unet_deepflash2" class="doc_header"><code>unet_deepflash2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L207" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_deepflash2</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong><code>dropout</code></strong>=<em><code>0.5</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>U-Net model optimized for deepflash2</p>
 
@@ -382,7 +382,7 @@ Loaded model weights trained on wue_cFOS.
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_custom" class="doc_header"><code>unet_custom</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L216" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_custom</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="unet_custom" class="doc_header"><code>unet_custom</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L217" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_custom</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Customizable U-Net model. Customize via kwargs</p>
 
@@ -433,7 +433,7 @@ Loaded model weights trained on wue_cFOS.
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="FPN" class="doc_header"><code>class</code> <code>FPN</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L224" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FPN</code>(<strong><code>input_channels</code></strong>:<code>list</code>, <strong><code>output_channels</code></strong>:<code>list</code>) :: <code>Module</code></p>
+<h2 id="FPN" class="doc_header"><code>class</code> <code>FPN</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L225" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FPN</code>(<strong><code>input_channels</code></strong>:<code>list</code>, <strong><code>output_channels</code></strong>:<code>list</code>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -488,7 +488,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UnetBlock" class="doc_header"><code>class</code> <code>UnetBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L243" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UnetBlock</code>(<strong><code>up_in_c</code></strong>:<code>int</code>, <strong><code>x_in_c</code></strong>:<code>int</code>, <strong><code>nf</code></strong>:<code>int</code>=<em><code>None</code></em>, <strong><code>blur</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>self_attention</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>padding</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
+<h2 id="UnetBlock" class="doc_header"><code>class</code> <code>UnetBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L244" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UnetBlock</code>(<strong><code>up_in_c</code></strong>:<code>int</code>, <strong><code>x_in_c</code></strong>:<code>int</code>, <strong><code>nf</code></strong>:<code>int</code>=<em><code>None</code></em>, <strong><code>blur</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>self_attention</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>padding</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -550,7 +550,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="ASPP" class="doc_header"><code>class</code> <code>ASPP</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L288" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ASPP</code>(<strong><code>inplanes</code></strong>=<em><code>512</code></em>, <strong><code>mid_c</code></strong>=<em><code>256</code></em>, <strong><code>dilations</code></strong>=<em><code>[6, 12, 18, 24]</code></em>, <strong><code>out_c</code></strong>=<em><code>None</code></em>) :: <code>Module</code></p>
+<h2 id="ASPP" class="doc_header"><code>class</code> <code>ASPP</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L289" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ASPP</code>(<strong><code>inplanes</code></strong>=<em><code>512</code></em>, <strong><code>mid_c</code></strong>=<em><code>256</code></em>, <strong><code>dilations</code></strong>=<em><code>[6, 12, 18, 24]</code></em>, <strong><code>out_c</code></strong>=<em><code>None</code></em>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -605,7 +605,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="UneXt50" class="doc_header"><code>class</code> <code>UneXt50</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L319" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UneXt50</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>stride</code></strong>=<em><code>1</code></em>, <strong><code>inplanes</code></strong>=<em><code>64</code></em>, <strong><code>pre_ssl</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
+<h2 id="UneXt50" class="doc_header"><code>class</code> <code>UneXt50</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L320" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UneXt50</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>stride</code></strong>=<em><code>1</code></em>, <strong><code>inplanes</code></strong>=<em><code>64</code></em>, <strong><code>pre_ssl</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
 </blockquote>
 <p>Base class for all neural network modules.</p>
 <p>Your models should also subclass this class.</p>
@@ -660,7 +660,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="unext50_deepflash2" class="doc_header"><code>unext50_deepflash2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L384" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unext50_deepflash2</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="unext50_deepflash2" class="doc_header"><code>unext50_deepflash2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L385" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unext50_deepflash2</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>UneXt50 model. Customize via kwargs</p>
 
@@ -757,39 +757,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="import_smp" class="doc_header"><code>import_smp</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L392" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>import_smp</code>()</p>
-</blockquote>
-<p>Import or install segmentation_models_pytorch</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L403" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L393" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Load segmentation_models_pytorch model</p>
 
@@ -854,7 +822,7 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_default_shapes" class="doc_header"><code>get_default_shapes</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L418" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_default_shapes</code>(<strong><code>arch</code></strong>)</p>
+<h4 id="get_default_shapes" class="doc_header"><code>get_default_shapes</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L408" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_default_shapes</code>(<strong><code>arch</code></strong>)</p>
 </blockquote>
 
 </div>
