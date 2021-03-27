@@ -19,7 +19,8 @@ def preprocess_mask(clabels=None, instlabels=None, ignore=None, remove_overlap=T
     # If no classlabels are given treat the problem as binary segmentation
     # ==> Create a new array assigning class 1 (foreground) to each instance
     if clabels is None:
-        clabels = (instlabels > 0).astype(int)
+        clabels = (instlabels[:] > 0).astype(int)
+    else: clabels = np.array(clabels[:])
 
     if remove_overlap:
         # Initialize label and weights arrays with background
@@ -94,7 +95,8 @@ def calculate_weights(clabels=None, instlabels=None, ignore=None,
     # If no classlabels are given treat the problem as binary segmentation
     # ==> Create a new array assigning class 1 (foreground) to each instance
     if clabels is None:
-        clabels = (instlabels > 0).astype(int)
+        clabels = (instlabels[:] > 0).astype(int)
+    else: clabels = np.array(clabels[:])
 
     # Initialize label and weights arrays with background
     labels = np.zeros_like(clabels)
@@ -198,7 +200,7 @@ class WeightTransformSingle(DisplayedTransform):
         self.bws, self.fds, self.bwf, self.fbr= bws, fds, bwf, fbr
         self.channels, self.lmbda = channels, lmbda
         self.filter = SeparableConv2D(self.lmbda, channels, ks=ks)
-        print('Using real-time weight calculation.')
+        #print('Using real-time weight calculation.')
 
     def _distance_transform(self, x):
         'Fast convolutional distance transform'

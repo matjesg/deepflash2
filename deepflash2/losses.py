@@ -6,6 +6,7 @@ __all__ = ['WeightedSoftmaxCrossEntropy', 'load_kornia_loss']
 import torch
 import torch.nn.functional as F
 from fastai.torch_core import TensorBase
+from .utils import import_package
 
 # Cell
 class WeightedSoftmaxCrossEntropy(torch.nn.Module):

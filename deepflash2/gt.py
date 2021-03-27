@@ -130,6 +130,9 @@ class GTEstimator(GetAttr):
         if save_dir:
             self.df_res.to_csv(path.parent/f'{method}_vs_experts.csv', index=False)
             self.df_agg.to_csv(path.parent/f'{method}_vs_experts_agg.csv', index=False)
+            with pd.ExcelWriter(path.parent/f'{method}_vs_experts.xlsx') as writer:
+                self.df_res.to_excel(writer, sheet_name='raw')
+                self.df_agg.to_excel(writer, sheet_name='aggregated')
 
     def show_gt(self, method='STAPLE', max_n=6, files=None, figsize=(15,5), **kwargs):
         if not files: files = list(t.masks.keys())[:max_n]

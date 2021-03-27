@@ -517,6 +517,9 @@ class TileDataset(BaseDataset):
                     j += 1
 
         if val_length:
+            if val_length>len(self.image_shapes):
+                print(f'Reducing validation from {val_length} lenght to {len(self.image_shapes)}')
+                val_length = len(self.image_shapes)
             np.random.seed(val_seed)
             choice = np.random.choice(len(self.image_indices), val_length, replace=False)
             self.valid_indices = {i:idx for i, idx in  enumerate(choice)}

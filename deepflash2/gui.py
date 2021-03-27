@@ -800,9 +800,9 @@ _dparam= {
     'rot': ('Rotation (max. degrees)', 'Randomly rotate a training image up to max. degrees.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'deformation_grid'   : ('Deformation Grid Size', "Size of the deformation grid.", 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'deformation_magnitude'   : ('Deformation Magnitude', 'Magnitude of the deformation within the deformation grid', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
-    'brightness_max_lighting': ('Brightness (max. lighting)', 'Brightness refers to the amount of light in the image.', 'https://docs.fast.ai/vision.augment.html'),
-    'contrast_max_lighting': ('Contrast (max. lighting)', 'Contrast pushes pixels to either the maximum or minimum values.', 'https://docs.fast.ai/vision.augment.html'),
-    'saturation_max_lighting': ('Saturation (max. lighting)', 'Change in saturation of the image.', 'https://docs.fast.ai/vision.augment.html'),
+    'brightness_limit': ('Brightness (limit)', 'Factor range for changing brightness.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.RandomBrightnessContrast'),
+    'contrast_limit': ('Contrast (limit)', 'Factor range for changing contrast.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.RandomBrightnessContrast'),
+    'CLAHE_clip_limit': ('CLAHE (clip limit)', 'Contrast Limited Adaptive Histogram Equalization (CLAHE). Set upper threshold value for contrast limiting.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.CLAHE'),
     'zoom_sigma': ('Zoom standard deviation', 'Standard deviation of the Guassian that zooms in or out of the image.', 'https://matjesg.github.io/deepflash2/data.html#RandomTileDataset'),
 }
 
@@ -814,19 +814,19 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
         'arch' : w.Dropdown(options=_archs, layout=w.Layout(width='auto', min_width='1px')),
         'encoder_name' : w.Text(layout=w.Layout(width='auto', min_width='1px'), disabled=True),
         'encoder_weights' : w.Text(layout=w.Layout(width='auto', min_width='1px'), disabled=True),
-        'bs':w.IntSlider(min=2, max=16, step=2,layout=w.Layout(width='auto', min_width='1px')),
+        'bs':w.IntSlider(min=2, max=32, step=2,layout=w.Layout(width='auto', min_width='1px')),
         'mpt': w.ToggleButtons(options=[('Yes', True), ('No', False)],
                               tooltips=['Enable Mixed-Precision Training','Disable Mixed-Precision Training']),
         'wd':w.FloatText(min=0, max=1,layout=w.Layout(width='auto', min_width='1px')),
         'optim':w.Dropdown(options=_optim_dict.keys(), layout=w.Layout(width='auto', min_width='1px')),
         'flip':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
         'rot':w.IntSlider(min=0, max=360, step=5, layout=w.Layout(width='auto', min_width='1px')),
+        'zoom_sigma':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),#w.FloatText(layout=w.Layout(width='auto', min_width='1px'))
         'deformation_grid':w.IntSlider(min=0, max=350, step=10, layout=w.Layout(width='auto', min_width='1px')),
         'deformation_magnitude':w.IntSlider(min=0, max=100, layout=w.Layout(width='auto', min_width='1px')),
-        'brightness_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
-        'contrast_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
-        'saturation_max_lighting':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
-        'zoom_sigma':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),#w.FloatText(layout=w.Layout(width='auto', min_width='1px'))
+        'brightness_limit':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
+        'contrast_limit':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
+        'CLAHE_clip_limit':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
     }
 
 
@@ -1013,6 +1013,7 @@ class TrainUI(BaseUI):
 _dpred = {
     'img_pred' : ('Image Folder*', 'One folder containing all new images for prediction.', 'https://matjesg.github.io/deepflash2/add_information.html#Prediction'),
     'mdl' : ('Model Folder', 'One folder containing the all models of the ensemble. If not selected, latest models from Training will be selected.'),
+    'msk_pred' : ('Test Mask Folder', 'For testing on new data. One folder containing all segmentation masks.'),
     'up_pred' : ('Upload Data', 'Upload a zip file with images or models.'),
     'ood_model' : ('OOD Model', '(Optional) Select model for out-of-distribution detection. If not selected, latest models from training will be used.'),
     's_pred'  : ('Select', 'Ensemble or model to be used for prediction.'),
@@ -1027,12 +1028,13 @@ class PredInputSB:
     txt = 'Provide new images and models'
     hints = w.Label(txt)
 
-    grid = w.GridspecLayout(5, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(6, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #Labels
     grid[0, 0] = w.HTML(_html_wrap(*_dpred['img_pred']))
     grid[1, 0] = w.HTML(_html_wrap(*_dpred['mdl']))
     grid[3, :] = w.HTML('<hr>')
-    grid[4, 0] = w.HTML(_html_wrap(*_dpred['up_pred']))
+    grid[4, 0] = w.HTML(_html_wrap(*_dpred['msk_pred']))
+    grid[5, 0] = w.HTML(_html_wrap(*_dpred['up_pred']))
 
     #Load Data
     run = w.Button(description='Load*', layout=w.Layout(width='auto', min_width='1px'))
@@ -1047,9 +1049,11 @@ class PredInputSB:
         self.grid[0, 1:] = self.img.button
         self.ens  = PathSelector(path, 'Select')
         self.grid[1, 1:] = self.ens.button
+        self.msk  = PathSelector(path, 'Select')
+        self.grid[4, 1:] = self.msk.button
         #Data Upload
         self.du = ZipUpload(path)
-        self.grid[4, 1:] = self.du.widget
+        self.grid[5, 1:] = self.du.widget
 
 # Cell
 class PredSB(BaseParamWidget, GetAttr):
@@ -1126,6 +1130,7 @@ class PredUI(BaseUI):
         self.main = {
             'img':self.sb['data'].img.dialog,
             'ens':self.sb['data'].ens.dialog,
+            'msk':self.sb['data'].msk.dialog,
             'ood':self.sb['pred'].ood_path.dialog,
             'down':self.sb['pred'].down.dialog,
              **{k:w.Output() for k in self.sb.keys()}
@@ -1204,6 +1209,7 @@ class GUI(GetAttr):
 
         ## Pred
         self.pred.sb['data'].run.on_click(self.pred_data_run_clicked)
+        self.pred.sb['data'].msk.button_select.on_click(self.pred_data_msk_save_clicked)
         self.pred.sb['pred'].run.on_click(self.pred_run_clicked)
         self.pred.sb['pred'].ood_path.button_select.on_click(self.pred_ood_load_clicked)
         self.pred.sb['pred'].ood.on_click(self.pred_ood_score_clicked)
@@ -1252,22 +1258,22 @@ class GUI(GetAttr):
         self.train.sb['data'].msk.set_path(self.proj_path)
         self.train.sb['data'].cfg.set_path(self.proj_path)
         self.pred.sb['data'].img.set_path(self.proj_path)
+        self.pred.sb['data'].msk.set_path(self.proj_path)
         self.pred.sb['pred'].ood_path.set_path(self.proj_path)
 
         self.train.sb['valid'].ens.set_path(self.proj_path)
         self.pred.sb['data'].ens.set_path(self.proj_path)
 
-
     def _init_proj(self):
         self.el, self.el_pred, self.gt_est = None, None, None
         self._set_download_dirs()
+        self.test_masks_provided = False
 
     def set_project_dir(self, b):
         self.proj.button.button_style=''
         self.config.proj_dir = str(self.proj.path)
         self._set_selection_dirs()
         self._init_proj()
-
 
     def cat_clicked(self, b):
         self.star_info.layout.display = "block"
@@ -1446,7 +1452,10 @@ class GUI(GetAttr):
                 print('Temporary Logs:')
                 self.el.get_ensemble_results(self.el.files, use_tta=True)
         else:
-            self.el.get_ensemble_results(self.el.files, use_tta=True)
+            with self.tmp:
+                print('Temporary Logs:')
+                self.el.get_ensemble_results(self.el.files, use_tta=True)
+                self.tmp.clear_output()
         out.clear_output()
         with out:
             print(f'Training OOD Model')
@@ -1505,18 +1514,22 @@ class GUI(GetAttr):
             display(ipp.widget)
 
     # Prediction
+    def pred_data_msk_save_clicked(self, b):
+        self.test_masks_provided = True
+
     def pred_data_run_clicked(self, b):
         out = self.pred.main['data']
         out.clear_output()
         with out: print('Loading data. Please wait')
-        image_folder = self.pred.sb['data'].img.path.relative_to(self.proj_path)
-        ens_folder = self.pred.sb['data'].ens.path
+        image_dir = self.pred.sb['data'].img.path.relative_to(self.proj_path)
+        ens_dir = self.pred.sb['data'].ens.path
+        mask_dir = self.pred.sb['data'].msk.path.relative_to(self.proj_path) if self.test_masks_provided else None
 
         with out:
-            self.el_pred = EnsembleLearner(image_folder, config=self.config, path=self.proj_path, ensemble_dir=ens_folder)
+            self.el_pred = EnsembleLearner(image_dir, mask_dir=mask_dir, config=self.config, path=self.proj_path, ensemble_dir=ens_dir)
             self.el_pred.load_ensemble()
             items = {x:x for x in self.el_pred.files}
-            ipp = ItemsPerPage(self.proj_path, self.el_pred.ds.show_data, items=items, figsize = (5,5))
+            ipp = ItemsPerPage(self.proj_path, self.el_pred.ds.show_data, items=items)
             display(ipp.widget)
 
     def pred_run_clicked(self, b, use_tta=None, show=True):
@@ -1540,6 +1553,9 @@ class GUI(GetAttr):
                 self.tmp.clear_output()
         if show:
             with out:
+                if self.test_masks_provided:
+                    print('Calculating metrics...')
+                    self.el_pred.score_ensemble_results(label_fn=self.el_pred.label_fn)
                 items = {x.name:x.name for x in self.el_pred.files}
                 ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
                 display(ipp.widget)
@@ -1571,6 +1587,7 @@ class GUI(GetAttr):
             export_dir = self.pred.sb['pred'].down.path
             print(f'Saving scoring results to {export_dir}')
             self.el_pred.df_ens.to_csv(export_dir/f'prediction_with_ood_score.csv', index=False)
+            self.el_pred.df_ens.to_excel(export_dir/f'prediction_with_ood_score.xlsx')
             items = {r.file:r.ood_score for _, r in self.el_pred.df_ens.iterrows()}
             print(f'A lower OOD score indicates out-of-distribution (OOD) or anomalous data.')
             ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', unc_metric='ood_score')

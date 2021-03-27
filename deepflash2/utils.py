@@ -2,7 +2,7 @@
 
 __all__ = ['unzip', 'ensemble_results', 'plot_results', 'iou', 'label_mask', 'get_candidates', 'iou_mapping',
            'calculate_roi_measures', 'calc_iterations', 'get_label_fn', 'save_mask', 'save_unc', 'install_package',
-           'import_package']
+           'import_package', 'compose_albumentations']
 
 # Cell
 import sys, subprocess, zipfile, imageio, importlib, numpy as np
@@ -42,14 +42,17 @@ def ensemble_results(res_dict, file, std=False):
     return a
 
 # Cell
-def plot_results(*args, df, model=None, unc_metric=None, figsize=(20, 20), **kwargs):
+def plot_results(*args, df, hastarget=False, model=None, unc_metric=None, figsize=(20, 20), **kwargs):
     "Plot images, (masks), predictions and uncertainties side-by-side."
     if len(args)==4:
         img, msk, pred, pred_std = args
-    if len(args)==3:
+    elif len(args)==3 and not hastarget:
         img, pred, pred_std = args
-    if len(args)==2:
+    elif len(args)==3:
+        img, msk, pred = args
+    elif len(args)==2:
         img, pred = args
+    else: raise NotImplementedError
     fig, axs = plt.subplots(nrows=1, ncols=len(args), figsize=figsize, **kwargs)
     #One channel fix
     if img.ndim == 3 and img.shape[-1] == 1:
@@ -69,13 +72,20 @@ def plot_results(*args, df, model=None, unc_metric=None, figsize=(20, 20), **kwa
         axs[3].imshow(pred_std)
         axs[3].set_axis_off()
         axs[3].set_title(unc_title)
-    elif len(args)==3:
+    elif len(args)==3 and not hastarget:
         axs[1].imshow(pred)
         axs[1].set_axis_off()
         axs[1].set_title(pred_title)
         axs[2].imshow(pred_std)
         axs[2].set_axis_off()
         axs[2].set_title(unc_title)
+    elif len(args)==3:
+        axs[1].imshow(msk)
+        axs[1].set_axis_off()
+        axs[1].set_title('Target')
+        axs[2].imshow(pred)
+        axs[2].set_axis_off()
+        axs[2].set_title(f'{pred_title} \n IoU: {df.iou:.2f}')
     elif len(args)==2:
         axs[1].imshow(pred)
         axs[1].set_axis_off()
@@ -217,3 +227,14 @@ def import_package(package):
         print(f'Installing {package}. Please wait.')
         install_package(package)
     return importlib.import_module(package)
+
+# Cell
+def compose_albumentations(CLAHE_clip_limit=0., brightness_limit=0, contrast_limit=0.):
+    'Compose albumentations augmentations'
+    A = import_package('albumentations')
+    augs = []
+    if CLAHE_clip_limit>0:
+        augs.append(A.CLAHE(clip_limit=CLAHE_clip_limit))
+    if sum([brightness_limit,contrast_limit])>0:
+        augs.append(A.RandomBrightnessContrast(brightness_limit=brightness_limit, contrast_limit=contrast_limit))
+    return A.OneOf([*augs], p=0.5)

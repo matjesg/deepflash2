@@ -31,7 +31,8 @@ from .losses import WeightedSoftmaxCrossEntropy,load_kornia_loss
 from .callbacks import ElasticDeformCallback
 from .models import get_default_shapes, load_smp_model
 from .data import TileDataset, RandomTileDataset, _read_img, _read_msk
-from .utils import iou, plot_results, get_label_fn, calc_iterations, save_mask, save_unc
+from .utils import iou, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, compose_albumentations
+from .utils import compose_albumentations as _compose_albumentations
 import deepflash2.tta as tta
 from .transforms import WeightTransform, calculate_weights
 
@@ -77,9 +78,9 @@ class Config:
     tta:bool = True
 
     # Train Data Augmentation
-    saturation_max_lighting:float = 0.0
-    contrast_max_lighting:float = 0.0
-    brightness_max_lighting:float = 0.1
+    CLAHE_clip_limit:float = 0.0
+    brightness_limit:float = 0.0
+    contrast_limit:float = 0.0
     zoom_sigma:float = 0.0
     flip:bool = True
     rot:int = 360
@@ -116,8 +117,13 @@ class Config:
 
     @property
     def mw_kwargs(self):
-        mw_vars = ['bwf', 'bws', 'fds', 'fbr']
-        return dict(filter(lambda x: x[0] in mw_vars, self.__dict__.items()))
+        kwargs = ['bwf', 'bws', 'fds', 'fbr']
+        return dict(filter(lambda x: x[0] in kwargs, self.__dict__.items()))
+
+    @property
+    def albumentation_kwargs(self):
+        kwargs = ['CLAHE_clip_limit', 'brightness_limit', 'contrast_limit']
+        return dict(filter(lambda x: x[0] in kwargs, self.__dict__.items()))
 
     @property
     def svm_kwargs(self):
@@ -239,15 +245,15 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, path=None, mc_dropout=False, 
 # Cell
 class EnsembleLearner(GetAttr):
     _default = 'config'
-    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None,
-                 label_fn=None, metrics=None, cbs=None, ds_kwargs={}, dl_kwargs={}, model_kwargs={}, loss_kwargs={}, stats=None, files=None):
+    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None, item_tfms=None,
+                 label_fn=None, metrics=None, cbs=None, ds_kwargs={}, dl_kwargs={}, model_kwargs={}, stats=None, files=None):
 
         self.config = config or Config()
         self.stats = stats
         self.dl_kwargs = dl_kwargs
         self.model_kwargs = model_kwargs
-        self.loss_kwargs = loss_kwargs
         self.add_ds_kwargs = ds_kwargs
+        self.item_tfms = item_tfms
         self.path = Path(path) if path is not None else Path('.')
         self.metrics = metrics or [Iou(), Dice_f1()]
         self.loss_fn = self.get_loss()
@@ -269,10 +275,6 @@ class EnsembleLearner(GetAttr):
             self.label_fn = label_fn
         self.n_splits=min(len(self.files), self.max_splits)
 
-        # Transforms (Data Augmentation)
-        self.item_tfms=[Saturation(max_lighting=self.saturation_max_lighting, p=0.75, draw=None, batch=False),
-                        Contrast(max_lighting=self.contrast_max_lighting, p=0.75, draw=None, batch=False),
-                        Brightness(max_lighting=self.brightness_max_lighting, p=0.75, draw=None, batch=False)]
         self.models = {}
         self.recorder = {}
         self._set_splits()
@@ -291,6 +293,9 @@ class EnsembleLearner(GetAttr):
         else:
             self.splits = {1: (self.files[0], self.files[0])}
 
+    def compose_albumentations(self, **kwargs):
+        return _compose_albumentations(**kwargs)
+
     @property
     def ds_kwargs(self):
         # Setting default shapes and padding
@@ -303,6 +308,8 @@ class EnsembleLearner(GetAttr):
         ds_kwargs['flip'] = self.flip
         ds_kwargs['deformation_grid']= (self.deformation_grid,)*2
         ds_kwargs['deformation_magnitude'] = (self.deformation_magnitude,)*2
+        if sum(self.albumentation_kwargs.values())>0:
+            ds_kwargs['albumentation_tfms'] = self.compose_albumentations(**self.albumentation_kwargs)
         return ds_kwargs
 
     def get_loss(self):
@@ -314,30 +321,44 @@ class EnsembleLearner(GetAttr):
 
     def get_model(self, pretrained):
         if self.arch in ["unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015", "unet_custom", "unext50_deepflash2"]:
-            model = torch.hub.load(self.repo, self.arch, pretrained=pretrained, n_classes=dls.c, in_channels=self.in_channels, **self.model_kwargs)
+            model = torch.hub.load(self.repo, self.arch, pretrained=pretrained, n_classes=self.c, in_channels=self.in_channels, **self.model_kwargs)
         else:
             kwargs = dict(encoder_name=self.encoder_name, encoder_weights=self.encoder_weights,
                           in_channels=self.in_channels, classes=self.c, **self.model_kwargs)
             model = load_smp_model(self.arch, **kwargs)
+        if torch.cuda.is_available(): model.cuda()
         return model
+
+    def get_dls(self, files, files_val=None):
+        ds = []
+        ds.append(RandomTileDataset(files, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs))
+        if files_val:
+            ds.append(TileDataset(files_val, label_fn=self.label_fn, **self.mw_kwargs,**self.ds_kwargs))
+        else:
+            ds.append(ds[0])
+        dls = DataLoaders.from_dsets(*ds, bs=self.bs, after_item=self.item_tfms, after_batch=self.get_batch_tfms(), **self.dl_kwargs)
+        if torch.cuda.is_available(): dls.cuda()
+        return dls
 
     def save_model(self, file, model, pickle_protocol=2):
         state = model.state_dict()
-        state = {'model': state, 'arch':self.arch, 'repo':self.repo, 'stats':self.stats, 'c':self.c}
+        state = {'model': state, 'arch':self.arch, 'stats':self.stats, 'c':self.c}
+        if self.arch in ["unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015", "unet_custom", "unext50_deepflash2"]:
+            state['repo']=self.repo
+        else:
+            state['encoder_name']=self.encoder_name
         torch.save(state, file, pickle_protocol=pickle_protocol, _use_new_zipfile_serialization=False)
 
     def load_model(self, file, with_meta=True, device=None, strict=True):
         if isinstance(device, int): device = torch.device('cuda', device)
         elif device is None: device = 'cpu'
         state = torch.load(file, map_location=device)
-        hasopt = set(state)=={'model', 'arch', 'repo', 'stats', 'c'}
+        hasopt = 'model' in state#set(state)=={'model', 'arch', 'repo', 'stats', 'c'}
         if hasopt:
             model_state = state['model']
             if with_meta:
-                self.config.arch = state['arch']
-                self.config.repo = state['repo']
-                self.config.c  = state['c']
-                self.stats = state['stats']
+                for opt in state:
+                    if opt!='model': setattr(self.config, opt, state[opt])
         else:
             model_state = state
         model = self.get_model(pretrained=None)
@@ -345,29 +366,25 @@ class EnsembleLearner(GetAttr):
         return model
 
     def get_batch_tfms(self):
+        self.stats = self.stats or self.ds.compute_stats()
         tfms = [Normalize.from_stats(*self.stats)]
         if isinstance(self.loss_fn, WeightedSoftmaxCrossEntropy):
             tfms.append(WeightTransform(self.out_size, **self.mw_kwargs))
         return tfms
 
-    def fit(self, i, n_iter=None, lr_max=None, bs=None, **kwargs):
+    def fit(self, i, n_iter=None, lr_max=None, **kwargs):
         n_iter = n_iter or self.n_iter
         lr_max = lr_max or self.lr
-        bs = bs or self.bs
-        self.stats = self.stats or self.ds.compute_stats()
         name = self.ensemble_dir/f'{self.arch}_model-{i}.pth'
-        files_train, files_val = self.splits[i]
-        train_ds = RandomTileDataset(files_train, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
-        valid_ds = TileDataset(files_val, label_fn=self.label_fn, **self.mw_kwargs,**self.ds_kwargs)
-        dls = DataLoaders.from_dsets(train_ds, valid_ds, bs=bs, after_item=self.item_tfms, after_batch=self.get_batch_tfms(), **self.dl_kwargs)
         pre = None if self.pretrained=='new' else self.pretrained
         model = self.get_model(pretrained=pre)
-        if torch.cuda.is_available(): dls.cuda(), model.cuda()
+        files_train, files_val = self.splits[i]
+        dls = self.get_dls(files_train, files_val)
         self.learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim], cbs=self.cbs)
         self.learn.model_dir = self.ensemble_dir.parent/'.tmp'
         if self.mpt: self.learn.to_fp16()
         print(f'Starting training for {name.name}')
-        epochs = calc_iterations(n_iter=n_iter,ds_length=len(train_ds), bs=bs)
+        epochs = calc_iterations(n_iter=n_iter,ds_length=len(dls.train_ds), bs=self.bs)
         self.learn.fit_one_cycle(epochs, lr_max)
 
         print(f'Saving model at {name}')
@@ -379,7 +396,6 @@ class EnsembleLearner(GetAttr):
         #gc.collect()
         #torch.cuda.empty_cache()
 
-
     def fit_ensemble(self, n_iter, skip=False, **kwargs):
         for i in range(1, self.n+1):
             if skip and (i in self.models): continue
@@ -390,16 +406,15 @@ class EnsembleLearner(GetAttr):
             self.models.pop(i+1, None)
         self.n = n
 
-    def predict(self, files, model_no, bs=None, path=None, **kwargs):
-        bs = bs or self.bs
+    def predict(self, files, model_no, path=None, **kwargs):
         model_path = self.models[model_no]
         model = self.load_model(model_path)
         ds_kwargs = self.ds_kwargs
         # Adding extra padding (overlap) for models that have the same input and output shape
         if ds_kwargs['padding'][0]==0: ds_kwargs['padding'] = (self.extra_padding,)*2
         ds = TileDataset(files, **ds_kwargs)
-        dls = DataLoaders.from_dsets(ds, batch_size=bs, after_batch=self.get_batch_tfms(), shuffle=False, drop_last=False, **self.dl_kwargs)
-        if torch.cuda.is_available(): dls.cuda(), model.cuda()
+        dls = DataLoaders.from_dsets(ds, batch_size=self.bs, after_batch=self.get_batch_tfms(), shuffle=False, drop_last=False, **self.dl_kwargs)
+        if torch.cuda.is_available(): dls.cuda()
         learn = Learner(dls, model, loss_func=self.loss_fn)
         if self.mpt: learn.to_fp16()
         if path: path = path/f'model_{model_no}'
@@ -441,7 +456,9 @@ class EnsembleLearner(GetAttr):
                     if self.tta:
                         save_unc(g_std[f.name][:], unc_path/f'{df_tmp.file}_{df_tmp.model}_unc', filetype)
         self.df_val = pd.DataFrame(res_list)
-        if export_dir: self.df_val.to_csv(export_dir/f'val_results.csv', index=False)
+        if export_dir:
+            self.df_val.to_csv(export_dir/f'val_results.csv', index=False)
+            self.df_val.to_excel(export_dir/f'val_results.xlsx')
         return self.df_val
 
     def show_valid_results(self, model_no=None, files=None, **kwargs):
@@ -468,6 +485,7 @@ class EnsembleLearner(GetAttr):
             self.models[model_id] = m
         print(f'Found {len(self.models)} models in folder {path}')
         print(self.models)
+
 
     def ensemble_results(self, files, path=None, export_dir=None, filetype='.png', use_tta=None, **kwargs):
         use_tta = use_tta or self.pred_tta
@@ -534,26 +552,39 @@ class EnsembleLearner(GetAttr):
         self.df_ens  = self.ensemble_results(new_files, export_dir=export_dir, filetype=filetype, **kwargs)
         return self.df_ens
 
+    def score_ensemble_results(self, mask_dir=None, label_fn=None):
+        if not label_fn:
+            label_fn = get_label_fn(self.df_ens.img_path[0], self.path/mask_dir)
+        for idx, r in self.df_ens.iterrows():
+            msk_path = self.label_fn(r.img_path)
+            msk = _read_msk(msk_path)
+            self.df_ens.loc[idx, 'msk_path'] = msk_path
+            pred = zarr.load(r.pred_path)
+            self.df_ens.loc[idx, 'iou'] = iou(msk, pred)
+        return self.df_ens
+
     def show_ensemble_results(self, files=None, model_no=None, unc=True, unc_metric=None):
         if self.df_ens is None: assert print("Please run `get_ensemble_results` first.")
         if model_no is None: df = self.df_ens
         else: df = self.df_models[df_models.model_no==model_no]
         if files is not None: df = df.set_index('file', drop=False).loc[files]
         for _, r in df.iterrows():
-            img = _read_img(r.img_path)[:]
-            pred = zarr.load(r.pred_path)
-            std = zarr.load(r.std_path)
-            if unc: plot_results(img, pred, std, df=r, unc_metric=unc_metric)
-            else: plot_results(img, pred, df=r)
+            imgs = []
+            imgs.append(_read_img(r.img_path)[:])
+            if 'iou' in r.index:
+                imgs.append(_read_msk(r.msk_path))
+                hastarget=True
+            else:
+                hastarget=False
+            imgs.append(zarr.load(r.pred_path))
+            if unc: imgs.append(zarr.load(r.std_path))
+            plot_results(*imgs, df=r, hastarget=hastarget, unc_metric=unc_metric)
 
-    def lr_find(self, files=None, bs=None, **kwargs):
-        bs = bs or self.bs
+    def lr_find(self, files=None, **kwargs):
         files = files or self.files
-        train_ds = RandomTileDataset(files, label_fn=self.label_fn, **self.mw_kwargs, **self.ds_kwargs)
-        dls = DataLoaders.from_dsets(train_ds, train_ds, bs=bs, **self.dl_kwargs)
+        dls = self.get_dls(files)
         pre = None if self.pretrained=='new' else self.pretrained
         model = self.get_model(pretrained=pre)
-        if torch.cuda.is_available(): dls.cuda(), model.cuda()
         learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim])
         if self.mpt: learn.to_fp16()
         sug_lrs = learn.lr_find(**kwargs)
@@ -613,8 +644,11 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          show_valid_results="Plot results of all or `file` validation images",
          ensemble_results="Merge single model results",
          get_ensemble_results="Get models and ensemble results",
+         score_ensemble_results="Compare ensemble results (Intersection over the Union) to given segmentation masks.",
          show_ensemble_results="Show result of ensemble or `model_no`",
          load_ensemble="Get models saved at `path`",
+         compose_albumentations="Helper function to compose albumentations augmentations",
+         get_dls="Create datasets and dataloaders from files",
          get_model="Get model architecture",
          get_loss="Get loss function from loss name (config)",
          get_batch_tfms="Get transform performed on batch level",
