@@ -228,10 +228,10 @@ def predict_tiles(self:Learner, ds_idx=1, dl=None, path=None, mc_dropout=False, 
             outSlice = dl.out_slices[idx]
             inSlice = dl.in_slices[idx]
             if last_file!=f:
-                z_smx = g_smx.empty(f.name, shape=(*outShape, dl.c), dtype='float32')
-                z_seg = g_seg.empty(f.name, shape=outShape, dtype='uint8')
-                z_std = g_std.empty(f.name, shape=outShape, dtype='float32')
-                z_eng = g_eng.empty(f.name, shape=outShape, dtype='float32')
+                z_smx = g_smx.zeros(f.name, shape=(*outShape, dl.c), dtype='float32')
+                z_seg = g_seg.zeros(f.name, shape=outShape, dtype='uint8')
+                z_std = g_std.zeros(f.name, shape=outShape, dtype='float32')
+                z_eng = g_eng.zeros(f.name, shape=outShape, dtype='float32')
                 last_file = f
             z_smx[outSlice] = smx[inSlice]
             z_seg[outSlice] = np.argmax(smx, axis=-1)[inSlice]
