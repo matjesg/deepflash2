@@ -2,6 +2,27 @@
 
 <!-- do not remove -->
 
+## 0.1.2
+
+### New Features
+
+- Real-Time loss weight computation and large file support ([#11](https://github.com/matjesg/deepflash2/pull/11)), thanks to [@matjesg](https://github.com/matjesg)
+  - - Real-Time loss weight computation via fast convolutional distance transform on GPU
+- temp storage using zarr instead of RAM
+- zarr dependency
+
+### Bugs Squashed
+
+- Prediction not possible on Windows machines due to cuda error ([#10](https://github.com/matjesg/deepflash2/issues/10))
+  - During prediction on a windows machine a a OS Error occurs due to: 
+
+"RuntimeError: cuda runtime error (801) : operation not supported at ..\torch/csrc/generic/StorageSharing.cpp:247"
+
+Problem: Storage sharing currently not supported on windows.
+
+Proposed solution: Ensemble learner takes "num_workers" argument and passes it to subsequent functions. If num_workers == 0, prediction works for me.
+
+
 ## 0.1.1
 
 - Bud fixes and minor improvements.
