@@ -47,6 +47,9 @@ entries:
       title: Data
       url: data.html
     - output: web,pdf
+      title: Transforms
+      url: transforms.html
+    - output: web,pdf
       title: Metrics
       url: metrics.html
     - output: web,pdf
