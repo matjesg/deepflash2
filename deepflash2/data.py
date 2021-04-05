@@ -3,7 +3,7 @@
 __all__ = ['show', 'DeformationField', 'BaseDataset', 'RandomTileDataset', 'TileDataset']
 
 # Cell
-import os, zarr, cv2, imageio, shutil, numpy as np
+import os, zarr, cv2, imageio, shutil, tifffile, numpy as np
 from joblib import Parallel, delayed
 
 from scipy import ndimage
@@ -245,7 +245,10 @@ def _read_img(path, divide=None, **kwargs):
             img = np.max(img, axis=0) # max z projection
             img = np.moveaxis(img, 0, -1)
     else:
-        img = imageio.imread(path, **kwargs)
+        if path.suffix in ['.tif', '.tiff']:
+            img = tifffile.imread(path, **kwargs)
+        else:
+            img = imageio.imread(path, **kwargs)
         if divide is None and img.max()>0:
             img = img/np.iinfo(img.dtype).max
         if divide is not None:
@@ -261,6 +264,8 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
     "Read image and check classes"
     if path.suffix == '.zarr':
         msk = zarr.convenience.open(path.as_posix())
+    elif path.suffix in ['.tif', '.tiff']:
+        msk = tifffile.imread(path, **kwargs)
     else:
         msk = imageio.imread(path, **kwargs)
     if not instance_labels:
