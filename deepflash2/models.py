@@ -340,7 +340,7 @@ class UneXt50(nn.Module):
             with torch.no_grad():
                 m.conv1.weight = nn.Parameter(m.conv1.weight[:,:in_channels,...])
         elif in_channels>3:
-            m.conv1 = nn.Conv2d(1, self.inplanes, kernel_size=7, stride=2, bias=False)
+            m.conv1 = nn.Conv2d(in_channels, self.inplanes, kernel_size=7, stride=2, bias=False)
 
         #self.bn1 =  m.bn1 if in_channels==3 else nn.BatchNorm2d(self.inplanes)
         self.enc0 = nn.Sequential(m.conv1, m.bn1, nn.ReLU(inplace=True))
