@@ -24,13 +24,20 @@ Combining state of the art deep learning with a barrier free environment for lif
 - Reliable prediction on new data
     - leveraging Bayesian Uncertainties
 
+## Citing
 
+We're working on a peer reviewed publication. Until than, the preliminary citation is:
 
-
-
-## Workflow
-
-tbd
+```
+@misc{griebel2021deepflash2,
+  author = {Matthias Griebel},
+  title = {DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images},
+  year = {2021},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/matjesg/deepflash2}}
+}
+```
 
 ## Installing
 
@@ -62,6 +69,7 @@ has an editable install of fastai and fastcore.
 All docker containers are configured to start a jupyter server. **deepflash2** notebooks are available in the `deepflash2_notebooks` folder.
 
 For more information on how to run docker see [docker orientation and setup](https://docs.docker.com/get-started/) and [fastai docker](https://github.com/fastai/docker-containers).
+
 
 ## Model Library
 
