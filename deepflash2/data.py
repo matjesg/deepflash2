@@ -258,6 +258,8 @@ def _read_img(path, **kwargs):
         img = zarr.convenience.open(path.as_posix())
     else:
         img = imageio.imread(path, **kwargs)
+    if img.max()>1.:
+        img = img/np.iinfo(img.dtype).max
     if img.ndim == 2:
         img = np.expand_dims(img, axis=2)
     return img
@@ -398,8 +400,6 @@ class BaseDataset(Dataset):
         mean_sum, var_sum = 0., 0.
         for i, f in enumerate(self.files, 1):
             img = self.read_img(f)[:]
-            if not any((img.dtype== np.float32, img.dtype==np.float64)):
-                img = AF.to_float(img)
             mean_sum += img.mean((0,1))
             var_sum += img.var((0,1))
             if i==max_samples:
@@ -430,7 +430,7 @@ class RandomTileDataset(BaseDataset):
         tfms = [A.RandomGamma()]
         if self.normalize:
             tfms += [
-                A.ToFloat(),
+                #A.ToFloat(),
                 A.Normalize(mean=self.stats[0], std=self.stats[1], max_pixel_value=1.)
             ]
         if self.albumentations_tfms:
@@ -495,7 +495,7 @@ class TileDataset(BaseDataset):
         tfms = []
         if self.normalize:
             tfms += [
-                A.ToFloat(),
+                #A.ToFloat(),
                 A.Normalize(mean=self.stats[0], std=self.stats[1], max_pixel_value=1.)
             ]
         self.tfms =  A.Compose(tfms+[ToTensorV2()])
