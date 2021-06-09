@@ -71,7 +71,7 @@ class Config:
     mpt:bool = False
     optim:str = 'ranger'
     loss:str = 'CrossEntropyDiceLoss'
-    n_iter:int = 1000
+    n_iter:int = 2000
 
     # Validation and Prediction Settings
     tta:bool = True
