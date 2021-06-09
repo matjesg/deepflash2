@@ -6,8 +6,8 @@ title: Losses
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "Implements custom loss functions."
-description: "Implements custom loss functions."
+summary: "Implements popular segmentation loss functions."
+description: "Implements popular segmentation loss functions."
 nb_path: "nbs/05_losses.ipynb"
 ---
 <!--
@@ -38,12 +38,138 @@ nb_path: "nbs/05_losses.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Weighted-Softmax-Cross-Entropy-Loss">Weighted Softmax Cross Entropy Loss<a class="anchor-link" href="#Weighted-Softmax-Cross-Entropy-Loss"> </a></h2><p>as described by Falk, Thorsten, et al. "U-Net: deep learning for cell counting, detection, and morphometry." Nature methods 16.1 (2019): 67-70.</p>
+<p>Losses implemented here:</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Loss-Wrapper-functions">Loss Wrapper functions<a class="anchor-link" href="#Loss-Wrapper-functions"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Wrapper for handling different tensor types from <a href="https://docs.fast.ai/torch_core.html#TensorBase">fastai</a>.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="FastaiLoss" class="doc_header"><code>class</code> <code>FastaiLoss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L19" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FastaiLoss</code>(<strong><code>loss</code></strong>, <strong><code>axis</code></strong>=<em><code>1</code></em>) :: <code>_Loss</code></p>
+</blockquote>
+<p>Wrapper class around loss function for handling different tensor types.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Wrapper for combining different losses, adapted from from <a href="https://github.com/BloodAxe/pytorch-toolbelt">pytorch-toolbelt</a></p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="WeightedLoss" class="doc_header"><code>class</code> <code>WeightedLoss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L37" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>WeightedLoss</code>(<strong><code>loss</code></strong>, <strong><code>weight</code></strong>=<em><code>1.0</code></em>) :: <code>_Loss</code></p>
+</blockquote>
+<p>Wrapper class around loss function that applies weighted with fixed factor.
+This class helps to balance multiple losses if they have different scales</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="JointLoss" class="doc_header"><code>class</code> <code>JointLoss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L50" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>JointLoss</code>(<strong><code>first</code></strong>:<code>Module</code>, <strong><code>second</code></strong>:<code>Module</code>, <strong><code>first_weight</code></strong>=<em><code>1.0</code></em>, <strong><code>second_weight</code></strong>=<em><code>1.0</code></em>) :: <code>_Loss</code></p>
+</blockquote>
+<p>Wrap two loss functions into one. This class computes a weighted sum of two losses.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Popular-segmentation-losses">Popular segmentation losses<a class="anchor-link" href="#Popular-segmentation-losses"> </a></h2><p>The <code>get_loss()</code> function loads popular segmentation losses from <a href="https://github.com/qubvel/segmentation_models.pytorch">Segmenation Models Pytorch</a> and <a href="https://kornia.readthedocs.io/en/latest/losses.html#semantic-segmentation">kornia</a>:</p>
 <ul>
-<li><code>axis</code> for softmax calculations. Defaulted at 1 (channel dimension).</li>
-<li><code>reduction</code> will be used when we call <code>Learner.get_preds</code></li>
-<li><code>activation</code> function will be applied on the raw output logits of the model when calling <code>Learner.get_preds</code> or <code>Learner.predict</code></li>
-<li><code>decodes</code> function converts the output of the model to a format similar to the target (here binary masks). This is used in <code>Learner.predict</code></li>
+<li>(Soft) CrossEntropy Loss</li>
+<li>Dice Loss</li>
+<li>Jaccard Loss</li>
+<li>Focal Loss</li>
+<li>Lovasz Loss</li>
+<li>TverskyLoss</li>
 </ul>
 
 </div>
@@ -60,9 +186,8 @@ nb_path: "nbs/05_losses.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="WeightedSoftmaxCrossEntropy" class="doc_header"><code>class</code> <code>WeightedSoftmaxCrossEntropy</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L12" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>WeightedSoftmaxCrossEntropy</code>(<strong>*<code>args</code></strong>, <strong><code>axis</code></strong>=<em><code>-1</code></em>, <strong><code>reduction</code></strong>=<em><code>'mean'</code></em>) :: <code>Module</code></p>
+<h4 id="to_tensor" class="doc_header"><code>to_tensor</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L64" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>to_tensor</code>(<strong><code>x</code></strong>, <strong><code>dtype</code></strong>=<em><code>None</code></em>)</p>
 </blockquote>
-<p>Weighted Softmax Cross Entropy loss functions</p>
 
 </div>
 
@@ -81,46 +206,6 @@ nb_path: "nbs/05_losses.ipynb"
 </div>
     {% endraw %}
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>In a segmentation task, we want to take the softmax over the channel dimension</p>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">tst</span> <span class="o">=</span> <span class="n">WeightedSoftmaxCrossEntropy</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">output</span> <span class="o">=</span> <span class="n">TensorImage</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-<span class="n">targets</span> <span class="o">=</span> <span class="n">TensorMask</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">())</span>
-<span class="n">weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">)</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">tst</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
-<span class="n">test_eq</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="o">-</span><span class="mf">0.002415925730019808</span><span class="p">)</span>
-<span class="n">test_eq</span><span class="p">(</span><span class="n">tst</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">output</span><span class="p">),</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">test_eq</span><span class="p">(</span><span class="n">tst</span><span class="o">.</span><span class="n">decodes</span><span class="p">(</span><span class="n">output</span><span class="p">),</span> <span class="n">output</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Kornia-Segmentation-Losses-Integration">Kornia Segmentation Losses Integration<a class="anchor-link" href="#Kornia-Segmentation-Losses-Integration"> </a></h2><p>Helper functions to load segmentation losses from <a href="https://github.com/kornia/kornia">kornia</a>. 
-Read the <a href="https://kornia.readthedocs.io/en/latest/losses.html#module">docs</a> for a detailed explanation.</p>
-
-</div>
-</div>
-</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -132,9 +217,9 @@ Read the <a href="https://kornia.readthedocs.io/en/latest/losses.html#module">do
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="load_kornia_loss" class="doc_header"><code>load_kornia_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L39" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_kornia_loss</code>(<strong><code>loss_name</code></strong>, <strong><code>alpha</code></strong>=<em><code>0.5</code></em>, <strong><code>beta</code></strong>=<em><code>0.5</code></em>, <strong><code>gamma</code></strong>=<em><code>2.0</code></em>, <strong><code>reduction</code></strong>=<em><code>'mean'</code></em>, <strong><code>eps</code></strong>=<em><code>1e-08</code></em>)</p>
+<h4 id="get_loss" class="doc_header"><code>get_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L82" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_loss</code>(<strong><code>loss_name</code></strong>, <strong><code>mode</code></strong>=<em><code>'multiclass'</code></em>, <strong><code>classes</code></strong>=<em><code>[1]</code></em>, <strong><code>smooth_factor</code></strong>=<em><code>0.0</code></em>, <strong><code>alpha</code></strong>=<em><code>0.5</code></em>, <strong><code>beta</code></strong>=<em><code>0.5</code></em>, <strong><code>gamma</code></strong>=<em><code>2.0</code></em>, <strong><code>reduction</code></strong>=<em><code>'mean'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
-<p>Load segmentation_models_pytorch model</p>
+<p>Load losses from based on loss_name</p>
 
 </div>
 
@@ -160,16 +245,115 @@ Read the <a href="https://kornia.readthedocs.io/en/latest/losses.html#module">do
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">TensorImage</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-<span class="n">targets</span> <span class="o">=</span> <span class="n">TensorMask</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">())</span>
-<span class="n">tst</span> <span class="o">=</span> <span class="n">load_kornia_loss</span><span class="p">(</span><span class="s2">&quot;TverskyLoss&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="c1"># equals dice loss</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">tst</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-<span class="n">tst2</span> <span class="o">=</span> <span class="n">load_kornia_loss</span><span class="p">(</span><span class="s2">&quot;DiceLoss&quot;</span><span class="p">)</span>
-<span class="n">loss2</span> <span class="o">=</span> <span class="n">tst2</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-<span class="n">test_eq</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">loss2</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_classes</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c1">#output = TensorImage(torch.randn(4, n_classes, 356, 356, requires_grad=True))</span>
+<span class="c1">#target = TensorMask(torch.randint(0, n_classes, (4, 356, 356)))</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">loss_name</span> <span class="ow">in</span> <span class="n">LOSSES</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Testing </span><span class="si">{</span><span class="n">loss_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">tst</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="n">loss_name</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_classes</span><span class="p">)))</span> 
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">tst</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</pre></div>
 
-<span class="n">tst3</span> <span class="o">=</span> <span class="n">load_kornia_loss</span><span class="p">(</span><span class="s2">&quot;FocalLoss&quot;</span><span class="p">)</span>
-<span class="n">loss3</span> <span class="o">=</span> <span class="n">tst3</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Testing CrossEntropyLoss
+Testing DiceLoss
+Testing SoftCrossEntropyLoss
+Testing CrossEntropyDiceLoss
+Testing JaccardLoss
+Testing FocalLoss
+Testing LovaszLoss
+Testing TverskyLoss
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ce1</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="s1">&#39;SoftCrossEntropyLoss&#39;</span><span class="p">,</span> <span class="n">smooth_factor</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ce2</span> <span class="o">=</span> <span class="n">CrossEntropyLossFlat</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">test_close</span><span class="p">(</span><span class="n">ce1</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">ce2</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-04</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">jc</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="s1">&#39;JaccardLoss&#39;</span><span class="p">)</span>
+<span class="n">dc</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="s1">&#39;DiceLoss&#39;</span><span class="p">)</span>
+<span class="n">dc_loss</span> <span class="o">=</span> <span class="n">dc</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+<span class="n">dc_to_jc</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dc_loss</span><span class="o">/</span><span class="p">(</span><span class="n">dc_loss</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="c1">#it seems to be the other way around?</span>
+<span class="n">test_close</span><span class="p">(</span><span class="n">jc</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">dc_to_jc</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-02</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tw</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="s2">&quot;TverskyLoss&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">test_close</span><span class="p">(</span><span class="n">dc</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">tw</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-02</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">)</span>
+<span class="n">output</span><span class="p">[:,</span><span class="mi">1</span><span class="p">,</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">tst</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="n">loss_name</span><span class="o">=</span><span class="s1">&#39;DiceLoss&#39;</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> 
+<span class="n">tst2</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="n">loss_name</span><span class="o">=</span><span class="s1">&#39;DiceLoss&#39;</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_classes</span><span class="p">)))</span> 
+<span class="n">test_ne</span><span class="p">(</span><span class="n">tst</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">tst2</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
 </pre></div>
 
     </div>

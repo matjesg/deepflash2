@@ -16,6 +16,7 @@ from skimage.measure import label
 from skimage.segmentation import relabel_sequential, watershed
 from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
+import albumentations as A
 
 # Cell
 def unzip(path, zip_file):
@@ -229,12 +230,15 @@ def import_package(package):
     return importlib.import_module(package)
 
 # Cell
-def compose_albumentations(CLAHE_clip_limit=0., brightness_limit=0, contrast_limit=0.):
+def compose_albumentations(gamma_limit_lower=0, gamma_limit_upper=0, CLAHE_clip_limit=0., brightness_limit=0, contrast_limit=0., distort_limit=0.):
     'Compose albumentations augmentations'
-    A = import_package('albumentations')
     augs = []
+    if sum([gamma_limit_lower,gamma_limit_upper])>0:
+        augs.append(A.RandomGamma(gamma_limit=(gamma_limit_lower, gamma_limit_upper), p=0.5))
     if CLAHE_clip_limit>0:
         augs.append(A.CLAHE(clip_limit=CLAHE_clip_limit))
     if sum([brightness_limit,contrast_limit])>0:
         augs.append(A.RandomBrightnessContrast(brightness_limit=brightness_limit, contrast_limit=contrast_limit))
-    return A.OneOf([*augs], p=0.5)
+    if distort_limit>0:
+        augs.append(A.GridDistortion(num_steps=5, distort_limit=distort_limit, interpolation=1, border_mode=4, p=0.5))
+    return A.Compose([*augs], p=0.5)

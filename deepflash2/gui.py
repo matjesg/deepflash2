@@ -15,11 +15,14 @@ from pathlib import Path
 from fastcore.foundation import store_attr
 from fastcore.basics import GetAttr
 from fastai.data.transforms import get_files
+import segmentation_models_pytorch as smp
 import matplotlib.pyplot as plt
 
 from .utils import unzip, get_label_fn
 from .learner import EnsembleLearner, Config, _optim_dict
 from .gt import GTEstimator
+from .models import ARCHITECTURES, ENCODERS, get_pretrained_options
+from .losses import LOSSES
 
 try:
     from google import colab
@@ -28,12 +31,6 @@ except ImportError:
     COLAB = False
 
 GRID_COLS = 2
-
-# Cell
-_archs = ["unext50_deepflash2", "unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015",
-         'Unet', 'UnetPlusPlus', 'MAnet', 'FPN', 'PAN', 'PSPNet', 'Linknet', 'DeepLabV3', 'DeepLabV3Plus']
-_losses = ['WeightedSoftmaxCrossEntropy', 'FocalLoss', 'TverskyLoss', 'DiceLoss', 'CrossEntropyLoss']
-_pretrained = ["new", "wue_cFOS", "wue_Parv", "wue_GFP", "wue_OPN3"]
 
 # Cell
 tooltip_css = """<style>
@@ -543,16 +540,16 @@ _dtrain = {
     'n'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
     's'   : ('Select', 'Train all models (ensemble) or (re-)train specific model.'),
     'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
-    'lr'  : ('Learning Rate', '''The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset'''),
-    'lrf' : ('LR Finder', 'Click "Open" to get more information.'),
+    'base_lr': ('Learning Rate', '''Base learning rate for fine-tuning the model. The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset''', 'https://docs.fast.ai/callback.schedule.html#Learner.fine_tune'),
+    'lrf' : ('LR Finder', 'Click Open to get more information.'),
     'mw'  : ('Loss Function', 'Click "Customize" to get more information.'),
     'ts'  : ('Train Settings', 'Click "Customize" to get more information.'),
     'cfg_load' : ('Configuration', 'Select configuration file (.json) from previous experiments.'),
     'cfg_save' : ('Configuration', 'Save current configuration to file (.json).'),
-    'tta' : ('Uncertainties', 'Enable uncertainty estimation via test-time augmentation (more reliable and accurate, but slow).'),
+    'tta' : ('Use TTA', 'Enable test-time augmentation for prediction (more reliable and accurate, but slow).'),
     's_val': ('Select', 'Select model for validation. Select "Ensemble" to validate all models.'),
     'mdl' : ('Model Folder', '(Optional) One folder containing the all models of the ensemble. If not selected, latest models from Training will be selected.'),
-    'ood' : ('OOD Detection', '(Optional) For inference/prediction: Train a support-vector machine (SVM) for the detection of out-of-distribution (OOD) or anomalous data.'),
+    #'ood' : ('OOD Detection', '(Optional) For inference/prediction: Train a support-vector machine (SVM) for the detection of out-of-distribution (OOD) or anomalous data.'),
     'cache'  : ('Clear Cache', 'Delete cached files used for validation and visualization. This will not affect the final results.'),
 }
 
@@ -620,53 +617,53 @@ class TrainModelSB(BaseParamWidget, GetAttr):
     hints = w.Label(txt)
 
     params = {
-        'pretrained': w.Dropdown(options=_pretrained, continuous_update=True, layout=w.Layout(width='auto', min_width='1px')),
+        #'pretrained': w.Dropdown(options=_pretrained, continuous_update=True, layout=w.Layout(width='auto', min_width='1px')),
         'n': w.IntSlider(min=1, max=5, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
         'n_iter':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
-        'lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px'))
+        'base_lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px'))
     }
 
     sel = w.Dropdown(options=[],continuous_update=True, layout=w.Layout(width='auto', min_width='1px'))
 
     #Grid
-    grid = w.GridspecLayout(11, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(10, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #grid[0, 0] = w.Label('Model Arch')
-    grid[0, 0] = w.HTML(_html_wrap(*_dtrain['pretrained']))
-    grid[0, 1:]= params['pretrained']
-    grid[1, 0] = w.HTML(_html_wrap(*_dtrain['n']))
-    grid[1, 1:]= params['n']
-    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['n_iter']))
-    grid[2, 1:]= params['n_iter']
-    grid[3, 0] = w.HTML(_html_wrap(*_dtrain['s']))
-    grid[3, 1:]= sel
+    #grid[0, 0] = w.HTML(_html_wrap(*_dtrain['pretrained']))
+    #grid[0, 1:]= params['pretrained']
+    grid[0, 0] = w.HTML(_html_wrap(*_dtrain['n']))
+    grid[0, 1:]= params['n']
+    grid[1, 0] = w.HTML(_html_wrap(*_dtrain['n_iter']))
+    grid[1, 1:]= params['n_iter']
+    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['s']))
+    grid[2, 1:]= sel
     #grid[4, 0] = w.Label('MAY TAKE SOME HOURS')
-    grid[5, :] = w.HTML('<hr>')
-    grid[6, 0] = w.HTML(_html_wrap(*_dtrain['lr']))
-    grid[6, 1:]= params['lr']
-    grid[7, 0] = w.HTML(_html_wrap(*_dtrain['lrf']))
-    grid[8, 0] = w.HTML(_html_wrap(*_dtrain['mw']))
-    grid[9, 0] = w.HTML(_html_wrap(*_dtrain['ts']))
-    grid[10, 0] = w.HTML(_html_wrap(*_dtrain['cfg_save']))
+    grid[4, :] = w.HTML('<hr>')
+    grid[5, 0] = w.HTML(_html_wrap(*_dtrain['base_lr']))
+    grid[5, 1:]= params['base_lr']
+    grid[6, 0] = w.HTML(_html_wrap(*_dtrain['lrf']))
+    grid[7, 0] = w.HTML(_html_wrap(*_dtrain['mw']))
+    grid[8, 0] = w.HTML(_html_wrap(*_dtrain['ts']))
+    grid[9, 0] = w.HTML(_html_wrap(*_dtrain['cfg_save']))
 
     #Run
     run = w.Button(description='Start Training', layout=w.Layout(width='auto'))
-    grid[4, 1:] = run
+    grid[3, 1:] = run
 
     #LR Finder
     open_lrfinder = w.Button(description='Open', layout=w.Layout(width='auto'))
-    grid[7, 1:] = open_lrfinder
+    grid[6, 1:] = open_lrfinder
 
     #Custom Mask Weights
     open_mw = w.Button(description='Customize', layout=w.Layout(width='auto'))
-    grid[8, 1:] = open_mw
+    grid[7, 1:] = open_mw
 
     #Custom Data Aug
     open_par = w.Button(description='Customize', layout=w.Layout(width='auto'))
-    grid[9, 1:] = open_par
+    grid[8, 1:] = open_par
 
     #Custom Data Aug
     cfg_save = w.Button(description='Save Config', layout=w.Layout(width='auto'))
-    grid[10, 1:] = cfg_save
+    grid[9, 1:] = cfg_save
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -696,17 +693,16 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     params['tta'].style.button_width = '50px'
 
     #Grid
-    grid = w.GridspecLayout(10, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(9, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['s_val']))
     grid[1, 0] = w.HTML(_html_wrap(*_dtrain['tta']))
     grid[1, 1:]= params['tta']
     grid[3, :] = w.HTML('<hr>')
-    grid[4, :] = w.Label('Train out-of-distribution (OOD) detection')
+    grid[4, :] = w.Label('Load exisiting models')
     grid[5, 0] = w.HTML(_html_wrap(*_dtrain['mdl']))
-    grid[6, 0] = w.HTML(_html_wrap(*_dtrain['ood']))
-    grid[7, :] = w.HTML('<hr>')
-    grid[8, 0] = w.HTML('Downloads')
-    grid[9, 0] = w.HTML(_html_wrap(*_dtrain['cache']))
+    grid[6, :] = w.HTML('<hr>')
+    grid[7, 0] = w.HTML('Downloads')
+    grid[8, 0] = w.HTML(_html_wrap(*_dtrain['cache']))
 
     #Model
     sel = w.Dropdown(continuous_update=True, layout=w.Layout(width='auto', min_width='1px'))
@@ -717,11 +713,11 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     grid[2, 1:] = run
 
     #Res
-    ood = w.Button(description='Train OOD Model', layout=w.Layout(width='auto'))
-    grid[6, 1:] = ood
+    #ood = w.Button(description='Train OOD Model', layout=w.Layout(width='auto'))
+    #grid[6, 1:] = ood
 
     cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
-    grid[9, 1:] = cache
+    grid[8, 1:] = cache
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -731,7 +727,7 @@ class TrainValidSB(BaseParamWidget, GetAttr):
         path = path or Path('.')
         self.sel.options = _get_model_list(self.config.n)
         self.down  = PathDownloads(path, 'Select', tooltip='Click to download models, predictions or validation results')
-        self.grid[8, 1:] = self.down.button
+        self.grid[7, 1:] = self.down.button
         self.ens  = PathSelector(path, 'Select')
         self.grid[5, 1:] = self.ens.button
 
@@ -798,12 +794,15 @@ _dparam= {
     'optim'  : ('Optimizer', 'Optimizer.', 'https://docs.fast.ai/optimizer.html'),
     'flip'  : ('Flip', 'Randomly flip a training image.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'rot': ('Rotation (max. degrees)', 'Randomly rotate a training image up to max. degrees.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
-    'deformation_grid'   : ('Deformation Grid Size', "Size of the deformation grid.", 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
-    'deformation_magnitude'   : ('Deformation Magnitude', 'Magnitude of the deformation within the deformation grid', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
+    'gamma_limit_lower': ('Gamma (lower limit)', 'Random Gamma augmentation lower gamma limit.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.RandomGamma'),
+    'gamma_limit_upper': ('Gamma (upper limit)', 'Random Gamma augmentation upper gamma limit.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.RandomGamma'),
     'brightness_limit': ('Brightness (limit)', 'Factor range for changing brightness.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.RandomBrightnessContrast'),
     'contrast_limit': ('Contrast (limit)', 'Factor range for changing contrast.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.RandomBrightnessContrast'),
     'CLAHE_clip_limit': ('CLAHE (clip limit)', 'Contrast Limited Adaptive Histogram Equalization (CLAHE). Set upper threshold value for contrast limiting.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.CLAHE'),
-    'zoom_sigma': ('Zoom standard deviation', 'Standard deviation of the Guassian that zooms in or out of the image.', 'https://matjesg.github.io/deepflash2/data.html#RandomTileDataset'),
+    'distort_limit': ('GridDistortion (limit)', 'GridDistortion in the range (-distort_limit, distort_limit).', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.GridDistortion'),
+    #'zoom_sigma': ('Zoom standard deviation', 'Standard deviation of the Guassian that zooms in or out of the image.', 'https://matjesg.github.io/deepflash2/data.html#RandomTileDataset'),
+
+
 }
 
 # Cell
@@ -811,9 +810,9 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     'Widget for custom training parameters'
     _default = 'config'
     params = {
-        'arch' : w.Dropdown(options=_archs, layout=w.Layout(width='auto', min_width='1px')),
-        'encoder_name' : w.Text(layout=w.Layout(width='auto', min_width='1px'), disabled=True),
-        'encoder_weights' : w.Text(layout=w.Layout(width='auto', min_width='1px'), disabled=True),
+        'arch' : w.Dropdown(options=ARCHITECTURES, layout=w.Layout(width='auto', min_width='1px')),
+        'encoder_name' : w.Dropdown(options=ENCODERS, layout=w.Layout(width='auto', min_width='1px')),
+        'encoder_weights' : w.Dropdown(options=['imagenet'],layout=w.Layout(width='auto', min_width='1px'), continuous_update=True),
         'bs':w.IntSlider(min=2, max=32, step=2,layout=w.Layout(width='auto', min_width='1px')),
         'mpt': w.ToggleButtons(options=[('Yes', True), ('No', False)],
                               tooltips=['Enable Mixed-Precision Training','Disable Mixed-Precision Training']),
@@ -821,12 +820,13 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
         'optim':w.Dropdown(options=_optim_dict.keys(), layout=w.Layout(width='auto', min_width='1px')),
         'flip':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
         'rot':w.IntSlider(min=0, max=360, step=5, layout=w.Layout(width='auto', min_width='1px')),
-        'zoom_sigma':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),#w.FloatText(layout=w.Layout(width='auto', min_width='1px'))
-        'deformation_grid':w.IntSlider(min=0, max=350, step=10, layout=w.Layout(width='auto', min_width='1px')),
-        'deformation_magnitude':w.IntSlider(min=0, max=100, layout=w.Layout(width='auto', min_width='1px')),
+        #'zoom_sigma':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),#w.FloatText(layout=w.Layout(width='auto', min_width='1px'))
+        'gamma_limit_lower':w.IntSlider(min=0, max=255, step=10, layout=w.Layout(width='auto', min_width='1px')),
+        'gamma_limit_upper':w.IntSlider(min=0, max=255, step=10, layout=w.Layout(width='auto', min_width='1px')),
         'brightness_limit':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
         'contrast_limit':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
         'CLAHE_clip_limit':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
+        'distort_limit':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),
     }
 
 
@@ -860,26 +860,18 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
         self.widget = w.Accordion(children=[w.VBox([w.HBox([self.button_reset, self.button_close]),self.lbl,self.grid])])
         self.widget.set_title(0, 'Training Parameters')
         self.widget.layout.display = "none"
-        self.params['arch'].observe(self.on_arch_change, 'value')
+        self.params['encoder_name'].observe(self.on_encoder_change, 'value')
 
-    def on_arch_change(self, change):
-        if change['new'] not in ["unext50_deepflash2", "unet_deepflash2",  "unet_falk2019", "unet_ronnberger2015"]:
-            self.params['encoder_name'].disabled = False
-            self.params['encoder_weights'].disabled = False
-        else:
-            self.params['encoder_name'].disabled = True
-            self.params['encoder_weights'].disabled = True
+    def on_encoder_change(self, change):
+        self.params['encoder_weights'].options = get_pretrained_options(change['new'])
 
 # Cell
 _dmw= {
     'loss': ('Loss Function', 'Objective function to minimize during training.', 'https://matjesg.github.io/deepflash2/losses.html'),
     'loss_alpha' :('alpha', 'Loss coefficient for FocalLoss and TverskyLoss.', 'https://kornia.readthedocs.io/en/latest/losses.html#kornia.losses.TverskyLoss'),
     'loss_beta' :('beta', 'Loss coefficient for TverskyLoss.', 'https://kornia.readthedocs.io/en/latest/losses.html#kornia.losses.TverskyLoss'),
-    'loss_gamma' :('gamma', 'Focusing parameter for FocalLoss.', 'https://kornia.readthedocs.io/en/latest/losses.html#kornia.losses.FocalLoss'),
-    'bwf' : ('Border Weight Factor', 'Choose a high value to focus on instance separation (separation between foreground objects).', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
-    'bws' : ('Border Weight Sigma', 'Standard deviation of the Gaussian function to focus on the area between foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
-    'fbr' : ('Forground-Background Ratio', 'Ratio between forground and background. Choose a low value to focus on foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
-    'fds' : ('Forground Distance Sigma', 'Standard deviation of the Gaussian function to focus on the area around foreground objects.', 'https://matjesg.github.io/deepflash2/data.html#Weight-Calculation'),
+    'loss_gamma' :('gamma', 'FocalLoss power factor for dampening weight (focal strength).', 'https://github.com/qubvel/segmentation_models.pytorch/blob/master/segmentation_models_pytorch/losses/focal.py'),
+    'loss_smooth_factor': ('smooth_factor', 'SoftCrossEntropyLoss factor to smooth target (e.g. if smooth_factor=0.1 then [1, 0, 0] -> [0.9, 0.05, 0.05])', 'https://github.com/qubvel/segmentation_models.pytorch/blob/master/segmentation_models_pytorch/losses/soft_ce.py'),
 }
 
 # Cell
@@ -887,14 +879,11 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
     'Widget to customize loss functions'
     _default = 'config'
     params = {
-        'loss' : w.Dropdown(options=_losses, layout=w.Layout(width='auto', min_width='1px')),
-        'loss_alpha' : w.FloatText(layout= w.Layout(width='auto')), # w.FloatSlider(min=0, max=1, continuous_update=True, layout= w.Layout(width='auto')),
-        'loss_beta' : w.FloatText(layout= w.Layout(width='auto')),#w.FloatSlider(min=0, max=1, continuous_update=True, layout= w.Layout(width='auto')),
-        'loss_gamma' : w.FloatText(layout= w.Layout(width='auto')),#w.FloatSlider(min=0, max=10, continuous_update=True, layout= w.Layout(width='auto')),
-        'bwf': w.IntText(layout= w.Layout(width='auto')),#w.IntSlider(min=1, max=50, continuous_update=True, layout= w.Layout(width='auto')),
-        'fbr':w.FloatText(layout= w.Layout(width='auto')),#w.FloatSlider(min=0, max=1, continuous_update=True, layout= w.Layout(width='auto')),
-        'bws':w.IntText(layout= w.Layout(width='auto')),#w.IntSlider(min=1, max=20, continuous_update=True, layout= w.Layout(width='auto')),
-        'fds':w.IntText(layout= w.Layout(width='auto'))#:w.IntSlider(min=1, max=20, continuous_update=True, layout= w.Layout(width='auto'))
+        'loss' : w.Dropdown(options=LOSSES, layout=w.Layout(width='auto', min_width='1px')),
+        'loss_alpha' : w.FloatText(layout= w.Layout(width='auto')),
+        'loss_beta' : w.FloatText(layout= w.Layout(width='auto')),
+        'loss_gamma' : w.FloatText(layout= w.Layout(width='auto')),
+        'loss_smooth_factor': w.FloatText(layout= w.Layout(width='auto'))
     }
     out = w.Output()
 
@@ -902,20 +891,12 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
     lbl = w.HTML('Settings are saved automatically.')
 
     #Grid
-    grid = w.GridspecLayout(11, 2, width='400px',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(5, 2, width='400px',  grid_gap="0px", align_items='center')
     i=0
     for k in params:
         grid[i, 0] = w.HTML(_html_wrap(*_dmw[k]))
         grid[i, 1] = params[k]
         i += 1
-        if i==4:
-            grid[i, :] = w.HTML('<hr>')
-            i += 1
-            grid[i, :] = w.HTML('<b>Mask Weights</b>')
-            i += 1
-    grid[10, 0] = w.HTML('Visualization')
-    show = w.Button(description='Show', tooltip='Show example', layout= w.Layout(width='auto'))
-    grid[10, 1:] = show
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -928,16 +909,13 @@ class MWWidget(BasePopUpParamWidget, GetAttr):
         self.widget.set_title(0, 'Loss Function')
         self.widget.layout.display = "none"
         self.params['loss'].observe(self.on_arch_change, 'value')
-        self.on_arch_change({'new':'WeightedSoftmaxCrossEntropy'})
+        self.on_arch_change({'new':'CrossEntropyDiceLoss'})
 
     def on_arch_change(self, change):
         enable = ['loss']
-        self.show.disabled = True
-        if change['new'] ==  'WeightedSoftmaxCrossEntropy':
-            enable += ['bwf', 'fbr', 'bws', 'fds']
-            self.show.disabled = False
-        elif change['new'] ==  'FocalLoss': enable += ['loss_gamma', 'loss_alpha']
+        if change['new'] ==  'FocalLoss': enable += ['loss_gamma', 'loss_alpha']
         elif change['new'] ==  'TverskyLoss': enable +=  ['loss_beta', 'loss_alpha']
+        elif change['new'] ==  'SoftCrossEntropyLoss': enable +=  ['loss_smooth_factor']
         for k,v in self.params.items():
             if k in enable: v.disabled = False
             else: v.disabled = True
@@ -1015,7 +993,6 @@ _dpred = {
     'mdl' : ('Model Folder', 'One folder containing the all models of the ensemble. If not selected, latest models from Training will be selected.'),
     'msk_pred' : ('Test Mask Folder', 'For testing on new data. One folder containing all segmentation masks.'),
     'up_pred' : ('Upload Data', 'Upload a zip file with images or models.'),
-    'ood_model' : ('OOD Model', '(Optional) Select model for out-of-distribution detection. If not selected, latest models from training will be used.'),
     's_pred'  : ('Select', 'Ensemble or model to be used for prediction.'),
     'cache'  : ('Clear Cache', 'Delete cached files used for ensembling and visualization. This will not affect the final results.'),
 }
@@ -1071,28 +1048,21 @@ class PredSB(BaseParamWidget, GetAttr):
     params['pred_tta'].style.button_width = '50px'
 
     #Grid
-    grid = w.GridspecLayout(9, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(5, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #grid[0, 0] = w.HTML(_html_wrap(*_dpred['s_pred']))
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['tta']))
     grid[0, 1:] = params['pred_tta']
     grid[2, :] = w.HTML('<hr>')
-    grid[3, :] = w.Label('Quality control (OOD Detection)')
-    grid[4, 0] = w.HTML(_html_wrap(*_dpred['ood_model']))
-    grid[6, :] = w.HTML('<hr>')
-    grid[7, 0] = w.HTML('Downloads')
-    grid[8, 0] = w.HTML(_html_wrap(*_dpred['cache']))
+    grid[3, 0] = w.HTML('Downloads')
+    grid[4, 0] = w.HTML(_html_wrap(*_dpred['cache']))
 
     #Res
     run = w.Button(description='Run Prediction*', layout=w.Layout(width='auto'))
     grid[1, 1:] = run
 
     #OOD
-    ood = w.Button(description='Score Predictions', layout=w.Layout(width='auto'))
-    grid[5, 1:] = ood
-
-    #OOD
     cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
-    grid[8, 1:] = cache
+    grid[4, 1:] = cache
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -1101,9 +1071,7 @@ class PredSB(BaseParamWidget, GetAttr):
         super().__init__(**kwargs)
         path = path or Path('.')
         self.down  = PathDownloads(path, 'Select', tooltip='Click to download')
-        self.grid[7, 1:] = self.down.button
-        self.ood_path  =  PathConfig(path, 'Select', select_file=True)
-        self.grid[4, 1:] = self.ood_path.button
+        self.grid[3, 1:] = self.down.button
 
 # Cell
 class PredUI(BaseUI):
@@ -1131,7 +1099,6 @@ class PredUI(BaseUI):
             'img':self.sb['data'].img.dialog,
             'ens':self.sb['data'].ens.dialog,
             'msk':self.sb['data'].msk.dialog,
-            'ood':self.sb['pred'].ood_path.dialog,
             'down':self.sb['pred'].down.dialog,
              **{k:w.Output() for k in self.sb.keys()}
         }
@@ -1148,7 +1115,7 @@ class GUI(GetAttr):
     _default = 'config'
 
     #Header and Footer
-    head = "<h4 style='text-align:center;background-color:lightgray'>deepflash</h4>"
+    head = "<h4 style='text-align:center;background-color:lightgray'>deepflash2</h4>"
     header = w.HTML(value=head, layout=w.Layout(width='auto', grid_area='header'))
     foot = "<h6 style='text-align:left;background-color:lightgray'>&nbsp; </h6>"
     #foot = ""
@@ -1202,17 +1169,13 @@ class GUI(GetAttr):
         self.train.sb['train'].cfg_save.on_click(self.train_cfg_save_clicked)
         self.train.sb['valid'].run.on_click(self.train_valid_run_clicked)
         self.train.sb['valid'].ens.button_select.on_click(self.train_valid_ens_save_clicked)
-        self.train.sb['valid'].ood.on_click(self.train_valid_ood_clicked)
         self.train.sb['valid'].cache.on_click(self.train_valid_cache_clicked)
         self.train.xtr['lr'].run.on_click(self.lr_start_clicked)
-        self.train.xtr['mw'].show.on_click(self.mw_show_clicked)
 
         ## Pred
         self.pred.sb['data'].run.on_click(self.pred_data_run_clicked)
         self.pred.sb['data'].msk.button_select.on_click(self.pred_data_msk_save_clicked)
         self.pred.sb['pred'].run.on_click(self.pred_run_clicked)
-        self.pred.sb['pred'].ood_path.button_select.on_click(self.pred_ood_load_clicked)
-        self.pred.sb['pred'].ood.on_click(self.pred_ood_score_clicked)
         self.pred.sb['pred'].cache.on_click(self.pred_cache_clicked)
 
         # Init Project
@@ -1259,7 +1222,6 @@ class GUI(GetAttr):
         self.train.sb['data'].cfg.set_path(self.proj_path)
         self.pred.sb['data'].img.set_path(self.proj_path)
         self.pred.sb['data'].msk.set_path(self.proj_path)
-        self.pred.sb['pred'].ood_path.set_path(self.proj_path)
 
         self.train.sb['valid'].ens.set_path(self.proj_path)
         self.pred.sb['data'].ens.set_path(self.proj_path)
@@ -1386,7 +1348,6 @@ class GUI(GetAttr):
         path = self.proj_path/self.train_dir/f'config_{timestr}'
         with self.train.main['train']: self.config.save(path)
 
-
     def train_run_clicked(self, b):
         out = self.train.main['train']
         out.clear_output()
@@ -1443,30 +1404,6 @@ class GUI(GetAttr):
         path = self.train.sb['valid'].ens.path
         with self.train.main['valid']: self.el.load_ensemble(path)
 
-    def train_valid_ood_clicked(self, b):
-        out = self.train.main['valid']
-        out.clear_output()
-        with out: print(f'OOD Detection: Running ensemble prediction on training data. This may take a while!')
-        if COLAB:
-            with colab.output.temporary():
-                print('Temporary Logs:')
-                self.el.get_ensemble_results(self.el.files, use_tta=True)
-        else:
-            with self.tmp:
-                print('Temporary Logs:')
-                self.el.get_ensemble_results(self.el.files, use_tta=True)
-                self.tmp.clear_output()
-        out.clear_output()
-        with out:
-            print(f'Training OOD Model')
-            self.el.ood_train(**self.svm_kwargs)
-            timestr = time.strftime("%Y%m%d%H%M")
-            ood_path = self.proj_path/self.train_dir/self.ens_dir/f'ood_{timestr}'
-            self.el.ood_save(ood_path)
-            print(f'Showing ensemble results.')
-            items = {x.name:x.name for x in self.el.files}
-            ipp = ItemsPerPage(self.proj_path,self.el.show_ensemble_results, items=items)
-            display(ipp.widget)
 
     def train_valid_cache_clicked(self, b):
         with self.train.main['valid']: self.el.clear_tmp()
@@ -1496,22 +1433,12 @@ class GUI(GetAttr):
             plt.show()
 
     #Mask weights
-    def mw_open(self,b):
-        self.mw.widget.layout.display = "block"
+    #def mw_open(self,b):
+    #    self.mw.widget.layout.display = "block"
 
     #Train Settings
     def par_open(self,b):
         self.par.widget.layout.display = "block"
-
-    def mw_show_clicked(self, b):
-        out = self.train.xtr['mw'].out
-        out.clear_output()
-        with out:
-            print('Loading data. Please wait...')
-            items = {x:x for x in self.el.files}
-            ipp = ItemsPerPage(self.proj_path, elf.el.show_mask_weights, items=items)
-            out.clear_output()
-            display(ipp.widget)
 
     # Prediction
     def pred_data_msk_save_clicked(self, b):
@@ -1556,42 +1483,16 @@ class GUI(GetAttr):
                 if self.test_masks_provided:
                     print('Calculating metrics...')
                     self.el_pred.score_ensemble_results(label_fn=self.el_pred.label_fn)
-                items = {x.name:x.name for x in self.el_pred.files}
-                ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
+                print(f'Saving scoring results to {export_dir}')
+                self.el_pred.df_ens.to_csv(export_dir/f'scored_prediction.csv', index=False)
+                self.el_pred.df_ens.to_excel(export_dir/f'scored_prediction.xlsx')
+                items = {r.file:r.mean_energy for _, r in self.el_pred.df_ens.iterrows()}
+                print(f'A lower mean_energy score indicates difficult or anomalous data.')
+                ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_by='Energy Score', unc_metric='mean_energy')
                 display(ipp.widget)
-
-    def pred_ood_load_clicked(self, b):
-        o = self.pred.sb['pred'].ood_path
-        o.output.clear_output()
-        with o.output:
-            path = o.cwd/o.select.value[0]
-            self.el_pred.ood_load(path)
-        time.sleep(3)
-        o.output.clear_output()
-
-    def _get_ood(self, path):
-        files = get_files(path, extensions='.pkl', recurse=False, folders=None, followlinks=False)
-        print(files)
-        with self.pred.main['pred']: assert len(files)>0, f"No trained OOD Model found at {path}! Please select a valid model!"
-        files.sort(key=os.path.getctime)
-        self.el_pred.ood_load(files[0])
-
-    def pred_ood_score_clicked(self, b):
-        out = self.pred.main['pred']
-        out.clear_output()
-        if self.el_pred.ood is None: self._get_ood(self.el_pred.ensemble_dir)
-        if self.el_pred.df_ens is None: self.pred_run_clicked('', use_tta=True, show=False)
-        with out:
-            print('Scoring predictions')
-            self.el_pred.ood_score()
-            export_dir = self.pred.sb['pred'].down.path
-            print(f'Saving scoring results to {export_dir}')
-            self.el_pred.df_ens.to_csv(export_dir/f'prediction_with_ood_score.csv', index=False)
-            self.el_pred.df_ens.to_excel(export_dir/f'prediction_with_ood_score.xlsx')
-            items = {r.file:r.ood_score for _, r in self.el_pred.df_ens.iterrows()}
-            print(f'A lower OOD score indicates out-of-distribution (OOD) or anomalous data.')
-            ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_by='OOD Score', unc_metric='ood_score')
-            display(ipp.widget)
+                #items = {x.name:x.name for x in self.el_pred.files}
+                #ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
+                #display(ipp.widget)
 
     def pred_cache_clicked(self, b):
         with self.pred.main['pred']: self.el_pred.clear_tmp()
