@@ -1,8 +1,22 @@
-# deepflash2
-> Official repository of DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.
+# Welcome to
 
 
- ![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) [![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2) [![Build fastai images](https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg)](https://github.com/matjesg/deepflash2)
+
+ ![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) 
+ [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) 
+ [![PyPI - Downloads](https://img.shields.io/pypi/dm/deepflash2)](https://pypistats.org/packages/deepflash2)
+ [![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2) 
+ [![Build fastai images](https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg)](https://github.com/matjesg/deepflash2)
+ [![GitHub stars](https://img.shields.io/github/stars/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
+[![GitHub forks](https://img.shields.io/github/forks/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
+
+## Quick Start in 30 seconds
+
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/nbs/deepflash2.ipynb)
+
+![deepflash2 training getting started](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/screen_captures/GUI_Train_start.gif)
+
+Examplary training workflow.
 
 ## Why using deepflash2?
 
@@ -24,9 +38,28 @@ Combining state of the art deep learning with a barrier free environment for lif
 - Reliable prediction on new data
     - leveraging Bayesian Uncertainties
 
+**Kaggle Gold Medal and Innovation Price Winner**
+
+*deepflash2* does not only work on fluorescent labels. The *deepflash2* API built the foundation for winning the [Innovation Award](https://hubmapconsortium.github.io/ccf/pages/kaggle.html) a Kaggle Gold Medal in the [HuBMAP - Hacking the Kidney](https://www.kaggle.com/c/hubmap-kidney-segmentation) challenge. 
+Have a look at our [solution](https://www.kaggle.com/matjes/hubmap-deepflash2-judge-price)
+
+![Gold Medal](https://www.kaggle.com/static/images/medals/competitions/goldl@1x.png)
 
 
+## Citing
 
+We're working on a peer reviewed publication. Until than, the preliminary citation is:
+
+```
+@misc{griebel2021deepflash2,
+  author = {Matthias Griebel},
+  title = {DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images},
+  year = {2021},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/matjesg/deepflash2}}
+}
+```
 
 ## Workflow
 
