@@ -1117,10 +1117,10 @@ class GUI(GetAttr):
     _default = 'config'
 
     #Header and Footer
-    head = "<h4 style='text-align:center;background-color:lightgray'>deepflash2</h4>"
+    head = "<h1 style='text-align:center'><img src='https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/logo/logo_deepflash2_transp-02.png' width='100'/></h1><hr>"
     header = w.HTML(value=head, layout=w.Layout(width='auto', grid_area='header'))
-    foot = "<h6 style='text-align:left;background-color:lightgray'>&nbsp; </h6>"
-    #foot = ""
+    #foot = "<h6 style='text-align:left;background-color:lightgray'>&nbsp; </h6>"
+    foot = "<hr>"
     footer = w.HTML(value=foot, layout=w.Layout(width='100%', grid_area='footer'))
 
     #Category Buttons
