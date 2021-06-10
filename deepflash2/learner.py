@@ -72,6 +72,7 @@ class Config:
     optim:str = 'ranger'
     loss:str = 'CrossEntropyDiceLoss'
     n_iter:int = 2000
+    sample_mult:int = 0
 
     # Validation and Prediction Settings
     tta:bool = True
@@ -370,6 +371,7 @@ class EnsembleLearner(GetAttr):
         ds_kwargs['border_padding_factor']= 0.
         ds_kwargs['flip'] = self.flip
         ds_kwargs['albumentation_tfms'] = self._compose_albumentations(**self.albumentation_kwargs)
+        ds_kwargs['sample_mult'] = self.sample_mult if self.sample_mult>0 else None
         return ds_kwargs
 
     @property

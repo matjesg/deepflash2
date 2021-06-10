@@ -792,6 +792,7 @@ _dparam= {
     'mpt'   : ('Mixed Precision Training', 'Mixed Precision Training', 'https://docs.fast.ai/callback.fp16.html'),
     'wd'  : ('Weight Decay', 'Weight Decay.', 'https://arxiv.org/abs/1711.05101'),
     'optim'  : ('Optimizer', 'Optimizer.', 'https://docs.fast.ai/optimizer.html'),
+    'sample_mult' : ('Sample Multiplier', 'Defines how many are tiles are sampled from each image per epoch. Set to 0 for auto-mode.'),
     'flip'  : ('Flip', 'Randomly flip a training image.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'rot': ('Rotation (max. degrees)', 'Randomly rotate a training image up to max. degrees.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
     'gamma_limit_lower': ('Gamma (lower limit)', 'Random Gamma augmentation lower gamma limit.', 'https://albumentations.ai/docs/api_reference/augmentations/transforms/#albumentations.augmentations.transforms.RandomGamma'),
@@ -818,6 +819,7 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
                               tooltips=['Enable Mixed-Precision Training','Disable Mixed-Precision Training']),
         'wd':w.FloatText(min=0, max=1,layout=w.Layout(width='auto', min_width='1px')),
         'optim':w.Dropdown(options=_optim_dict.keys(), layout=w.Layout(width='auto', min_width='1px')),
+        'sample_mult' : w.IntText(layout= w.Layout(width='auto')),
         'flip':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
         'rot':w.IntSlider(min=0, max=360, step=5, layout=w.Layout(width='auto', min_width='1px')),
         #'zoom_sigma':w.FloatSlider(min=0, max=1, layout=w.Layout(width='auto', min_width='1px')),#w.FloatText(layout=w.Layout(width='auto', min_width='1px'))
@@ -841,13 +843,13 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     lbl = w.Label('Settings are saved automatically')
 
     #Grid
-    grid = w.GridspecLayout(17, 2, width='400px',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(18, 2, width='400px',  grid_gap="0px", align_items='center')
     i=0
     for k in params:
         grid[i, 0] = w.HTML(_html_wrap(*_dparam[k]))
         grid[i, 1] = params[k]
         i += 1
-        if i==7:
+        if i==8:
             grid[i, :] = w.HTML('<hr>')
             i += 1
             grid[i, :] = w.HTML('<b>Data Augmentation</b>')
