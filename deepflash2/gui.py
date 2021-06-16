@@ -702,7 +702,7 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     grid[5, 0] = w.HTML(_html_wrap(*_dtrain['mdl']))
     grid[6, :] = w.HTML('<hr>')
     grid[7, 0] = w.HTML('Downloads')
-    grid[8, 0] = w.HTML(_html_wrap(*_dtrain['cache']))
+    #grid[8, 0] = w.HTML(_html_wrap(*_dtrain['cache']))
 
     #Model
     sel = w.Dropdown(continuous_update=True, layout=w.Layout(width='auto', min_width='1px'))
@@ -716,8 +716,8 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     #ood = w.Button(description='Train OOD Model', layout=w.Layout(width='auto'))
     #grid[6, 1:] = ood
 
-    cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
-    grid[8, 1:] = cache
+    #cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
+    #grid[8, 1:] = cache
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -996,6 +996,8 @@ _dpred = {
     'msk_pred' : ('Test Mask Folder', 'For testing on new data. One folder containing all segmentation masks.'),
     'up_pred' : ('Upload Data', 'Upload a zip file with images or models.'),
     's_pred'  : ('Select', 'Ensemble or model to be used for prediction.'),
+    'min_pixel_export': ('Minimum Size', 'Minimumen ROI size (number of pixels) to be included in ImageJ export'),
+    'imagej'  : ('ImageJ Export', 'Export predicted masks to ImageJ ROI sets. '),
     'cache'  : ('Clear Cache', 'Delete cached files used for ensembling and visualization. This will not affect the final results.'),
 }
 
@@ -1045,26 +1047,34 @@ class PredSB(BaseParamWidget, GetAttr):
 
     params = {
         'pred_tta': w.ToggleButtons(options=[('Yes', True), ('No', False)],
-                                    tooltips=['Enable Test-Time Augmentation','Disable Test-Time Augmentation'])
+                                    tooltips=['Enable Test-Time Augmentation','Disable Test-Time Augmentation']),
+        'min_pixel_export' : w.IntText(layout= w.Layout(width='auto')),
     }
     params['pred_tta'].style.button_width = '50px'
 
     #Grid
-    grid = w.GridspecLayout(5, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(6, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #grid[0, 0] = w.HTML(_html_wrap(*_dpred['s_pred']))
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['tta']))
     grid[0, 1:] = params['pred_tta']
     grid[2, :] = w.HTML('<hr>')
-    grid[3, 0] = w.HTML('Downloads')
-    grid[4, 0] = w.HTML(_html_wrap(*_dpred['cache']))
+    grid[3, 0] = w.HTML(_html_wrap(*_dpred['min_pixel_export']))
+    grid[3, 1:] = params['min_pixel_export']
+    grid[4, 0] = w.HTML(_html_wrap(*_dpred['imagej']))
+    grid[5, 0] = w.HTML('Downloads')
+    #grid[6, 0] = w.HTML(_html_wrap(*_dpred['cache']))
 
     #Res
     run = w.Button(description='Run Prediction*', layout=w.Layout(width='auto'))
     grid[1, 1:] = run
 
-    #OOD
-    cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
-    grid[4, 1:] = cache
+    #Res
+    rois = w.Button(description='Export ROIs', layout=w.Layout(width='auto'))
+    grid[4, 1:] = rois
+
+    #clear
+    #cache = w.Button(description='Clear', layout=w.Layout(width='auto'))
+    #grid[6, 1:] = cache
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -1073,7 +1083,7 @@ class PredSB(BaseParamWidget, GetAttr):
         super().__init__(**kwargs)
         path = path or Path('.')
         self.down  = PathDownloads(path, 'Select', tooltip='Click to download')
-        self.grid[3, 1:] = self.down.button
+        self.grid[5, 1:] = self.down.button
 
 # Cell
 class PredUI(BaseUI):
@@ -1171,14 +1181,15 @@ class GUI(GetAttr):
         self.train.sb['train'].cfg_save.on_click(self.train_cfg_save_clicked)
         self.train.sb['valid'].run.on_click(self.train_valid_run_clicked)
         self.train.sb['valid'].ens.button_select.on_click(self.train_valid_ens_save_clicked)
-        self.train.sb['valid'].cache.on_click(self.train_valid_cache_clicked)
+        #self.train.sb['valid'].cache.on_click(self.train_valid_cache_clicked)
         self.train.xtr['lr'].run.on_click(self.lr_start_clicked)
 
         ## Pred
         self.pred.sb['data'].run.on_click(self.pred_data_run_clicked)
         self.pred.sb['data'].msk.button_select.on_click(self.pred_data_msk_save_clicked)
         self.pred.sb['pred'].run.on_click(self.pred_run_clicked)
-        self.pred.sb['pred'].cache.on_click(self.pred_cache_clicked)
+        self.pred.sb['pred'].rois.on_click(self.pred_rois_clicked)
+        #self.pred.sb['pred'].cache.on_click(self.pred_cache_clicked)
 
         # Init Project
         self._init_proj()
@@ -1495,6 +1506,15 @@ class GUI(GetAttr):
                 #items = {x.name:x.name for x in self.el_pred.files}
                 #ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
                 #display(ipp.widget)
+
+    def pred_rois_clicked(self, b):
+        export_dir = self.pred.sb['pred'].down.path
+        output_folder=Path(export_dir)/'ImageJ_ROIs'
+        out = self.pred.main['pred']
+        with out:
+            print('Exporting ROIs to ImageJ ROI Sets...')
+            self.el_pred.export_imagej_rois(output_folder, min_pixel=self.min_pixel_export)
+            print(f'Saved ROIs to {output_folder}. Click on `Select` to to download.')
 
     def pred_cache_clicked(self, b):
         with self.pred.main['pred']: self.el_pred.clear_tmp()

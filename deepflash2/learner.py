@@ -32,7 +32,7 @@ from .metrics import Dice, Iou
 from .losses import get_loss
 from .models import create_smp_model, save_smp_model, load_smp_model
 from .data import TileDataset, RandomTileDataset, _read_img, _read_msk
-from .utils import iou, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, compose_albumentations
+from .utils import iou, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, export_roi_set
 from .utils import compose_albumentations as _compose_albumentations
 import deepflash2.tta as tta
 
@@ -65,11 +65,11 @@ class Config:
     il:bool = False
 
     # Train Settings
-    base_lr:float = 0.002
+    base_lr:float = 0.001
     bs:int = 4
     wd:float = 0.001
     mpt:bool = False
-    optim:str = 'ranger'
+    optim:str = 'Adam'
     loss:str = 'CrossEntropyDiceLoss'
     n_iter:int = 2000
     sample_mult:int = 0
@@ -98,6 +98,7 @@ class Config:
 
     # Pred Settings
     pred_tta:bool = True
+    min_pixel_export:int = 0
 
     # Folder Structure
     gt_dir:str = 'GT_Estimation'
@@ -429,9 +430,6 @@ class EnsembleLearner(GetAttr):
         save_smp_model(self.learn.model, self.arch, name, stats=self.stats)
         self.models[i]=name
         self.recorder[i]=self.learn.recorder
-        #del model
-        #gc.collect()
-        #torch.cuda.empty_cache()
 
     def fit_ensemble(self, n_iter, skip=False, **kwargs):
         for i in range(1, self.n+1):
@@ -560,7 +558,7 @@ class EnsembleLearner(GetAttr):
         return self.df_ens
 
     def show_ensemble_results(self, files=None, model_no=None, unc=True, unc_metric=None):
-        if self.df_ens is None: assert print("Please run `get_ensemble_results` first.")
+        assert self.df_ens is not None, "Please run `get_ensemble_results` first."
         if model_no is None: df = self.df_ens
         else: df = self.df_models[df_models.model_no==model_no]
         if files is not None: df = df.set_index('file', drop=False).loc[files]
@@ -584,6 +582,16 @@ class EnsembleLearner(GetAttr):
         if self.mpt: learn.to_fp16()
         sug_lrs = learn.lr_find(**kwargs)
         return sug_lrs, learn.recorder
+
+    def export_imagej_rois(self, output_folder='ImageJ_ROIs', **kwargs):
+        assert self.df_ens is not None, "Please run prediction first."
+
+        output_folder = Path(output_folder)
+        output_folder.mkdir(exist_ok=True, parents=True)
+        for idx, r in progress_bar(self.df_ens.iterrows(), total=len(self.df_ens)):
+            mask = np.argmax(zarr.load(r.softmax_path), axis=-1).astype('uint8')
+            energy = zarr.load(r.energy_path)
+            export_roi_set(mask, energy, name=r.file, path=output_folder, **kwargs)
 
     def clear_tmp(self):
         try:
@@ -617,5 +625,6 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          #ood_score="Get OOD score",
          #ood_save='Save OOD model to path',
          #ood_load='Load OOD model from path',
+         export_imagej_rois='Export ImageJ ROI Sets to `ouput_folder`',
          clear_tmp="Clear directory with temporary files"
 )
