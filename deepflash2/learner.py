@@ -576,8 +576,8 @@ class EnsembleLearner(GetAttr):
 
     def lr_find(self, files=None, **kwargs):
         files = files or self.files
-        dls = self.get_dls(files)
-        model = self.get_model()
+        dls = self._get_dls(files)
+        model = self._create_model()
         learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim])
         if self.mpt: learn.to_fp16()
         sug_lrs = learn.lr_find(**kwargs)
