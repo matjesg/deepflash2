@@ -233,7 +233,7 @@ def export_roi_set(mask, intensity_image, name='RoiSet', path=Path('.'), ascendi
     i = 1
     with zipfile.ZipFile(path/f'{name}.zip', mode='w') as myzip:
         for _, row in df_props.iterrows():
-            contours = skimage.measure.find_contours(comps==row['index']+1, fully_connected='low')
+            contours = skimage.measure.find_contours(comps==row['index']+1, level=0.5, fully_connected='low')
             for cont in contours:
                 roi_name = f'{i:04d}-{row.mean_intensity:3f}.roi'
                 points = np.array([cont[:,1]+0.5, cont[:,0]+0.5]).T
