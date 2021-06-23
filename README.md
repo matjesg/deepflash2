@@ -1,8 +1,27 @@
-# deepflash2
-> Official repository of DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.
+# Welcome to 
 
 
- ![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) [![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2) [![Build fastai images](https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg)](https://github.com/matjesg/deepflash2)
+
+![deepflash2](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/logo/logo_deepflash2_transp-02.png)
+
+Official repository of deepflash2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.
+
+![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) 
+[![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) 
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/deepflash2)](https://pypistats.org/packages/deepflash2)
+[![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2) 
+[![Build fastai images](https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg)](https://github.com/matjesg/deepflash2)
+[![GitHub stars](https://img.shields.io/github/stars/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
+[![GitHub forks](https://img.shields.io/github/forks/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
+***
+
+## Quick Start in 30 seconds
+
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/nbs/deepflash2.ipynb)
+
+![deepflash2 training getting started](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/screen_captures/GUI_Train_start.gif)
+
+Examplary training workflow.
 
 ## Why using deepflash2?
 
@@ -23,7 +42,6 @@ Combining state of the art deep learning with a barrier free environment for lif
     - advanced augementation 
 - Reliable prediction on new data
     - leveraging Bayesian Uncertainties
-
 
 ## Workflow
 ## Using Google Colab:
@@ -141,6 +159,10 @@ You can enable test-time augmentation for prediction (more reliable and accurate
 If errors occur at any point, refer to the “common problems” section for help. 
 
 
+
+## Workflow
+
+tbd
 
 ## Installing
 

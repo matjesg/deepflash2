@@ -36,698 +36,9 @@ nb_path: "nbs/01_models.ipynb"
 </div>
     {% endraw %}
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="U-Net-models">U-Net models<a class="anchor-link" href="#U-Net-models"> </a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Pytorch implementation adapted from <a href="https://github.com/jvanvugt/pytorch-unet">https://github.com/jvanvugt/pytorch-unet</a></p>
-
-</div>
-</div>
-</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetConvBlock" class="doc_header"><code>class</code> <code>UNetConvBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L19" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetConvBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
-
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>:ivar training: Boolean represents whether this module is in training or
-                evaluation mode.
-:vartype training: bool</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNetUpBlock" class="doc_header"><code>class</code> <code>UNetUpBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L45" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNetUpBlock</code>(<strong><code>in_size</code></strong>, <strong><code>out_size</code></strong>, <strong><code>up_mode</code></strong>, <strong><code>padding</code></strong>, <strong><code>batch_norm</code></strong>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.1</code></em>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
-
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>:ivar training: Boolean represents whether this module is in training or
-                evaluation mode.
-:vartype training: bool</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UNet2D" class="doc_header"><code>class</code> <code>UNet2D</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L81" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UNet2D</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>depth</code></strong>=<em><code>5</code></em>, <strong><code>wf</code></strong>=<em><code>6</code></em>, <strong><code>padding</code></strong>=<em><code>False</code></em>, <strong><code>batch_norm</code></strong>=<em><code>False</code></em>, <strong><code>dropout</code></strong>=<em><code>0.0</code></em>, <strong><code>neg_slope</code></strong>=<em><code>0.0</code></em>, <strong><code>up_mode</code></strong>=<em><code>'upconv'</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
-</blockquote>
-<p>Pytorch U-Net Implementation</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>Args</strong>:\
-<code>in_channels</code> (int): the number of input channels.\
-<code>n_classes</code> (int): the number of output channels. \
-<code>depth</code> (int): depth of the network.\
-<code>wf</code> (int): number of filters in the first layer is 2^wf
-<code>padding</code> (bool): if True, apply padding such that the input shape is the same as the output. This may introduce artifacts\
-<code>batch_norm</code> (bool): Use BatchNorm after layers with an activation function\
-<code>up_mode</code> (str): one of 'upconv' or 'upsample'. 'upconv' will use transposed convolutions for learned upsampling. 'upsample' will use bilinear upsampling.\
-<code>neg_slope</code>(float): Controls the angle of the negative slope for LeakyReLU. Standard ReLU if set to 0.</p>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="U-Net-architectures">U-Net architectures<a class="anchor-link" href="#U-Net-architectures"> </a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Original U-Net architecture based on <em>Ronneberger, Olaf, Philipp Fischer, and Thomas Brox. "U-net: Convolutional networks for biomedical image segmentation." International Conference on Medical image computing and computer-assisted intervention. Springer, Cham, 2015.</em></p>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_ronneberger2015" class="doc_header"><code>unet_ronneberger2015</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L187" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_ronneberger2015</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>Original U-Net architecture based on Ronnberger et al. (2015)</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>U-Net architecture based on <em>Falk, Thorsten, et al. "U-Net: deep learning for cell counting, detection, and morphometry." Nature methods 16.1 (2019): 67-70.</em></p>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_falk2019" class="doc_header"><code>unet_falk2019</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L197" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_falk2019</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>U-Net architecture based on Falk et al. (2019)</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>U-Net model optimized for deepflash2</p>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_deepflash2" class="doc_header"><code>unet_deepflash2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L207" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_deepflash2</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong><code>dropout</code></strong>=<em><code>0.5</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>U-Net model optimized for deepflash2</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span> <span class="o">=</span> <span class="n">unet_deepflash2</span><span class="p">()</span>
-<span class="n">tst</span> <span class="o">=</span> <span class="n">unet_deepflash2</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="s1">&#39;wue_cFOS&#39;</span><span class="p">)</span>
-<span class="n">tst</span> <span class="o">=</span> <span class="n">unet_deepflash2</span><span class="p">(</span><span class="n">n_classes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">pretrained</span><span class="o">=</span><span class="s1">&#39;wue_cFOS&#39;</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Loaded model weights trained on wue_cFOS.
-No pretrained weights for 3 classes in final layer.
-Loaded model weights trained on wue_cFOS.
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unet_custom" class="doc_header"><code>unet_custom</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L217" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unet_custom</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>Customizable U-Net model. Customize via kwargs</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="UneXt">UneXt<a class="anchor-link" href="#UneXt"> </a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>UneXt50 Architecture adapted from Maxim Shugaev on <a href="https://www.kaggle.com/iafoss/hubmap-pytorch-fast-ai-starter">Kaggle</a></p>
-<ul>
-<li>Semi-supervised Imagenet pretrained ResNeXt50 (<a href="https://github.com/facebookresearch/semi-supervised-ImageNet1K-models">https://github.com/facebookresearch/semi-supervised-ImageNet1K-models</a>) model as a backbone</li>
-<li>Feature Pyramid Network (FPN): additional skip connection </li>
-<li>Atrous Spatial Pyramid Pooling (ASPP) block added between encoder and decoder to increase the receptive field</li>
-<li>Decoder upscaling blocks are based on pixel shuffle (<a href="https://arxiv.org/pdf/1609.05158.pdf">https://arxiv.org/pdf/1609.05158.pdf</a>) rather than transposed convolution </li>
-</ul>
-
-</div>
-</div>
-</div>
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="FPN" class="doc_header"><code>class</code> <code>FPN</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L225" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>FPN</code>(<strong><code>input_channels</code></strong>:<code>list</code>, <strong><code>output_channels</code></strong>:<code>list</code>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
-
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>:ivar training: Boolean represents whether this module is in training or
-                evaluation mode.
-:vartype training: bool</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UnetBlock" class="doc_header"><code>class</code> <code>UnetBlock</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L244" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UnetBlock</code>(<strong><code>up_in_c</code></strong>:<code>int</code>, <strong><code>x_in_c</code></strong>:<code>int</code>, <strong><code>nf</code></strong>:<code>int</code>=<em><code>None</code></em>, <strong><code>blur</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>self_attention</code></strong>:<code>bool</code>=<em><code>False</code></em>, <strong><code>padding</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
-
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>:ivar training: Boolean represents whether this module is in training or
-                evaluation mode.
-:vartype training: bool</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="ASPP" class="doc_header"><code>class</code> <code>ASPP</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L289" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>ASPP</code>(<strong><code>inplanes</code></strong>=<em><code>512</code></em>, <strong><code>mid_c</code></strong>=<em><code>256</code></em>, <strong><code>dilations</code></strong>=<em><code>[6, 12, 18, 24]</code></em>, <strong><code>out_c</code></strong>=<em><code>None</code></em>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
-
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>:ivar training: Boolean represents whether this module is in training or
-                evaluation mode.
-:vartype training: bool</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="UneXt50" class="doc_header"><code>class</code> <code>UneXt50</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L320" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>UneXt50</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>stride</code></strong>=<em><code>1</code></em>, <strong><code>inplanes</code></strong>=<em><code>64</code></em>, <strong><code>pre_ssl</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
-</blockquote>
-<p>Base class for all neural network modules.</p>
-<p>Your models should also subclass this class.</p>
-<p>Modules can also contain other Modules, allowing to nest them in
-a tree structure. You can assign the submodules as regular attributes::</p>
-
-<pre><code>import torch.nn as nn
-import torch.nn.functional as F
-
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5)
-        self.conv2 = nn.Conv2d(20, 20, 5)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        return F.relu(self.conv2(x))
-
-</code></pre>
-<p>Submodules assigned in this way will be registered, and will have their
-parameters converted too when you call :meth:<code>to</code>, etc.</p>
-<p>:ivar training: Boolean represents whether this module is in training or
-                evaluation mode.
-:vartype training: bool</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="unext50_deepflash2" class="doc_header"><code>unext50_deepflash2</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L385" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>unext50_deepflash2</code>(<strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>pretrained</code></strong>=<em><code>None</code></em>, <strong><code>progress</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-<p>UneXt50 model. Customize via kwargs</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span> <span class="o">=</span> <span class="n">unext50_deepflash2</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="s1">&#39;wue_cFOS&#39;</span><span class="p">)</span>
-<span class="n">tst</span> <span class="o">=</span> <span class="n">unext50_deepflash2</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">518</span><span class="p">,</span> <span class="mi">518</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">tst</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">test_eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">392</span><span class="p">,</span> <span class="mi">392</span><span class="p">])</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Using cache found in /media/data/home/mag01ud/.cache/torch/hub/facebookresearch_semi-supervised-ImageNet1K-models_master
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Loaded model weights trained on wue_cFOS.
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Using cache found in /media/data/home/mag01ud/.cache/torch/hub/facebookresearch_semi-supervised-ImageNet1K-models_master
-</pre>
-</div>
-</div>
-
-</div>
-</div>
 
 </div>
     {% endraw %}
@@ -757,9 +68,41 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L393" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="get_pretrained_options" class="doc_header"><code>get_pretrained_options</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_pretrained_options</code>(<strong><code>encoder_name</code></strong>)</p>
 </blockquote>
-<p>Load segmentation_models_pytorch model</p>
+<p>Return available options for pretrained weights for a given encoder</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="create_smp_model" class="doc_header"><code>create_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L24" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+</blockquote>
+<p>Create segmentation_models_pytorch model</p>
 
 </div>
 
@@ -785,10 +128,26 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst</span> <span class="o">=</span> <span class="n">load_smp_model</span><span class="p">(</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;DeepLabV3&#39;</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">tst</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">test_eq</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bs</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">tile_shapes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">512</span><span class="p">]</span> <span class="c1">#1024</span>
+<span class="n">in_channels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#1,3,4</span>
+<span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># 2,5</span>
+<span class="n">encoders</span> <span class="o">=</span> <span class="n">ENCODERS</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="c1">#+ENCODERS[-1:]</span>
+
+<span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">tile_shapes</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">in_c</span> <span class="ow">in</span> <span class="n">in_channels</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
+            <span class="n">inp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">bs</span><span class="p">,</span> <span class="n">in_c</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
+            <span class="n">out_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">bs</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">ts</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">arch</span> <span class="ow">in</span> <span class="n">ARCHITECTURES</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">encoder_name</span> <span class="ow">in</span> <span class="n">encoders</span><span class="p">:</span>
+                    <span class="n">model</span> <span class="o">=</span> <span class="n">create_smp_model</span><span class="p">(</span><span class="n">arch</span><span class="o">=</span><span class="n">arch</span><span class="p">,</span> 
+                                             <span class="n">encoder_name</span><span class="o">=</span><span class="n">encoder_name</span><span class="p">,</span>
+                                             <span class="n">encoder_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                             <span class="n">in_channels</span><span class="o">=</span><span class="n">in_c</span><span class="p">,</span> 
+                                             <span class="n">classes</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+                    <span class="n">test_eq</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -798,19 +157,6 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 </div>
     {% endraw %}
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Shape-Defaults">Shape Defaults<a class="anchor-link" href="#Shape-Defaults"> </a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Helper functions for default input and masks shapes, depending on model architecture</p>
-
-</div>
-</div>
-</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -822,8 +168,9 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_default_shapes" class="doc_header"><code>get_default_shapes</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L408" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_default_shapes</code>(<strong><code>arch</code></strong>)</p>
+<h4 id="save_smp_model" class="doc_header"><code>save_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_smp_model</code>(<strong><code>model</code></strong>, <strong><code>arch</code></strong>, <strong><code>file</code></strong>, <strong><code>stats</code></strong>=<em><code>None</code></em>, <strong><code>pickle_protocol</code></strong>=<em><code>2</code></em>)</p>
 </blockquote>
+<p>Save smp model, optionally including  stats</p>
 
 </div>
 
@@ -838,6 +185,80 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;Unet&#39;</span>
+<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;tst.pth&#39;</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;encoder_name&#39;</span><span class="p">:</span> <span class="s1">&#39;resnet34&#39;</span><span class="p">}</span>
+<span class="n">tst</span> <span class="o">=</span> <span class="n">create_smp_model</span><span class="p">(</span><span class="n">arch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="n">save_smp_model</span><span class="p">(</span><span class="n">tst</span><span class="p">,</span> <span class="n">arch</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L51" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>file</code></strong>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>strict</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+</blockquote>
+<p>Loads smp model from file</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst2</span><span class="p">,</span> <span class="n">stats2</span> <span class="o">=</span> <span class="n">load_smp_model</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tst</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">tst2</span><span class="o">.</span><span class="n">parameters</span><span class="p">()):</span>
+    <span class="n">test_eq</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">p2</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">stats2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}
