@@ -154,6 +154,21 @@ nb_path: "nbs/01_models.ipynb"
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/media/data/anaconda3/envs/fastai2/lib/python3.8/site-packages/torch/nn/functional.py:718: UserWarning: Named tensors and all their associated APIs are an experimental feature and subject to change. Please do not use them for anything important until they are released as stable. (Triggered internally at  /opt/conda/conda-bld/pytorch_1623448278899/work/c10/core/TensorImpl.h:1156.)
+  return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -254,6 +269,165 @@ nb_path: "nbs/01_models.ipynb"
 <span class="k">for</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tst</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">tst2</span><span class="o">.</span><span class="n">parameters</span><span class="p">()):</span>
     <span class="n">test_eq</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">p2</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
 <span class="n">test_eq</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">stats2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Deep-Supervision:-Unet-Patch">Deep Supervision: Unet Patch<a class="anchor-link" href="#Deep-Supervision:-Unet-Patch"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="MultiSegmentationHead" class="doc_header"><code>class</code> <code>MultiSegmentationHead</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L71" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>MultiSegmentationHead</code>(<strong><code>heads</code></strong>) :: <code>Module</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="UnetDecoder.forward" class="doc_header"><code>UnetDecoder.forward</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L81" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>UnetDecoder.forward</code>(<strong>*<code>features</code></strong>)</p>
+</blockquote>
+<p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<p>.. note::
+    Although the recipe for forward pass needs to be defined within
+    this function, one should call the :class:<code>Module</code> instance afterwards
+    instead of this since the former takes care of running the
+    registered hooks while the latter silently ignores them.</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h4 id="Unet.__init__" class="doc_header"><code>Unet.__init__</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L106" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>Unet.__init__</code>(<strong><code>encoder_name</code></strong>:<code>str</code>=<em><code>'resnet34'</code></em>, <strong><code>encoder_depth</code></strong>:<code>int</code>=<em><code>5</code></em>, <strong><code>encoder_weights</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>'imagenet'</code></em>, <strong><code>decoder_use_batchnorm</code></strong>:<code>bool</code>=<em><code>True</code></em>, <strong><code>decoder_channels</code></strong>:<code>List</code>[<code>int</code>]=<em><code>(256, 128, 64, 32, 16)</code></em>, <strong><code>decoder_attention_type</code></strong>:<code>Optional</code>[<code>str</code>]=<em><code>None</code></em>, <strong><code>in_channels</code></strong>:<code>int</code>=<em><code>3</code></em>, <strong><code>classes</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>activation</code></strong>:<code>Union</code>[<code>str</code>, <code>callable</code>, <code>NoneType</code>]=<em><code>None</code></em>, <strong><code>aux_params</code></strong>:<code>Optional</code>[<code>dict</code>]=<em><code>None</code></em>, <strong><code>deep_supervision</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
+</blockquote>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="o">=</span> <span class="n">create_smp_model</span><span class="p">(</span><span class="n">arch</span><span class="o">=</span><span class="s1">&#39;Unet&#39;</span><span class="p">,</span> 
+                                             <span class="n">encoder_name</span><span class="o">=</span><span class="n">encoder_name</span><span class="p">,</span>
+                                             <span class="n">encoder_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                             <span class="n">in_channels</span><span class="o">=</span><span class="n">in_c</span><span class="p">,</span> 
+                                             <span class="n">classes</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
 </pre></div>
 
     </div>

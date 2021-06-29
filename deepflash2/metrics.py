@@ -13,7 +13,7 @@ from fastcore.foundation import patch
 class Dice(fastai_Dice):
     "Dice coefficient metric for binary target in segmentation"
     def accumulate(self, learn):
-        pred,targ = flatten_check(learn.pred.argmax(dim=self.axis), learn.yb[0])
+        pred,targ = flatten_check(learn.pred[0].argmax(dim=self.axis), learn.yb[0])
         pred, targ  = map(TensorBase, (pred, targ))
         self.inter += (pred*targ).float().sum().item()
         self.union += (pred+targ).float().sum().item()

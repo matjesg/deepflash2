@@ -71,6 +71,7 @@ class Config:
     mpt:bool = False
     optim:str = 'Adam'
     loss:str = 'CrossEntropyDiceLoss'
+    deep_supervision:bool = True
     n_iter:int = 2000
     sample_mult:int = 0
 
@@ -381,6 +382,7 @@ class EnsembleLearner(GetAttr):
 
     def get_loss(self):
         kwargs = {'mode':self.mode,
+                  'deep_supervision':self.deep_supervision,
                   'classes':[x for x in range(1, self.c)],
                   'smooth_factor': self.loss_smooth_factor,
                   'alpha':self.loss_alpha,

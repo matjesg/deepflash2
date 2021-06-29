@@ -118,30 +118,20 @@ nb_path: "nbs/03_metrics.ipynb"
 </div>
     {% endraw %}
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">x2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">pred</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">inter</span> <span class="o">=</span> <span class="p">(</span><span class="n">pred</span><span class="o">*</span><span class="n">x2</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="n">union</span> <span class="o">=</span> <span class="p">(</span><span class="n">pred</span><span class="o">+</span><span class="n">x2</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="n">x1</span> <span class="o">=</span> <span class="n">TensorImage</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
-<span class="n">x2</span> <span class="o">=</span> <span class="n">TensorMask</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
-<span class="n">test_eq</span><span class="p">(</span><span class="n">compute_val</span><span class="p">(</span><span class="n">Dice</span><span class="p">(),</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">),</span> <span class="mi">2</span><span class="o">*</span><span class="n">inter</span><span class="o">/</span><span class="n">union</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>x1 = torch.randn(20,2,3,3)
+x2 = torch.randint(0, 2, (20, 3, 3))
+pred = x1.argmax(1)
+inter = (pred<em>x2).float().sum().item()
+union = (pred+x2).float().sum().item()
+x1 = TensorImage(x1)
+x2 = TensorMask(x2)
+test_eq(compute_val(Dice(), x1, x2), 2</em>inter/union)</p>
 
 </div>
-    {% endraw %}
-
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Intersection-Over-Union">Intersection-Over-Union<a class="anchor-link" href="#Intersection-Over-Union"> </a></h2>
@@ -180,23 +170,13 @@ nb_path: "nbs/03_metrics.ipynb"
 </div>
     {% endraw %}
 
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_eq</span><span class="p">(</span><span class="n">compute_val</span><span class="p">(</span><span class="n">Iou</span><span class="p">(),</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">),</span> <span class="n">inter</span><span class="o">/</span><span class="p">(</span><span class="n">union</span><span class="o">-</span><span class="n">inter</span><span class="p">))</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>test_eq(compute_val(Iou(), x1, x2), inter/(union-inter))</p>
 
 </div>
-    {% endraw %}
-
+</div>
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Patch-to-show-metrics">Patch to show metrics<a class="anchor-link" href="#Patch-to-show-metrics"> </a></h3>

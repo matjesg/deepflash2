@@ -160,6 +160,61 @@ This class helps to balance multiple losses if they have different scales</p>
 </div>
     {% endraw %}
 
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="DeepSupervisionLoss" class="doc_header"><code>class</code> <code>DeepSupervisionLoss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L63" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>DeepSupervisionLoss</code>(<strong><code>criterion</code></strong>) :: <code>Module</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Popular-segmentation-losses">Popular segmentation losses<a class="anchor-link" href="#Popular-segmentation-losses"> </a></h2><p>The <code>get_loss()</code> function loads popular segmentation losses from <a href="https://github.com/qubvel/segmentation_models.pytorch">Segmenation Models Pytorch</a> and <a href="https://kornia.readthedocs.io/en/latest/losses.html#semantic-segmentation">kornia</a>:</p>
@@ -186,7 +241,7 @@ This class helps to balance multiple losses if they have different scales</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_loss" class="doc_header"><code>get_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L62" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_loss</code>(<strong><code>loss_name</code></strong>, <strong><code>mode</code></strong>=<em><code>'multiclass'</code></em>, <strong><code>classes</code></strong>=<em><code>[1]</code></em>, <strong><code>smooth_factor</code></strong>=<em><code>0.0</code></em>, <strong><code>alpha</code></strong>=<em><code>0.5</code></em>, <strong><code>beta</code></strong>=<em><code>0.5</code></em>, <strong><code>gamma</code></strong>=<em><code>2.0</code></em>, <strong><code>reduction</code></strong>=<em><code>'mean'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="get_loss" class="doc_header"><code>get_loss</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/losses.py#L80" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_loss</code>(<strong><code>loss_name</code></strong>, <strong><code>mode</code></strong>=<em><code>'multiclass'</code></em>, <strong><code>deep_supervision</code></strong>=<em><code>False</code></em>, <strong><code>classes</code></strong>=<em><code>[1]</code></em>, <strong><code>smooth_factor</code></strong>=<em><code>0.0</code></em>, <strong><code>alpha</code></strong>=<em><code>0.5</code></em>, <strong><code>beta</code></strong>=<em><code>0.5</code></em>, <strong><code>gamma</code></strong>=<em><code>2.0</code></em>, <strong><code>reduction</code></strong>=<em><code>'mean'</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Load losses from based on loss_name</p>
 
@@ -215,8 +270,6 @@ This class helps to balance multiple losses if they have different scales</p>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_classes</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="c1">#output = TensorImage(torch.randn(4, n_classes, 356, 356, requires_grad=True))</span>
-<span class="c1">#target = TensorMask(torch.randint(0, n_classes, (4, 356, 356)))</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">target</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">loss_name</span> <span class="ow">in</span> <span class="n">LOSSES</span><span class="p">:</span>
@@ -231,6 +284,66 @@ This class helps to balance multiple losses if they have different scales</p>
 
 <div class="output_wrapper">
 <div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Testing CrossEntropyLoss
+Testing DiceLoss
+Testing SoftCrossEntropyLoss
+Testing CrossEntropyDiceLoss
+Testing JaccardLoss
+Testing FocalLoss
+Testing LovaszLoss
+Testing TverskyLoss
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/media/data/anaconda3/envs/fastai2/lib/python3.8/site-packages/kornia/augmentation/augmentation.py:1830: DeprecationWarning: GaussianBlur is no longer maintained and will be removed from the future versions. Please use RandomGaussianBlur instead.
+  warnings.warn(
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">output_list</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">[</span><span class="n">output</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">loss_name</span> <span class="ow">in</span> <span class="n">LOSSES</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Testing </span><span class="si">{</span><span class="n">loss_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">tst</span> <span class="o">=</span> <span class="n">get_loss</span><span class="p">(</span><span class="n">loss_name</span><span class="p">,</span> <span class="n">deep_supervision</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_classes</span><span class="p">)))</span> 
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">tst</span><span class="p">(</span><span class="n">output_list</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/media/data/home/mag01ud/.local/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre>
+</div>
+</div>
 
 <div class="output_area">
 
@@ -269,6 +382,21 @@ Testing TverskyLoss
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/media/data/home/mag01ud/.local/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -290,6 +418,21 @@ Testing TverskyLoss
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/media/data/home/mag01ud/.local/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -305,6 +448,21 @@ Testing TverskyLoss
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/media/data/home/mag01ud/.local/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -326,6 +484,21 @@ Testing TverskyLoss
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/media/data/home/mag01ud/.local/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
