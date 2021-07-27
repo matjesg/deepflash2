@@ -415,7 +415,7 @@ class RandomTileDataset(BaseDataset):
     Pytorch Dataset that creates random tiles with augmentations from the input images.
     """
     n_inp = 1
-    def __init__(self, *args, sample_mult=None, flip=True, rotation_range_deg=(0, 360), scale_range=(0, 0), albumentations_tfms=None, **kwargs):
+    def __init__(self, *args, sample_mult=None, flip=True, rotation_range_deg=(0, 360), scale_range=(0, 0), albumentations_tfms=[A.RandomGamma()], **kwargs):
         super().__init__(*args, **kwargs)
         store_attr('sample_mult, flip, rotation_range_deg, scale_range, albumentations_tfms')
 
@@ -427,14 +427,11 @@ class RandomTileDataset(BaseDataset):
             self.sample_mult = int(np.product(np.floor(msk_shape/tile_shape)))
 
 
-        tfms = [A.RandomGamma()]
+        tfms = self.albumentations_tfms
         if self.normalize:
             tfms += [
-                #A.ToFloat(),
                 A.Normalize(mean=self.stats[0], std=self.stats[1], max_pixel_value=1.)
             ]
-        if self.albumentations_tfms:
-            tfms += [*self.albumentations_tfms]
         self.tfms =  A.Compose(tfms+[ToTensorV2()])
 
     def _random_center(self, pdf, orig_shape, reshape=512):
