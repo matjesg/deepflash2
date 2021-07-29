@@ -1,4 +1,4 @@
-# Welcome to 
+# Welcome to
 
 
 
@@ -26,7 +26,7 @@ Examplary training workflow.
 ## Why using deepflash2?
 
 __The best of two worlds:__
-Combining state of the art deep learning with a barrier free environment for life science researchers.
+Combining state of the art deep learning with a barrier free environment for life science researchers. test
 
 - End-to-end process for life science researchers
     - graphical user interface - no coding skills required
