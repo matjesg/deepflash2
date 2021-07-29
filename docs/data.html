@@ -546,7 +546,7 @@ nb_path: "nbs/02_data.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BaseDataset" class="doc_header"><code>class</code> <code>BaseDataset</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/data.py#L286" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <code>Dataset</code></p>
+<h2 id="BaseDataset" class="doc_header"><code>class</code> <code>BaseDataset</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/data.py#L286" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseDataset</code>(<strong><code>files</code></strong>, <strong><code>label_fn</code></strong>=<em><code>None</code></em>, <strong><code>instance_labels</code></strong>=<em><code>False</code></em>, <strong><code>n_classes</code></strong>=<em><code>2</code></em>, <strong><code>ignore</code></strong>=<em><code>{}</code></em>, <strong><code>remove_overlap</code></strong>=<em><code>True</code></em>, <strong><code>stats</code></strong>=<em><code>None</code></em>, <strong><code>normalize</code></strong>=<em><code>True</code></em>, <strong><code>tile_shape</code></strong>=<em><code>(512, 512)</code></em>, <strong><code>padding</code></strong>=<em><code>(0, 0)</code></em>, <strong><code>preproc_dir</code></strong>=<em><code>None</code></em>, <strong><code>verbose</code></strong>=<em><code>1</code></em>, <strong><code>scale</code></strong>=<em><code>1</code></em>, <strong><code>pdf_reshape</code></strong>=<em><code>512</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Dataset</code></p>
 </blockquote>
 <p>An abstract class representing a :class:<code>Dataset</code>.</p>
 <p>All datasets that represent a map from keys to data samples should subclass
@@ -674,7 +674,7 @@ Using preprocessed masks from sample_data/labels/.cache
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RandomTileDataset" class="doc_header"><code>class</code> <code>RandomTileDataset</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/data.py#L413" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomTileDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <a href="/deepflash2/data.html#BaseDataset"><code>BaseDataset</code></a></p>
+<h2 id="RandomTileDataset" class="doc_header"><code>class</code> <code>RandomTileDataset</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/data.py#L413" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RandomTileDataset</code>(<strong>*<code>args</code></strong>, <strong><code>sample_mult</code></strong>=<em><code>None</code></em>, <strong><code>flip</code></strong>=<em><code>True</code></em>, <strong><code>rotation_range_deg</code></strong>=<em><code>(0, 360)</code></em>, <strong><code>scale_range</code></strong>=<em><code>(0, 0)</code></em>, <strong><code>albumentations_tfms</code></strong>=<em><code>[RandomGamma(always_apply=False, p=0.5, gamma_limit=(80, 120), eps=None)]</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/deepflash2/data.html#BaseDataset"><code>BaseDataset</code></a></p>
 </blockquote>
 <p>Pytorch Dataset that creates random tiles with augmentations from the input images.</p>
 
@@ -932,7 +932,7 @@ Using preprocessed masks from sample_data/labels/.cache
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="TileDataset" class="doc_header"><code>class</code> <code>TileDataset</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/data.py#L475" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TileDataset</code>(<strong>*<code>args</code></strong>, <strong>**<code>kwds</code></strong>) :: <a href="/deepflash2/data.html#BaseDataset"><code>BaseDataset</code></a></p>
+<h2 id="TileDataset" class="doc_header"><code>class</code> <code>TileDataset</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/data.py#L475" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>TileDataset</code>(<strong>*<code>args</code></strong>, <strong><code>val_length</code></strong>=<em><code>None</code></em>, <strong><code>val_seed</code></strong>=<em><code>42</code></em>, <strong><code>is_zarr</code></strong>=<em><code>False</code></em>, <strong><code>shift</code></strong>=<em><code>1.0</code></em>, <strong><code>border_padding_factor</code></strong>=<em><code>0.25</code></em>, <strong><code>return_index</code></strong>=<em><code>False</code></em>, <strong>**<code>kwargs</code></strong>) :: <a href="/deepflash2/data.html#BaseDataset"><code>BaseDataset</code></a></p>
 </blockquote>
 <p>Pytorch Dataset that creates random tiles for validation and prediction on new data.</p>
 
