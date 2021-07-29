@@ -56,7 +56,7 @@ def compose_albumentations(gamma_limit_lower=0, gamma_limit_upper=0, CLAHE_clip_
         augs.append(A.RandomBrightnessContrast(brightness_limit=brightness_limit, contrast_limit=contrast_limit))
     if distort_limit>0:
         augs.append(A.GridDistortion(num_steps=5, distort_limit=distort_limit, interpolation=1, border_mode=4, p=0.5))
-    return A.Compose([*augs], p=0.5)
+    return augs
 
 # Cell
 def ensemble_results(res_dict, file, std=False):

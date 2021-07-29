@@ -10,9 +10,6 @@ entries:
       title: Getting Started
       url: /
     - output: web,pdf
-      title: User Interface
-      url: deepflash2.html
-    - output: web,pdf
       title: Tutorial
       url: tutorial.html
     - output: web,pdf

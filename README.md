@@ -17,7 +17,7 @@ Official repository of deepflash2 - a deep learning pipeline for segmentation of
 
 ## Quick Start in 30 seconds
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/nbs/deepflash2.ipynb)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb)
 
 ![deepflash2 training getting started](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/screen_captures/GUI_Train_start.gif)
 

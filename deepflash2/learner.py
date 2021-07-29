@@ -371,7 +371,7 @@ class EnsembleLearner(GetAttr):
         ds_kwargs['shift']= 1.
         ds_kwargs['border_padding_factor']= 0.
         ds_kwargs['flip'] = self.flip
-        ds_kwargs['albumentation_tfms'] = self._compose_albumentations(**self.albumentation_kwargs)
+        ds_kwargs['albumentations_tfms'] = self._compose_albumentations(**self.albumentation_kwargs)
         ds_kwargs['sample_mult'] = self.sample_mult if self.sample_mult>0 else None
         return ds_kwargs
 
