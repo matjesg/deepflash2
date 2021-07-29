@@ -47,11 +47,7 @@ nb_path: "nbs/workflow.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>2. Setup Environment:</strong></p>
-<p>At first you must allow google colab to run the notebook from GitHub by accepting the prompt.
-{% include note.html content='You can <strong>reset the runtime</strong> when DeepFlash2 does not respond anymore.' %}&gt; Click on runtime in the left upper toolbar and select <strong>factory reset runtime</strong>.</p>
-<blockquote><p>Then you should reload the page and start again.</p>
-</blockquote>
-<p><img src="https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/screen_captures/GUI_reset_runtime.gif" alt="reset runtime"></p>
+<p>At first you must allow google colab to run the notebook from GitHub by accepting the prompt.</p>
 
 </div>
 </div>
@@ -65,16 +61,21 @@ You can allow it with ‘y’ for yes or deny it with ‘n’ for no.</p>
 There you can choose your google drive account to connect to google colab.</p>
 <p>After you have successfully connected the accounts, google will present you a one time authorization code. Copy this code and enter it in the according field in the “Set up environment cell” and continue by pressing the enter key.</p>
 <p>Note: The authentication key will only work with this runtime. When you close google colab you have to request a new code as described.</p>
-<p>Make sure that the google drive account you use with google colab matches the one you connect to the runtime.</p>
+<p>Make sure that the google drive account you use with google colab matches the one you connect to the runtime.
+{% include note.html content='You can <strong>reset the runtime</strong> when DeepFlash2 does not respond anymore.' %}</p>
+<blockquote><p>Click on runtime in the left upper toolbar and select <strong>factory reset runtime</strong>.
+Then you should reload the page and start again.</p>
+<p><img src="./media/screen_captures/GUI_reset_runtime.gif" alt="reset runtime"></p>
+</blockquote>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>4. Start deepflash2 UI:</strong></p>
-<p>Note: You have to create a Folder Structure as described here, before starting the program.</p>
-<p>When you run this cell, the UI opens. At first click “Select Project Folder”. 
+<p><strong>4. Start deepflash2 UI:</strong>
+{% include note.html content='You have to create a Folder Structure as described <a href="before_you_get_started.ipynb">here</a>, before starting the program.' %}
+When you run this cell, the UI opens. At first click “Select Project Folder”. 
 This unfolds your google drive main directory.</p>
 <p>There you can browse through the folders and select the correct folders.
 After that hit Save. Now the selected folder is connected to deepFlash2.</p>
