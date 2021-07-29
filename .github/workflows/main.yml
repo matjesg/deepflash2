@@ -13,8 +13,7 @@ jobs:
       run: |
         pip install jupyter
         pip install -e .
-        git clone -b colab_cell_metadata_keep --single-branch https://github.com/matjesg/nbdev.git
-        pip install -e nbdev
+        pip install nbdev
     - name: Read all notebooks
       run: |
         nbdev_read_nbs
