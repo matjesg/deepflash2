@@ -32,27 +32,14 @@ nb_path: "nbs/before_you_get_started.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="General-Information-for-deepflash2">General Information for deepflash2<a class="anchor-link" href="#General-Information-for-deepflash2"> </a></h2><p>When a star (*) appears in the name of a button a change in the data or selection was recognized by the program. When you press the according button the change will be applied.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Supported-image-formats">Supported image formats<a class="anchor-link" href="#Supported-image-formats"> </a></h2><p>We recommend ImageJ/Fiji to format your Images. Click to install <a href="https://imagej.net/software/fiji/">Fiji/ImageJ</a>.</p>
 <p>DeepFlash2 can handle different types of imagedata. Recommended image formats are jpeg , png, or tiff.</p>
 <p>You should avoid gif image format.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Required-Folder-Structure-and-Naming-Convention-to-access-you-data">Required Folder Structure and Naming Convention to access you data<a class="anchor-link" href="#Required-Folder-Structure-and-Naming-Convention-to-access-you-data"> </a></h2><p>Required Folder Structure and Naming Convention when using google drive:
-{% include note.html content='You have to follow this section when using google drive as a storage for the data you want to use with deepFlash2. This applies to the local installation as well as ' %}&gt; to google colab.</p>
-<p>Exemplary folder structure:<strong>Main directory:</strong><br>
-<img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_mainDirectory.png" alt="main directory image"></p>
-<p><strong>GT Estimation:</strong></p>
-<p><img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_GTestimation.png" alt="gt estimation"></p>
+{% include note.html content='You have to follow this section when using google drive as a storage for the data you want to use with deepFlash2. This applies to the local installation as well as ' %}&gt;to google colab.</p>
+<h3 id="Main-directory">Main directory<a class="anchor-link" href="#Main-directory"> </a></h3><p><img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_mainDirectory.png" alt="main directory image"></p>
+<hr>
+<h3 id="GT-Estimation">GT Estimation<a class="anchor-link" href="#GT-Estimation"> </a></h3><p><img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_GTestimation.png" alt="gt estimation"></p>
 <p>[folder] GT_estimation<br>
 &nbsp;&nbsp;[folder] expert1<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[file] mask1.png<br>
@@ -63,8 +50,8 @@ nb_path: "nbs/before_you_get_started.ipynb"
 &nbsp;&nbsp;[folder] expert3<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[file] mask1.png<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[file] mask2.png</p>
-<p><strong>Training:</strong></p>
-<p><img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_Training.png" alt="gt estimation"></p>
+<hr>
+<h3 id="Training">Training<a class="anchor-link" href="#Training"> </a></h3><p><img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_Training.png" alt="gt estimation"></p>
 <p>[folder] Training<br>
 &nbsp;&nbsp;[folder] images<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[file] 0001.tif<br>
@@ -72,8 +59,8 @@ nb_path: "nbs/before_you_get_started.ipynb"
 &nbsp;&nbsp;[folder] masks<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[file] 0001_mask.png<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[file] 0002_mask.png</p>
-<p><strong>Prediction:</strong></p>
-<p><img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_Prediction.png" alt="gt estimation"></p>
+<hr>
+<h3 id="Prediction">Prediction<a class="anchor-link" href="#Prediction"> </a></h3><p><img src="/deepflash2/./media/images/df2_exemplaryFolderStructure_Prediction.png" alt="gt estimation"></p>
 <p>[folder] Prediction<br>
 &nbsp;&nbsp;[folder] images<br>
 &nbsp;&nbsp;&nbsp;&nbsp;[file] 0001.tif<br>
