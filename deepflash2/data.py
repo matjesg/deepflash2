@@ -279,12 +279,12 @@ def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
             if np.array_equal(msk[...,0], msk[...,1]):
                 msk = msk[...,0]
         # Mask check
-        assert len(np.unique(msk))<=n_classes, 'Check n_classes and provided mask'
+        # assert len(np.unique(msk))<=n_classes, 'Check n_classes and provided mask'
     return msk
 
 # Cell
 class BaseDataset(Dataset):
-    def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, ignore={},remove_overlap=True,stats=None,normalize=True,
+    def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, ignore={},remove_overlap=False,stats=None,normalize=True,
                  tile_shape=(512,512), padding=(0,0),preproc_dir=None, verbose=1, scale=1, pdf_reshape=512, **kwargs):
         store_attr('files, label_fn, instance_labels, n_classes, ignore, tile_shape, remove_overlap, padding, normalize, scale, pdf_reshape')
         self.c = n_classes

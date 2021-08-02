@@ -17,7 +17,6 @@
     "Models": "models.html",
     "Data": "data.html",
     "Transforms": "transforms.html",
-    "Metrics": "metrics.html",
     "Callbacks": "callbacks.html",
     "Losses": "losses.html",
     "Utility functions": "utils.html",

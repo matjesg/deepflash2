@@ -27,12 +27,12 @@ from fastai.data.core import DataLoaders
 from fastai.data.transforms import get_image_files, get_files
 from fastai.vision.augment import Brightness, Contrast, Saturation
 from fastai.losses import CrossEntropyLossFlat
+from fastai.metrics import Dice, DiceMulti
 
-from .metrics import Dice, Iou
 from .losses import get_loss
 from .models import create_smp_model, save_smp_model, load_smp_model
 from .data import TileDataset, RandomTileDataset, _read_img, _read_msk
-from .utils import iou, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, export_roi_set
+from .utils import dice_score, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, export_roi_set
 from .utils import compose_albumentations as _compose_albumentations
 import deepflash2.tta as tta
 
@@ -60,7 +60,7 @@ class Config:
     encoder_weights:str = 'imagenet'
 
     # Train Data Settings
-    c:int = 2
+    n_classes:int = 2
     tile_shape:int = 512
     il:bool = False
 
@@ -71,7 +71,7 @@ class Config:
     mpt:bool = False
     optim:str = 'Adam'
     loss:str = 'CrossEntropyDiceLoss'
-    n_iter:int = 2000
+    n_iter:int = 2500
     sample_mult:int = 0
 
     # Validation and Prediction Settings
@@ -312,9 +312,10 @@ class EnsembleLearner(GetAttr):
         self.add_ds_kwargs = ds_kwargs
         self.item_tfms = item_tfms
         self.path = Path(path) if path is not None else Path('.')
-        self.metrics = metrics or [Iou(), Dice()]
+        default_metrics = [Dice()] if self.n_classes==2 else [DiceMulti()]
+        self.metrics = metrics or default_metrics
         self.loss_fn = self.get_loss()
-        self.cbs = cbs or [SaveModelCallback(monitor='iou')] #ShowGraphCallback
+        self.cbs = cbs or [SaveModelCallback(monitor='dice' if self.n_classes==2 else 'dice_multi')] #ShowGraphCallback
         self.ensemble_dir = ensemble_dir or self.path/'ensemble'
 
         self.files = L(files) or get_image_files(self.path/image_dir, recurse=False)
@@ -335,7 +336,7 @@ class EnsembleLearner(GetAttr):
         self.models = {}
         self.recorder = {}
         self._set_splits()
-        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, stats=self.stats, verbose=0)
+        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, stats=self.stats, n_classes=self.n_classes, verbose=0)
         self.stats = stats or self.ds.stats
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
@@ -355,7 +356,7 @@ class EnsembleLearner(GetAttr):
         # Setting default shapes and padding
         ds_kwargs = self.add_ds_kwargs.copy()
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
-        ds_kwargs['n_classes']= self.c
+        ds_kwargs['n_classes']= self.n_classes
         ds_kwargs['shift']= self.shift
         ds_kwargs['border_padding_factor']= self.border_padding_factor
         return ds_kwargs
@@ -367,7 +368,7 @@ class EnsembleLearner(GetAttr):
         # Settings from config
         ds_kwargs['stats']= self.stats
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
-        ds_kwargs['n_classes']= self.c
+        ds_kwargs['n_classes']= self.n_classes
         ds_kwargs['shift']= 1.
         ds_kwargs['border_padding_factor']= 0.
         ds_kwargs['flip'] = self.flip
@@ -377,11 +378,11 @@ class EnsembleLearner(GetAttr):
 
     @property
     def model_name(self):
-        return f'{self.arch}_{self.encoder_name}_{self.c}classes'
+        return f'{self.arch}_{self.encoder_name}_{self.n_classes}classes'
 
     def get_loss(self):
         kwargs = {'mode':self.mode,
-                  'classes':[x for x in range(1, self.c)],
+                  'classes':[x for x in range(1, self.n_classes)],
                   'smooth_factor': self.loss_smooth_factor,
                   'alpha':self.loss_alpha,
                   'beta':self.loss_beta,
@@ -405,7 +406,7 @@ class EnsembleLearner(GetAttr):
                                  encoder_name=self.encoder_name,
                                  encoder_weights=self.encoder_weights,
                                  in_channels=self.in_channels,
-                                 classes=self.c,
+                                 classes=self.n_classes,
                                  **self.model_kwargs)
         if torch.cuda.is_available(): model.cuda()
         return model
@@ -443,7 +444,7 @@ class EnsembleLearner(GetAttr):
 
     def get_valid_results(self, model_no=None, export_dir=None, filetype='.png', **kwargs):
         res_list = []
-        model_list = self.models if not model_no else [model_no]
+        model_list = self.models if not model_no else {k:v for k,v in self.models.items() if k==model_no}
         if export_dir:
             export_dir = Path(export_dir)
             pred_path = export_dir/'masks'
@@ -460,13 +461,12 @@ class EnsembleLearner(GetAttr):
             for j, f in enumerate(files_val):
                 msk = self.ds.get_data(f, mask=True)[0]
                 pred = np.argmax(g_smx[f.name][:], axis=-1).astype('uint8')
-                m_iou = iou(msk, pred)
+                m_dice = dice_score(msk, pred)
                 m_path = self.models[i].name
                 df_tmp = pd.Series({'file' : f.name,
                         'model' :  m_path,
                         'model_no' : i,
-                        'iou': m_iou,
-                        'dice': 2*m_iou/(m_iou+1),
+                        'dice_score': m_dice,
                         'mean_energy': np.mean(g_eng[f.name][:][pred>0]),
                         'mean_uncertainty': np.mean(g_std[f.name][:][pred>0]),
                         'image_path': f,
@@ -554,7 +554,7 @@ class EnsembleLearner(GetAttr):
             msk = _read_msk(msk_path)
             self.df_ens.loc[idx, 'mask_path'] = msk_path
             pred = np.argmax(zarr.load(r.softmax_path), axis=-1).astype('uint8')
-            self.df_ens.loc[idx, 'iou'] = iou(msk, pred)
+            self.df_ens.loc[idx, 'dice'] = dice_score(msk, pred)
         return self.df_ens
 
     def show_ensemble_results(self, files=None, model_no=None, unc=True, unc_metric=None):
@@ -565,7 +565,7 @@ class EnsembleLearner(GetAttr):
         for _, r in df.iterrows():
             imgs = []
             imgs.append(_read_img(r.image_path)[:])
-            if 'iou' in r.index:
+            if 'dice' in r.index:
                 imgs.append(_read_msk(r.mask_path))
                 hastarget=True
             else:

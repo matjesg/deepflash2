@@ -47,9 +47,6 @@ entries:
       title: Transforms
       url: transforms.html
     - output: web,pdf
-      title: Metrics
-      url: metrics.html
-    - output: web,pdf
       title: Callbacks
       url: callbacks.html
     - output: web,pdf

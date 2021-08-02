@@ -532,7 +532,7 @@ class GTEstUI(BaseUI):
 _dtrain = {
     'img' : ('Image Folder*', 'One folder containing all training images.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'msk' : ('Mask Folder*', 'One folder containing all segmentation masks. We highly recommend using ground truth estimation from multiple experts.'),
-    'c'   : ('No. of Classes', 'Number of classes: e.g., 2 for binary segmentation (foreground and background class).'),
+    'n_classes': ('No. of Classes', 'Number of classes: e.g., 2 for binary segmentation (foreground and background class).'),
     'il'  : ('Instance Labels', 'Are you providing instance labels (class-aware and instance-aware)?'),
     'up'  : ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain the correct folder structure.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'sd'  : ('Sample Data', 'Get sample data for demonstration and testing.'),
@@ -563,7 +563,7 @@ class TrainDataSB(BaseParamWidget, GetAttr):
     hints = w.Label(txt)
 
     params = {
-        'c': w.IntSlider(value=2, min=2, max=10, step=1, layout=w.Layout(width='auto', min_width='1px')),
+        'n_classes': w.IntSlider(value=2, min=2, max=10, step=1, layout=w.Layout(width='auto', min_width='1px')),
         'il':w.ToggleButtons(options=[('Yes', True), ('No', False)],tooltips=['You are providing instance labels (class-aware and instance-aware)',
                                                                                'You are not providing only class-aware labels']),
     }
@@ -574,8 +574,8 @@ class TrainDataSB(BaseParamWidget, GetAttr):
     #Labels
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['img']))
     grid[1, 0] = w.HTML(_html_wrap(*_dtrain['msk']))
-    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['c']))
-    grid[2, 1:]= params['c']
+    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['n_classes']))
+    grid[2, 1:]= params['n_classes']
     grid[3, 0] = w.HTML(_html_wrap(*_dtrain['il']))
     grid[3, 1:]= params['il']
     grid[5, :] = w.HTML('<hr>')
@@ -1331,7 +1331,7 @@ class GUI(GetAttr):
         with out:
             self.el = EnsembleLearner(image_folder, mask_folder, self.config, self.proj_path, ens_folder)
             items = {x:x for x in self.el.files}
-            ipp = ItemsPerPage(self.proj_path, self.el.ds.show_data, items=items, overlay=True if self.c==2 else False)
+            ipp = ItemsPerPage(self.proj_path, self.el.ds.show_data, items=items, overlay=True if self.n_classes==2 else False)
             display(ipp.widget)
 
     def train_data_sd_clicked(self, b):

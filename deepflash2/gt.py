@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from .data import _read_msk
 from .learner import Config
-from .utils import save_mask, iou, install_package
+from .utils import save_mask, dice_score, install_package
 
 # Cell
 def import_sitk():
@@ -118,7 +118,7 @@ class GTEstimator(GetAttr):
                 ref = m_voting(masks, self.mv_undec)
             refs[m] = ref
             #assert ref.mean() > 0, 'Please try again!'
-            df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'iou': [iou(ref, msk) for msk in masks]})
+            df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'dice_score': [dice_score(ref, msk) for msk in masks]})
             res.append(df_tmp)
             if save_dir:
                 path = self.path/save_dir
@@ -126,7 +126,7 @@ class GTEstimator(GetAttr):
                 save_mask(ref, path/Path(m).stem, filetype)
         self.gt[method] = refs
         self.df_res = pd.concat(res)
-        self.df_agg = self.df_res.groupby('exp').agg(average_iou=('iou', 'mean'), std_iou=('iou', 'std'))
+        self.df_agg = self.df_res.groupby('exp').agg(average_dice_score=('dice_score', 'mean'), std_dice_score=('dice_score', 'std'))
         if save_dir:
             self.df_res.to_csv(path.parent/f'{method}_vs_experts.csv', index=False)
             self.df_agg.to_csv(path.parent/f'{method}_vs_experts_agg.csv', index=False)
@@ -145,9 +145,9 @@ class GTEstimator(GetAttr):
             masks_av = np.array(masks).sum(axis=0)#/len(masks)
             msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)+1))
             # Results
-            av_df = pd.DataFrame([self.df_res[self.df_res.file==f][['iou']].mean()], index=['average'], columns=['iou'])
-            plt_df = self.df_res[self.df_res.file==f].set_index('exp')[['iou']].append(av_df)
-            plt_df.columns = [f'Similarity (iou)']
+            av_df = pd.DataFrame([self.df_res[self.df_res.file==f][['dice_score']].mean()], index=['average'], columns=['dice_score'])
+            plt_df = self.df_res[self.df_res.file==f].set_index('exp')[['dice_score']].append(av_df)
+            plt_df.columns = [f'Similarity (Dice Score)']
             tbl = pd.plotting.table(ax[2], np.round(plt_df,3), loc='center', colWidths=[.5])
             tbl.set_fontsize(14)
             tbl.scale(1, 2)
