@@ -1002,39 +1002,45 @@ _dpred = {
 }
 
 # Cell
-class PredInputSB:
+class PredInputSB(BaseParamWidget, GetAttr):
     'Layout for "Data and Ensemble" Section'
 
+    params = {
+        'n_classes': w.IntSlider(value=2, min=2, max=10, step=1, layout=w.Layout(width='auto', min_width='1px')),
+    }
     #Hints
     txt = 'Provide new images and models'
     hints = w.Label(txt)
 
-    grid = w.GridspecLayout(6, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(7, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #Labels
     grid[0, 0] = w.HTML(_html_wrap(*_dpred['img_pred']))
     grid[1, 0] = w.HTML(_html_wrap(*_dpred['mdl']))
-    grid[3, :] = w.HTML('<hr>')
-    grid[4, 0] = w.HTML(_html_wrap(*_dpred['msk_pred']))
-    grid[5, 0] = w.HTML(_html_wrap(*_dpred['up_pred']))
+    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['n_classes']))
+    grid[2, 1:]= params['n_classes']
+    grid[4, :] = w.HTML('<hr>')
+    grid[5, 0] = w.HTML(_html_wrap(*_dpred['msk_pred']))
+    grid[6, 0] = w.HTML(_html_wrap(*_dpred['up_pred']))
 
     #Load Data
     run = w.Button(description='Load*', layout=w.Layout(width='auto', min_width='1px'))
-    grid[2, 1:] = run
+    grid[3, 1:] = run
 
     #Final Widget
     widget = w.VBox([hints,grid])
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, **kwargs):
+        super().__init__(**kwargs)
         path = path or Path('.')
         self.img  = PathSelector(path, 'Select')
         self.grid[0, 1:] = self.img.button
         self.ens  = PathSelector(path, 'Select')
         self.grid[1, 1:] = self.ens.button
         self.msk  = PathSelector(path, 'Select')
-        self.grid[4, 1:] = self.msk.button
+        self.grid[5, 1:] = self.msk.button
         #Data Upload
         self.du = ZipUpload(path)
-        self.grid[5, 1:] = self.du.widget
+        self.grid[6, 1:] = self.du.widget
 
 # Cell
 class PredSB(BaseParamWidget, GetAttr):
@@ -1096,7 +1102,7 @@ class PredUI(BaseUI):
 
         #Sidebar
         self.sb = {
-            'data':PredInputSB(path=self.path),
+            'data':PredInputSB(path=self.path, config=self.config),
             'pred':PredSB(path=self.path, config=self.config),
         }
 

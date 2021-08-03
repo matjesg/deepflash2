@@ -551,10 +551,10 @@ class EnsembleLearner(GetAttr):
             label_fn = get_label_fn(self.df_ens.image_path[0], self.path/mask_dir)
         for idx, r in self.df_ens.iterrows():
             msk_path = self.label_fn(r.image_path)
-            msk = _read_msk(msk_path)
+            msk = _read_msk(msk_path, n_classes=self.n_classes)
             self.df_ens.loc[idx, 'mask_path'] = msk_path
             pred = np.argmax(zarr.load(r.softmax_path), axis=-1).astype('uint8')
-            self.df_ens.loc[idx, 'dice'] = dice_score(msk, pred)
+            self.df_ens.loc[idx, 'dice_score'] = dice_score(msk, pred)
         return self.df_ens
 
     def show_ensemble_results(self, files=None, model_no=None, unc=True, unc_metric=None):
@@ -565,8 +565,8 @@ class EnsembleLearner(GetAttr):
         for _, r in df.iterrows():
             imgs = []
             imgs.append(_read_img(r.image_path)[:])
-            if 'dice' in r.index:
-                imgs.append(_read_msk(r.mask_path))
+            if 'dice_score' in r.index:
+                imgs.append(_read_msk(r.mask_path, n_classes=self.n_classes))
                 hastarget=True
             else:
                 hastarget=False
