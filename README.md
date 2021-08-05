@@ -68,7 +68,7 @@ We're working on a peer reviewed publication. Until than, the preliminary citati
 
 ## Workflow
 
-tbd
+[click here](workflow.ipynb)
 
 ## Installing
 

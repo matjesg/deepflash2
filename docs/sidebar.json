@@ -1,6 +1,9 @@
 {
   "deepflash2": {
-    "Getting Started": "/", 
+    "Before you get started": "before_you_get_started.html",
+    "Workflow": "workflow.html",
+    "Further Reading": "further_reading.html",
+    "Getting Started": "/",
     "Tutorial" : "tutorial.html",
     "Model Library": "model_library.html",
     "Additional Information": "add_information.html",

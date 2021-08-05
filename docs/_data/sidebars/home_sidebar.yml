@@ -7,6 +7,15 @@ entries:
 - folders:
   - folderitems:
     - output: web,pdf
+      title: Before you get started
+      url: before_you_get_started.html
+    - output: web,pdf
+      title: Workflow
+      url: workflow.html
+    - output: web,pdf
+      title: Further Reading
+      url: further_reading.html
+    - output: web,pdf
       title: Getting Started
       url: /
     - output: web,pdf
