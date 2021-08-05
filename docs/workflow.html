@@ -39,6 +39,7 @@ nb_path: "nbs/workflow.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="For-using-deepflash2-in-Google-Colab-follow-this-link">For using deepflash2 in Google Colab follow this link<a class="anchor-link" href="#For-using-deepflash2-in-Google-Colab-follow-this-link"> </a></h3><p>(<a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/nbs/deepflash2.ipynb">https://colab.research.google.com/github/matjesg/deepflash2/blob/master/nbs/deepflash2.ipynb</a>)</p>
+<h3 id="1.Video">1.Video<a class="anchor-link" href="#1.Video"> </a></h3><p>The whole workflow is also explained in this video. <a href="https://www.youtube.com/watch?v=rEZzoDEq_-Y">click here</a></p>
 
 </div>
 </div>
@@ -53,13 +54,12 @@ nb_path: "nbs/workflow.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="3.-Connect-your-google-drive">3. Connect your google drive<a class="anchor-link" href="#3.-Connect-your-google-drive"> </a></h3><p>It is recommended to connect your runtime to google drive.
+{% include note.html content='Make sure that the google drive account you use with google colab is the same as the one you connect to the runtime.' %}
 You can allow it with ‘y’ for yes or deny it with ‘n’ for no.</p>
 <p>Go to the Url that is presented to you in the “Set up environment cell”.
 There you can choose your google drive account to connect to google colab.</p>
 <p>After you have successfully connected the accounts, google will present you a one time authorization code. Copy this code and enter it in the according field in the “Set up environment cell” and continue by pressing the enter key.
-{% include note.html content='The authentication key will only work with this runtime. When you close google colab you have to request a new code as described. ' %}</p>
-<p>Make sure that the google drive account you use with google colab matches the one you connect to the runtime.
-{% include note.html content='You can <strong>reset the runtime</strong> when DeepFlash2 does not respond anymore.<br>' %}Click on runtime in the left upper toolbar and select <strong>factory reset runtime</strong>.<br>
+{% include note.html content='The authentication key will only work with this runtime. When you close google colab you have to request a new code as described.   ' %}{% include note.html content='You can <strong>reset the runtime</strong> when DeepFlash2 does not respond anymore.<br>' %}Click on runtime in the left upper toolbar and select <strong>factory reset runtime</strong>.<br>
 Then you should reload the page and start again. 
 <img src="/deepflash2/./media/screen_captures/GUI_reset_runtime.gif" alt="reset runtime"></p>
 
