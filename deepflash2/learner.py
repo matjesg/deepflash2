@@ -269,7 +269,7 @@ class EnsemblePredict():
 
             # Compose predictions
             for preds in zip(*out_list, idxs):
-                if len(preds)==3: smx,std,eng,idx = preds
+                if len(preds)==4: smx,std,eng,idx = preds
                 elif uncertainty_estimates: smx,std,idx = preds
                 elif energy_scores: smx,eng,idx = preds
 
