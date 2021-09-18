@@ -66,6 +66,7 @@ class Compose:
         return len(self.aug_transform_parameters)
 
 # Cell
+import matplotlib.pyplot as plt
 class Merger:
     def __init__(self):
         self.output = []
@@ -77,10 +78,28 @@ class Merger:
         s = torch.stack(self.output)
         if type == 'max':
             result = torch.max(s, dim=0)[0]
+
         elif type == 'mean':
             result = torch.mean(s, dim=0)
-        elif type ==  'std':
+
+        elif type == 'std':
             result = torch.std(s, dim=0)
+
+        elif type == 'uncertainty':
+            # adapted from https://github.com/ykwon0407/UQ_BNN/blob/master/retina/utils.py
+            aleatoric_uncertainty = torch.mean(s * (1 - s), dim=0)
+            epistemic_uncertainty = torch.mean(s**2, dim=0) - torch.mean(s, dim=0)**2
+            result = epistemic_uncertainty + aleatoric_uncertainty
+
+        elif type == 'aleatoric_uncertainty':
+            result = torch.mean(s * (1 - s), dim=0)
+
+        elif type == 'epistemic_uncertainty':
+            result = torch.mean(s**2, dim=0) - torch.mean(s, dim=0)**2
+
+        elif type == 'entropy':
+            result = -torch.sum(s * torch.log(s), dim=0)
+
         else:
             raise ValueError('Not correct merge type `{}`.'.format(self.type))
         return result

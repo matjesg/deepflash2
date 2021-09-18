@@ -244,7 +244,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Merger" class="doc_header"><code>class</code> <code>Merger</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L69" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Merger</code>()</p>
+<h2 id="Merger" class="doc_header"><code>class</code> <code>Merger</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L70" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Merger</code>()</p>
 </blockquote>
 
 </div>
@@ -271,8 +271,8 @@ nb_path: "nbs/07_tta.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">imgs</span> <span class="o">=</span> <span class="n">TensorImage</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">]:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">imgs</span> <span class="o">=</span> <span class="n">TensorImage</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="s1">&#39;uncertainty&#39;</span><span class="p">,</span> <span class="s1">&#39;entropy&#39;</span><span class="p">,</span> <span class="s1">&#39;aleatoric_uncertainty&#39;</span><span class="p">,</span> <span class="s1">&#39;epistemic_uncertainty&#39;</span><span class="p">]:</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">Merger</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span> <span class="n">m</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>    
     <span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -302,7 +302,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="HorizontalFlip" class="doc_header"><code>class</code> <code>HorizontalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L89" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>HorizontalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
+<h2 id="HorizontalFlip" class="doc_header"><code>class</code> <code>HorizontalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L108" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>HorizontalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
 </blockquote>
 <p>Flip images horizontally (left-&gt;right)</p>
 
@@ -354,7 +354,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="VerticalFlip" class="doc_header"><code>class</code> <code>VerticalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L104" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>VerticalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
+<h2 id="VerticalFlip" class="doc_header"><code>class</code> <code>VerticalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L123" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>VerticalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
 </blockquote>
 <p>Flip images vertically (up-&gt;down)</p>
 
@@ -406,7 +406,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Rotate90" class="doc_header"><code>class</code> <code>Rotate90</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L119" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Rotate90</code>(<strong><code>angles</code></strong>:<code>List</code>[<code>int</code>]) :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
+<h2 id="Rotate90" class="doc_header"><code>class</code> <code>Rotate90</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L138" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Rotate90</code>(<strong><code>angles</code></strong>:<code>List</code>[<code>int</code>]) :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
 </blockquote>
 <p>Rotate images 0/90/180/270 degrees (<code>angles</code>)</p>
 

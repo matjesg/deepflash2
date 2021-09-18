@@ -258,10 +258,10 @@ def _read_img(path, **kwargs):
         img = zarr.convenience.open(path.as_posix())
     else:
         img = imageio.imread(path, **kwargs)
-    if img.max()>1.:
-        img = img/np.iinfo(img.dtype).max
-    if img.ndim == 2:
-        img = np.expand_dims(img, axis=2)
+        if img.max()>1.:
+            img = img/np.iinfo(img.dtype).max
+        if img.ndim == 2:
+            img = np.expand_dims(img, axis=2)
     return img
 
 # Cell
@@ -407,7 +407,7 @@ class BaseDataset(Dataset):
                 continue
         self.mean = mean_sum/i
         self.std = np.sqrt(var_sum/i)
-        return self.mean, self.std
+        return self.mean, self.std#*2
 
 # Cell
 class RandomTileDataset(BaseDataset):

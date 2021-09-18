@@ -205,6 +205,8 @@ class EnsemblePredict():
                 use_gaussian=True,
                 sigma_scale=1./8,
                 uncertainty_estimates=True,
+                uncertainty_type = 'uncertainty',
+                energy_scores=False,
                 energy_T = 1.,
                 verbose=0):
 
@@ -220,7 +222,7 @@ class EnsemblePredict():
         softmax = np.zeros((*data_shape, ds.c), dtype='float32')
         merge_map = np.zeros(data_shape, dtype='float32')
         stdeviation = np.zeros(data_shape, dtype='float32') if uncertainty_estimates else None
-        energy = np.zeros(data_shape, dtype='float32') if uncertainty_estimates else None
+        energy = np.zeros(data_shape, dtype='float32') if energy_scores else None
 
         # Define merge weights
         if use_gaussian:
@@ -233,22 +235,22 @@ class EnsemblePredict():
         for tiles, idxs in iter(dl):
             tiles = tiles.to(self.device)
             smx_merger = tta.Merger()
-            if uncertainty_estimates:
+            if energy_scores:
                 energy_merger = tta.Merger()
 
             # Loop over tt-augmentations
             for t in tta.Compose(tfms):
                 aug_tiles = t.augment_image(tiles)
                 model_merger = tta.Merger()
-                if uncertainty_estimates: engergy_list = []
+                if energy_scores: engergy_list = []
 
                 # Loop over models
                 for model in self.models:
-                    with torch.no_grad():
+                    with torch.inference_mode():
                         logits = model(aug_tiles)
                     logits = t.deaugment_mask(logits)
                     smx_merger.append(F.softmax(logits, dim=1))
-                    if uncertainty_estimates:
+                    if energy_scores:
                         energy_merger.append(-energy_score(logits, energy_T)) #negative energy score
 
             out_list = []
@@ -258,15 +260,19 @@ class EnsemblePredict():
             out_list.append([x for x in batch_smx.permute(0,2,3,1).cpu().numpy()])
 
             if uncertainty_estimates:
-                batch_std = torch.mean(smx_merger.result('std'), dim=1)*mw.view(1,*mw.shape)
+                batch_std = torch.mean(smx_merger.result(uncertainty_type), dim=1)*mw.view(1,*mw.shape)
                 out_list.append([x for x in batch_std.cpu().numpy()])
 
+            if energy_scores:
                 batch_energy =  energy_merger.result()*mw.view(1,*mw.shape)
                 out_list.append([x for x in batch_energy.cpu().numpy()])
 
             # Compose predictions
             for preds in zip(*out_list, idxs):
-                if uncertainty_estimates: smx,std,eng,idx = preds
+                if len(preds)==3: smx,std,eng,idx = preds
+                elif uncertainty_estimates: smx,std,idx = preds
+                elif energy_scores: smx,eng,idx = preds
+
                 else: smx, idx = preds
                 out_slice = ds.out_slices[idx]
                 in_slice = ds.in_slices[idx]
@@ -275,13 +281,16 @@ class EnsemblePredict():
 
                 if uncertainty_estimates:
                     stdeviation[out_slice] += std[in_slice]
+                if energy_scores:
                     energy[out_slice] += eng[in_slice]
 
         # Normalize weighting
         softmax /= merge_map[..., np.newaxis]
         if uncertainty_estimates:
-            energy /= merge_map
             stdeviation /= merge_map
+        if energy_scores:
+            energy /= merge_map
+
 
         return softmax, stdeviation, energy
 
@@ -336,7 +345,8 @@ class EnsembleLearner(GetAttr):
         self.models = {}
         self.recorder = {}
         self._set_splits()
-        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, stats=self.stats, n_classes=self.n_classes, verbose=0)
+        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, stats=self.stats, n_classes=self.n_classes,
+                                    sample_mult=self.sample_mult, verbose=0)
         self.stats = stats or self.ds.stats
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
@@ -442,7 +452,7 @@ class EnsembleLearner(GetAttr):
             self.models.pop(i+1, None)
         self.n = n
 
-    def get_valid_results(self, model_no=None, export_dir=None, filetype='.png', **kwargs):
+    def get_valid_results(self, model_no=None, zarr_store=None, export_dir=None, filetype='.png', **kwargs):
         res_list = []
         model_list = self.models if not model_no else {k:v for k,v in self.models.items() if k==model_no}
         if export_dir:
@@ -453,7 +463,7 @@ class EnsembleLearner(GetAttr):
             unc_path.mkdir(parents=True, exist_ok=True)
 
         for i, model_path in model_list.items():
-            ep = EnsemblePredict(models_paths=[model_path])
+            ep = EnsemblePredict(models_paths=[model_path], zarr_store=zarr_store)
             _, files_val = self.splits[i]
             g_smx, g_std, g_eng = ep.predict_images(files_val, bs=self.bs, ds_kwargs=self.pred_ds_kwargs, **kwargs)
 
@@ -590,8 +600,9 @@ class EnsembleLearner(GetAttr):
         output_folder.mkdir(exist_ok=True, parents=True)
         for idx, r in progress_bar(self.df_ens.iterrows(), total=len(self.df_ens)):
             mask = np.argmax(zarr.load(r.softmax_path), axis=-1).astype('uint8')
-            energy = zarr.load(r.energy_path)
-            export_roi_set(mask, energy, name=r.file, path=output_folder, **kwargs)
+            #energy = zarr.load(r.energy_path)
+            uncertainty = zarr.load(r.uncertainty_path)
+            export_roi_set(mask, uncertainty, name=r.file, path=output_folder, ascending=False, **kwargs)
 
     def clear_tmp(self):
         try:
