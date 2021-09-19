@@ -183,8 +183,7 @@ class EnsemblePredict():
         self.store = str(zarr_store) if zarr_store else zarr.storage.TempStore()
         self.root = zarr.group(store=self.store)
         self.g_smx = self.root.require_group('smx')
-        self.g_std = self.root.require_group('std')
-        self.g_eng = self.root.require_group('energy')
+        self.g_eng, self.g_std = None, None
 
     def init_models(self):
         self.models = []
@@ -291,11 +290,11 @@ class EnsemblePredict():
         if energy_scores:
             energy /= merge_map
 
-
         return softmax, stdeviation, energy
 
     def predict_images(self, image_list, ds_kwargs={}, verbose=1, **kwargs):
         "Predict images in 'image_list' with kwargs and save to zarr"
+
         for f in progress_bar(image_list, leave=False):
             if verbose>0: print(f'Predicting {f.name}')
             ds = TileDataset([f], stats=self.stats, return_index=True, **ds_kwargs)
@@ -303,8 +302,12 @@ class EnsemblePredict():
 
             # Save to zarr
             self.g_smx[f.name] = softmax
-            if stdeviation is not None: self.g_std[f.name] = stdeviation
-            if energy is not None: self.g_eng[f.name] = energy
+            if stdeviation is not None:
+                self.g_std = self.root.require_group('std')
+                self.g_std[f.name] = stdeviation
+            if energy is not None:
+                self.g_eng = self.root.require_group('energy')
+                self.g_eng[f.name] = energy
 
         return self.g_smx, self.g_std, self.g_eng
 
@@ -477,13 +480,13 @@ class EnsembleLearner(GetAttr):
                         'model' :  m_path,
                         'model_no' : i,
                         'dice_score': m_dice,
-                        'mean_energy': np.mean(g_eng[f.name][:][pred>0]),
-                        'mean_uncertainty': np.mean(g_std[f.name][:][pred>0]),
+                        #'mean_energy': np.mean(g_eng[f.name][:][pred>0]),
+                        'mean_uncertainty': np.mean(g_std[f.name][:][pred>0]) if g_std is not None else None,
                         'image_path': f,
                         'mask_path': self.label_fn(f),
                         'softmax_path': f'{chunk_store}/{g_smx.path}/{f.name}',
                         'engergy_path': f'{chunk_store}/{g_eng.path}/{f.name}' if g_eng is not None else None,
-                        'uncertainty_path': f'{chunk_store}/{g_std.path}/{f.name}'} if g_std is not None else None)
+                        'uncertainty_path': f'{chunk_store}/{g_std.path}/{f.name}' if g_std is not None else None})
                 res_list.append(df_tmp)
                 if export_dir:
                     save_mask(pred, pred_path/f'{df_tmp.file}_{df_tmp.model}_mask', filetype)
@@ -539,19 +542,19 @@ class EnsembleLearner(GetAttr):
             df_tmp = pd.Series({'file' : f.name,
                                 'ensemble' :  self.model_name,
                                 'n_models' : len(self.models),
-                                'mean_energy': np.mean(g_eng[f.name][:][pred>0]),
-                                'mean_uncertainty': np.mean(g_std[f.name][:][pred>0]),
+                                #'mean_energy': np.mean(g_eng[f.name][:][pred>0]),
+                                'mean_uncertainty': np.mean(g_std[f.name][:][pred>0]) if g_std is not None else None,
                                 'image_path': f,
                                 'softmax_path': f'{chunk_store}/{g_smx.path}/{f.name}',
                                 'uncertainty_path': f'{chunk_store}/{g_std.path}/{f.name}' if g_std is not None else None,
-                                'energy_path': f'{chunk_store}/{g_eng.path}/{f.name}'} if g_eng is not None else None)
+                                'energy_path': f'{chunk_store}/{g_eng.path}/{f.name}' if g_eng is not None else None})
             res_list.append(df_tmp)
             if export_dir:
                 save_mask(pred, pred_path/f'{df_tmp.file}_{df_tmp.ensemble}_mask', filetype)
                 if g_std is not None:
                     save_unc(g_std[f.name][:], unc_path/f'{df_tmp.file}_{df_tmp.ensemble}_unc', filetype)
                 if g_eng is not None:
-                        save_unc(g_eng[f.name][:], unc_path/f'{df_tmp.file}_{df_tmp.ensemble}_energy', filetype)
+                    save_unc(g_eng[f.name][:], unc_path/f'{df_tmp.file}_{df_tmp.ensemble}_energy', filetype)
 
         self.df_ens  = pd.DataFrame(res_list)
         return g_smx, g_std, g_eng
