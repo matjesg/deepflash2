@@ -627,8 +627,8 @@ class EnsembleLearner(GetAttr):
 
     def show_cellpose_results(self, files=None, unc=True, unc_metric=None):
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
-        df = self.df_ens
-        if files is not None: df = df.reset_index().set_index('file', drop=False).loc[files]
+        df = self.df_ens.reset_index()
+        if files is not None: df = df.set_index('file', drop=False).loc[files]
         for _, r in df.iterrows():
             imgs = []
             imgs.append(_read_img(r.image_path)[:])
