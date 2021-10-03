@@ -115,7 +115,7 @@ class GTEstimator(GetAttr):
             if method=='STAPLE':
                 ref = staple(masks, self.staple_fval, self.staple_thres)
             elif method=='majority_voting':
-                ref = m_voting(masks, self.mv_undec)
+                ref = m_voting(masks, self.majority_vote_undec)
             refs[m] = ref
             #assert ref.mean() > 0, 'Please try again!'
             df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'dice_score': [dice_score(ref, msk) for msk in masks]})

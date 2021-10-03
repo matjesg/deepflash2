@@ -4,6 +4,7 @@ __all__ = ['Config', 'energy_score', 'EnsemblePredict', 'EnsembleLearner']
 
 # Cell
 import shutil, gc, joblib, json, zarr, numpy as np, pandas as pd
+import tifffile, cv2
 import torch, torch.nn as nn, torch.nn.functional as F
 from torch.utils.data import DataLoader
 from dataclasses import dataclass, field, asdict
@@ -14,6 +15,7 @@ from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from scipy.ndimage.filters import gaussian_filter
+from skimage.color import label2rgb
 import matplotlib.pyplot as plt
 
 from fastprogress import progress_bar
@@ -30,7 +32,7 @@ from fastai.losses import CrossEntropyLossFlat
 from fastai.metrics import Dice, DiceMulti
 
 from .losses import get_loss
-from .models import create_smp_model, save_smp_model, load_smp_model
+from .models import create_smp_model, save_smp_model, load_smp_model, run_cellpose
 from .data import TileDataset, RandomTileDataset, _read_img, _read_msk
 from .utils import dice_score, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, export_roi_set
 from .utils import compose_albumentations as _compose_albumentations
@@ -42,15 +44,15 @@ class Config:
     "Config class for settings."
 
     # Project
-    proj_dir:str = 'deepflash2'
+    project_dir:str = 'deepflash2'
 
     # GT Estimation Settings
     staple_thres:float = 0.5
     staple_fval:int= 1
-    mv_undec:int = 0
+    majority_vote_undec:int = 1
 
     # Train General Settings
-    n:int = 5
+    n_models:int = 5
     max_splits:int=5
     random_state:int = 42
 
@@ -62,13 +64,13 @@ class Config:
     # Train Data Settings
     n_classes:int = 2
     tile_shape:int = 512
-    il:bool = False
+    instance_labels:bool = False
 
     # Train Settings
     base_lr:float = 0.001
-    bs:int = 4
-    wd:float = 0.001
-    mpt:bool = False
+    batch_size:int = 4
+    weight_decay:float = 0.001
+    mixed_precision_training:bool = False
     optim:str = 'Adam'
     loss:str = 'CrossEntropyDiceLoss'
     n_iter:int = 2500
@@ -100,13 +102,17 @@ class Config:
     pred_tta:bool = True
     min_pixel_export:int = 0
 
+    # Cellpose Settings
+    cellpose_model:str='nuclei'
+    cellpose_diameter:int=0
+    cellpose_export_class:int=1
+
     # Folder Structure
     gt_dir:str = 'GT_Estimation'
     train_dir:str = 'Training'
     pred_dir:str = 'Prediction'
     ens_dir:str = 'ensemble'
     val_dir:str = 'valid'
-
 
     @property
     def albumentation_kwargs(self):
@@ -131,7 +137,7 @@ class Config:
         path = Path(path)
         try:
             with open(path) as config_file: c = json.load(config_file)
-            if not Path(c['proj_dir']).is_dir(): c['proj_dir']='deepflash2'
+            if not Path(c['project_dir']).is_dir(): c['project_dir']='deepflash2'
             for k,v in c.items(): setattr(self, k, v)
             print(f'Successsfully loaded configuration from {path}')
         except:
@@ -410,7 +416,7 @@ class EnsembleLearner(GetAttr):
             ds.append(TileDataset(files_val, label_fn=self.label_fn, **self.train_ds_kwargs))
         else:
             ds.append(ds[0])
-        dls = DataLoaders.from_dsets(*ds, bs=self.bs, pin_memory=True, **self.dl_kwargs)
+        dls = DataLoaders.from_dsets(*ds, bs=self.batch_size, pin_memory=True, **self.dl_kwargs)
         if torch.cuda.is_available(): dls.cuda()
         return dls
 
@@ -433,9 +439,9 @@ class EnsembleLearner(GetAttr):
         dls = self._get_dls(files_train, files_val)
         self.learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim], cbs=self.cbs)
         self.learn.model_dir = self.ensemble_dir.parent/'.tmp'
-        if self.mpt: self.learn.to_fp16()
+        if self.mixed_precision_training: self.learn.to_fp16()
         print(f'Starting training for {name.name}')
-        epochs = calc_iterations(n_iter=n_iter,ds_length=len(dls.train_ds), bs=self.bs)
+        epochs = calc_iterations(n_iter=n_iter,ds_length=len(dls.train_ds), bs=self.batch_size)
         #self.learn.fit_one_cycle(epochs, lr_max)
         self.learn.fine_tune(epochs, base_lr=base_lr)
 
@@ -453,7 +459,7 @@ class EnsembleLearner(GetAttr):
     def set_n(self, n):
         for i in range(n, len(self.models)):
             self.models.pop(i+1, None)
-        self.n = n
+        self.n_models = n
 
     def get_valid_results(self, model_no=None, zarr_store=None, export_dir=None, filetype='.png', **kwargs):
         res_list = []
@@ -468,7 +474,9 @@ class EnsembleLearner(GetAttr):
         for i, model_path in model_list.items():
             ep = EnsemblePredict(models_paths=[model_path], zarr_store=zarr_store)
             _, files_val = self.splits[i]
-            g_smx, g_std, g_eng = ep.predict_images(files_val, bs=self.bs, ds_kwargs=self.pred_ds_kwargs, **kwargs)
+            g_smx, g_std, g_eng = ep.predict_images(files_val, bs=self.batch_size, ds_kwargs=self.pred_ds_kwargs, **kwargs)
+            del ep
+            torch.cuda.empty_cache()
 
             chunk_store = g_smx.chunk_store.path
             for j, f in enumerate(files_val):
@@ -526,8 +534,10 @@ class EnsembleLearner(GetAttr):
 
     def get_ensemble_results(self, files, zarr_store=None, export_dir=None, filetype='.png', **kwargs):
         ep = EnsemblePredict(models_paths=self.models.values(), zarr_store=zarr_store)
-        g_smx, g_std, g_eng = ep.predict_images(files, bs=self.bs, ds_kwargs=self.pred_ds_kwargs, **kwargs)
+        g_smx, g_std, g_eng = ep.predict_images(files, bs=self.batch_size, ds_kwargs=self.pred_ds_kwargs, **kwargs)
         chunk_store = g_smx.chunk_store.path
+        del ep
+        torch.cuda.empty_cache()
 
         if export_dir:
             export_dir = Path(export_dir)
@@ -570,11 +580,10 @@ class EnsembleLearner(GetAttr):
             self.df_ens.loc[idx, 'dice_score'] = dice_score(msk, pred)
         return self.df_ens
 
-    def show_ensemble_results(self, files=None, model_no=None, unc=True, unc_metric=None):
+    def show_ensemble_results(self, files=None, unc=True, unc_metric=None):
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
-        if model_no is None: df = self.df_ens
-        else: df = self.df_models[df_models.model_no==model_no]
-        if files is not None: df = df.set_index('file', drop=False).loc[files]
+        df = self.df_ens
+        if files is not None: df = df.reset_index().set_index('file', drop=False).loc[files]
         for _, r in df.iterrows():
             imgs = []
             imgs.append(_read_img(r.image_path)[:])
@@ -587,25 +596,79 @@ class EnsembleLearner(GetAttr):
             if unc: imgs.append(zarr.load(r.uncertainty_path))
             plot_results(*imgs, df=r, hastarget=hastarget, unc_metric=unc_metric)
 
+    def get_cellpose_results(self, export_dir=None):
+        assert self.df_ens is not None, "Please run `get_ensemble_results` first."
+        cl = self.cellpose_export_class
+        assert cl<self.n_classes, f'{cl} not avaialable from {self.n_classes} classes'
+
+        smxs, preds = [], []
+        for _, r in self.df_ens.iterrows():
+            softmax = zarr.load(r.softmax_path)
+            smxs.append(softmax)
+            preds.append(np.argmax(softmax, axis=-1).astype('uint8'))
+
+        probs = [x[...,cl] for x in smxs]
+        masks = [x==cl for x in preds]
+        cp_masks = run_cellpose(probs, masks,
+                                model_type=self.cellpose_model,
+                                diameter=self.cellpose_diameter,
+                                min_size=self.min_pixel_export,
+                                gpu=torch.cuda.is_available())
+
+        if export_dir:
+            export_dir = Path(export_dir)
+            cp_path = export_dir/'cellpose_masks'
+            cp_path.mkdir(parents=True, exist_ok=True)
+            for idx, r in self.df_ens.iterrows():
+                tifffile.imwrite(cp_path/f'{r.name}_class{cl}.tif', cp_masks[idx], compress=6)
+
+        self.cellpose_masks = cp_masks
+        return cp_masks
+
+    def show_cellpose_results(self, files=None, unc=True, unc_metric=None):
+        assert self.df_ens is not None, "Please run `get_ensemble_results` first."
+        df = self.df_ens
+        if files is not None: df = df.reset_index().set_index('file', drop=False).loc[files]
+        for _, r in df.iterrows():
+            imgs = []
+            imgs.append(_read_img(r.image_path)[:])
+            if 'dice_score' in r.index:
+                mask = _read_msk(r.mask_path, n_classes=self.n_classes)
+                _, comps = cv2.connectedComponents((mask==self.cellpose_export_class).astype('uint8'), connectivity=4)
+                imgs.append(label2rgb(comps, bg_label=0))
+                hastarget=True
+            else:
+                hastarget=False
+            imgs.append(label2rgb(self.cellpose_masks[r['index']], bg_label=0))
+            if unc: imgs.append(zarr.load(r.uncertainty_path))
+            plot_results(*imgs, df=r, hastarget=hastarget, unc_metric=unc_metric)
+
     def lr_find(self, files=None, **kwargs):
         files = files or self.files
         dls = self._get_dls(files)
         model = self._create_model()
         learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim])
-        if self.mpt: learn.to_fp16()
+        if self.mixed_precision_training: learn.to_fp16()
         sug_lrs = learn.lr_find(**kwargs)
         return sug_lrs, learn.recorder
 
-    def export_imagej_rois(self, output_folder='ImageJ_ROIs', **kwargs):
+    def export_imagej_rois(self, output_folder='ROI_sets', **kwargs):
         assert self.df_ens is not None, "Please run prediction first."
 
         output_folder = Path(output_folder)
         output_folder.mkdir(exist_ok=True, parents=True)
         for idx, r in progress_bar(self.df_ens.iterrows(), total=len(self.df_ens)):
             mask = np.argmax(zarr.load(r.softmax_path), axis=-1).astype('uint8')
-            #energy = zarr.load(r.energy_path)
             uncertainty = zarr.load(r.uncertainty_path)
             export_roi_set(mask, uncertainty, name=r.file, path=output_folder, ascending=False, **kwargs)
+
+    def export_cellpose_rois(self, output_folder='cellpose_ROI_sets', **kwargs):
+        output_folder = Path(output_folder)
+        output_folder.mkdir(exist_ok=True, parents=True)
+        for idx, r in progress_bar(self.df_ens.iterrows(), total=len(self.df_ens)):
+            mask = self.cellpose_masks[idx]
+            uncertainty = zarr.load(r.uncertainty_path)
+            export_roi_set(mask, uncertainty, instance_labels=True, name=r.file, path=output_folder, ascending=False, **kwargs)
 
     def clear_tmp(self):
         try:
@@ -628,6 +691,8 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          score_ensemble_results="Compare ensemble results (Intersection over the Union) to given segmentation masks.",
          show_ensemble_results="Show result of ensemble or `model_no`",
          load_ensemble="Get models saved at `path`",
+         get_cellpose_results='Get instance segmentation results using the cellpose integration',
+         show_cellpose_results='Show instance segmentation results from cellpose predictions',
          #compose_albumentations="Helper function to compose albumentations augmentations",
          #get_dls="Create datasets and dataloaders from files",
          #get_model="Get model architecture",
@@ -640,5 +705,6 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          #ood_save='Save OOD model to path',
          #ood_load='Load OOD model from path',
          export_imagej_rois='Export ImageJ ROI Sets to `ouput_folder`',
+         export_cellpose_rois='Export cellpose predictions to ImageJ ROI Sets in `ouput_folder`',
          clear_tmp="Clear directory with temporary files"
 )

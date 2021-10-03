@@ -36,16 +36,21 @@ def unzip(path, zip_file):
 
 # Cell
 #from https://stackoverflow.com/questions/12332975/installing-python-module-within-code
-def install_package(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+def install_package(package, version=None):
+    if version:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", f'{package}=={version}'])
+    else:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 # Cell
-def import_package(package):
+def import_package(package, version=None):
     try:
-        importlib.import_module(package)
+        module = importlib.import_module(package)
+        if version:
+            assert module.__version__==version
     except:
         print(f'Installing {package}. Please wait.')
-        install_package(package)
+        install_package(package, version)
     return importlib.import_module(package)
 
 # Cell
@@ -258,19 +263,26 @@ def calculate_roi_measures(*masks, iou_threshold=.5, **kwargs):
     return recall, precision, f1_score
 
 # Cell
-def export_roi_set(mask, intensity_image, name='RoiSet', path=Path('.'), ascending=True, min_pixel=0):
+def export_roi_set(mask, intensity_image=None, instance_labels=False, name='RoiSet', path=Path('.'), ascending=True, min_pixel=0):
     "EXPERIMENTAL: Export mask regions to imageJ ROI Set"
     roifile = import_package('roifile')
-    _, comps = cv2.connectedComponents(mask.astype('uint8'), connectivity=4)
 
-    props = skimage.measure.regionprops_table(comps, intensity_image, properties=('area', 'coords', 'mean_intensity'))
-    df_props = pd.DataFrame(props)
-    df_props = df_props[df_props.area>min_pixel].sort_values('mean_intensity', ascending=ascending).reset_index()
+    if not instance_labels:
+        _, mask = cv2.connectedComponents(mask.astype('uint8'), connectivity=4)
+
+    if intensity_image is not None:
+        props = skimage.measure.regionprops_table(mask, intensity_image, properties=('area', 'coords', 'mean_intensity'))
+        df_props = pd.DataFrame(props)
+        df_props = df_props[df_props.area>min_pixel].sort_values('mean_intensity', ascending=ascending).reset_index()
+    else:
+        props = skimage.measure.regionprops_table(mask, properties=('area', 'coords'))
+        df_props = pd.DataFrame(props).reset_index()
+        df_props['mean_intensity'] = 1.
 
     i = 1
     with zipfile.ZipFile(path/f'{name}.zip', mode='w') as myzip:
         for _, row in df_props.iterrows():
-            contours = skimage.measure.find_contours(comps==row['index']+1, level=0.5, fully_connected='low')
+            contours = skimage.measure.find_contours(mask==row['index']+1, level=0.5, fully_connected='low')
             for cont in contours:
                 roi_name = f'{i:04d}-{row.mean_intensity:3f}.roi'
                 points = np.array([cont[:,1]+0.5, cont[:,0]+0.5]).T
