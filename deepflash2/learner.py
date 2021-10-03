@@ -437,7 +437,7 @@ class EnsembleLearner(GetAttr):
         model = self._create_model()
         files_train, files_val = self.splits[i]
         dls = self._get_dls(files_train, files_val)
-        self.learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim], cbs=self.cbs)
+        self.learn = Learner(dls, model, metrics=self.metrics, wd=self.weight_decay, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim], cbs=self.cbs)
         self.learn.model_dir = self.ensemble_dir.parent/'.tmp'
         if self.mixed_precision_training: self.learn.to_fp16()
         print(f'Starting training for {name.name}')
@@ -647,7 +647,7 @@ class EnsembleLearner(GetAttr):
         files = files or self.files
         dls = self._get_dls(files)
         model = self._create_model()
-        learn = Learner(dls, model, metrics=self.metrics, wd=self.wd, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim])
+        learn = Learner(dls, model, metrics=self.metrics, wd=self.weight_decay, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim])
         if self.mixed_precision_training: learn.to_fp16()
         sug_lrs = learn.lr_find(**kwargs)
         return sug_lrs, learn.recorder

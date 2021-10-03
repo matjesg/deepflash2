@@ -1451,8 +1451,8 @@ class GUI(GetAttr):
             print('Please watch the logs below. The final results will be printed here.')
 
         sel = self.train.sb['train'].sel.value
-        self.el.set_n(self.n)
-        for i in range(1, self.n+1):
+        self.el.set_n(self.n_classes)
+        for i in range(1, self.n_classes+1):
             if (sel != 'ensemble') and (sel != f'model_{i}'): continue
             with out: print(f'Training of model {i}')
             if COLAB:
@@ -1465,7 +1465,7 @@ class GUI(GetAttr):
                     self.el.fit(i)
                     self.tmp.clear_output()
             with out:
-                print(f'Metrics for model {i} of {self.n}')
+                print(f'Metrics for model {i} of {self.n_classes}')
                 self.el.recorder[i].plot_metrics()
 
     def train_valid_run_clicked(self, b):
