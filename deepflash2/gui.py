@@ -3,7 +3,7 @@
 __all__ = ['GRID_COLS', 'set_css_in_cell_output', 'tooltip_css', 'ZipUpload', 'ItemsPerPage', 'BaseParamWidget',
            'BaseUI', 'PathSelector', 'PathDownloads', 'PathConfig', 'GTDataSB', 'GTEstSB', 'GTEstUI', 'TrainDataSB',
            'TrainModelSB', 'TrainValidSB', 'LRWidget', 'BasePopUpParamWidget', 'ParamWidget', 'MWWidget', 'TrainUI',
-           'PredInputSB', 'PredSB', 'PredUI', 'GUI']
+           'PredInputSB', 'PredSB', 'CellposeSB', 'PredUI', 'GUI']
 
 # Cell
 import os, sys, shutil, time, zipfile, urllib, subprocess
@@ -426,6 +426,7 @@ _dgt = {
     'sd'  : ('Sample Data', 'Sample data for demonstration and testing.'),
     'staple': ("STAPLE", "Simultaneous truth and performance level estimation (STAPLE)", "https://pubmed.ncbi.nlm.nih.gov/15250643/"),
     'mv'  :("Majority Voting", "Pixelwise majority voting to obtain the reference segmentation.", "https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1LabelVotingImageFilter.html"),
+    'majority_vote_undec': ("MV undecided", "If majority voting is undecided, set pixels to this class label.", "https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1LabelVotingImageFilter.html"),
 }
 
 # Cell
@@ -462,20 +463,27 @@ class GTDataSB:
         self.grid[3, 1:] = self.du.widget
 
 # Cell
-class GTEstSB:
+class GTEstSB(BaseParamWidget, GetAttr):
     'Layout for Grund Truth Estimation "Data" Section'
+    _default = 'config'
 
     #Hints
     txt = 'Select algorithm for ground truth estimation'
     hints = w.HTML(txt)
 
-    grid = w.GridspecLayout(4, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    params = {
+        'majority_vote_undec': w.IntText(layout= w.Layout(width='auto')),
+    }
+
+    grid = w.GridspecLayout(5, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
 
     #Labels
     grid[0, 0] = w.HTML(_html_wrap(*_dgt['staple']))
     grid[1, 0] = w.HTML(_html_wrap(*_dgt['mv']))
     grid[2, :] = w.HTML('<hr>')
-    grid[3, 0] = w.HTML('Downloads')
+    grid[3, 1:]= params['majority_vote_undec']
+    grid[3, 0] = w.HTML(_html_wrap(*_dgt['majority_vote_undec']))
+    grid[4, 0] = w.HTML('Downloads')
 
     #Run Staple
     staple = w.Button(description='Run', layout=w.Layout(width='auto'),
@@ -492,10 +500,11 @@ class GTEstSB:
     #Final Widget
     widget = w.VBox([hints,grid])
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, **kwargs):
+        super().__init__(**kwargs)
         path = path or Path('.')
         self.down  = PathDownloads(path, 'Select', tooltip='Click to download file or directory')
-        self.grid[3, 1:] = self.down.button
+        self.grid[4, 1:] = self.down.button
 
 # Cell
 class GTEstUI(BaseUI):
@@ -509,7 +518,7 @@ class GTEstUI(BaseUI):
         #Sidebar
         self.sb = {
             'data':GTDataSB(self.path),
-            'gt':GTEstSB(self.path)
+            'gt':GTEstSB(self.path, config=self.config)
         }
 
         #Sidebar Accordion
@@ -533,14 +542,14 @@ _dtrain = {
     'img' : ('Image Folder*', 'One folder containing all training images.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'msk' : ('Mask Folder*', 'One folder containing all segmentation masks. We highly recommend using ground truth estimation from multiple experts.'),
     'n_classes': ('No. of Classes', 'Number of classes: e.g., 2 for binary segmentation (foreground and background class).'),
-    'il'  : ('Instance Labels', 'Are you providing instance labels (class-aware and instance-aware)?'),
+    'instance_labels'  : ('Instance Labels', 'Are you providing instance labels (class-aware and instance-aware)?'),
     'up'  : ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain the correct folder structure.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'sd'  : ('Sample Data', 'Get sample data for demonstration and testing.'),
     'pretrained': ('Pretrained*', 'Select pretrained weights from the model libray or "new" to use an untrained model (random initialization).', 'https://matjesg.github.io/deepflash2/model_library.html'),
-    'n'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
+    'n_models'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
     's'   : ('Select', 'Train all models (ensemble) or (re-)train specific model.'),
-    'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
-    'base_lr': ('Learning Rate', '''Base learning rate for fine-tuning the model. The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset''', 'https://docs.fast.ai/callback.schedule.html#Learner.fine_tune'),
+    #'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
+    #'base_lr': ('Learning Rate', '''Base learning rate for fine-tuning the model. The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset''', 'https://docs.fast.ai/callback.schedule.html#Learner.fine_tune'),
     'lrf' : ('LR Finder', 'Click Open to get more information.'),
     'mw'  : ('Loss Function', 'Click "Customize" to get more information.'),
     'ts'  : ('Train Settings', 'Click "Customize" to get more information.'),
@@ -564,11 +573,11 @@ class TrainDataSB(BaseParamWidget, GetAttr):
 
     params = {
         'n_classes': w.IntSlider(value=2, min=2, max=10, step=1, layout=w.Layout(width='auto', min_width='1px')),
-        'il':w.ToggleButtons(options=[('Yes', True), ('No', False)],tooltips=['You are providing instance labels (class-aware and instance-aware)',
+        'instance_labels':w.ToggleButtons(options=[('Yes', True), ('No', False)],tooltips=['You are providing instance labels (class-aware and instance-aware)',
                                                                                'You are not providing only class-aware labels']),
     }
 
-    params['il'].style.button_width = '50px'
+    params['instance_labels'].style.button_width = '50px'
     grid = w.GridspecLayout(9, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
 
     #Labels
@@ -576,8 +585,8 @@ class TrainDataSB(BaseParamWidget, GetAttr):
     grid[1, 0] = w.HTML(_html_wrap(*_dtrain['msk']))
     grid[2, 0] = w.HTML(_html_wrap(*_dtrain['n_classes']))
     grid[2, 1:]= params['n_classes']
-    grid[3, 0] = w.HTML(_html_wrap(*_dtrain['il']))
-    grid[3, 1:]= params['il']
+    grid[3, 0] = w.HTML(_html_wrap(*_dtrain['instance_labels']))
+    grid[3, 1:]= params['instance_labels']
     grid[5, :] = w.HTML('<hr>')
     grid[6, 0] = w.HTML(_html_wrap(*_dtrain['up']))
     grid[7, 0] = w.HTML(_html_wrap(*_dtrain['sd']))
@@ -618,60 +627,60 @@ class TrainModelSB(BaseParamWidget, GetAttr):
 
     params = {
         #'pretrained': w.Dropdown(options=_pretrained, continuous_update=True, layout=w.Layout(width='auto', min_width='1px')),
-        'n': w.IntSlider(min=1, max=5, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
-        'n_iter':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
-        'base_lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px'))
+        'n_models': w.IntSlider(min=1, max=5, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
+        #'n_iter':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
+        #'base_lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px'))
     }
 
     sel = w.Dropdown(options=[],continuous_update=True, layout=w.Layout(width='auto', min_width='1px'))
 
     #Grid
-    grid = w.GridspecLayout(10, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(8, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #grid[0, 0] = w.Label('Model Arch')
     #grid[0, 0] = w.HTML(_html_wrap(*_dtrain['pretrained']))
     #grid[0, 1:]= params['pretrained']
-    grid[0, 0] = w.HTML(_html_wrap(*_dtrain['n']))
-    grid[0, 1:]= params['n']
-    grid[1, 0] = w.HTML(_html_wrap(*_dtrain['n_iter']))
-    grid[1, 1:]= params['n_iter']
-    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['s']))
-    grid[2, 1:]= sel
+    grid[0, 0] = w.HTML(_html_wrap(*_dtrain['n_models']))
+    grid[0, 1:]= params['n_models']
+    #grid[1, 0] = w.HTML(_html_wrap(*_dtrain['n_iter']))
+    #grid[1, 1:]= params['n_iter']
+    grid[1, 0] = w.HTML(_html_wrap(*_dtrain['s']))
+    grid[1, 1:]= sel
     #grid[4, 0] = w.Label('MAY TAKE SOME HOURS')
-    grid[4, :] = w.HTML('<hr>')
-    grid[5, 0] = w.HTML(_html_wrap(*_dtrain['base_lr']))
-    grid[5, 1:]= params['base_lr']
-    grid[6, 0] = w.HTML(_html_wrap(*_dtrain['lrf']))
-    grid[7, 0] = w.HTML(_html_wrap(*_dtrain['mw']))
-    grid[8, 0] = w.HTML(_html_wrap(*_dtrain['ts']))
-    grid[9, 0] = w.HTML(_html_wrap(*_dtrain['cfg_save']))
+    grid[3, :] = w.HTML('<hr>')
+    #grid[5, 0] = w.HTML(_html_wrap(*_dtrain['base_lr']))
+    #grid[5, 1:]= params['base_lr']
+    grid[4, 0] = w.HTML(_html_wrap(*_dtrain['lrf']))
+    grid[5, 0] = w.HTML(_html_wrap(*_dtrain['mw']))
+    grid[6, 0] = w.HTML(_html_wrap(*_dtrain['ts']))
+    grid[7, 0] = w.HTML(_html_wrap(*_dtrain['cfg_save']))
 
     #Run
     run = w.Button(description='Start Training', layout=w.Layout(width='auto'))
-    grid[3, 1:] = run
+    grid[2, 1:] = run
 
     #LR Finder
     open_lrfinder = w.Button(description='Open', layout=w.Layout(width='auto'))
-    grid[6, 1:] = open_lrfinder
+    grid[4, 1:] = open_lrfinder
 
     #Custom Mask Weights
     open_mw = w.Button(description='Customize', layout=w.Layout(width='auto'))
-    grid[7, 1:] = open_mw
+    grid[5, 1:] = open_mw
 
     #Custom Data Aug
     open_par = w.Button(description='Customize', layout=w.Layout(width='auto'))
-    grid[8, 1:] = open_par
+    grid[6, 1:] = open_par
 
     #Custom Data Aug
     cfg_save = w.Button(description='Save Config', layout=w.Layout(width='auto'))
-    grid[9, 1:] = cfg_save
+    grid[7, 1:] = cfg_save
 
     #Final Widget
     widget = w.VBox([hints,grid])
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.sel.options = _get_model_list(self.config.n)
-        self.params['n'].observe(self.sel_update, 'value')
+        self.sel.options = _get_model_list(self.config.n_models)
+        self.params['n_models'].observe(self.sel_update, 'value')
 
     def sel_update(self, change):
         self.sel.options = _get_model_list(change['new'])
@@ -725,7 +734,7 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     def __init__(self, path=None, **kwargs):
         super().__init__(**kwargs)
         path = path or Path('.')
-        self.sel.options = _get_model_list(self.config.n)
+        self.sel.options = _get_model_list(self.config.n_models)
         self.down  = PathDownloads(path, 'Select', tooltip='Click to download models, predictions or validation results')
         self.grid[7, 1:] = self.down.button
         self.ens  = PathSelector(path, 'Select')
@@ -785,12 +794,15 @@ class BasePopUpParamWidget(BaseParamWidget):
 
 # Cell
 _dparam= {
+    'n_models'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
+    'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
+    'base_lr': ('Learning Rate', '''Base learning rate for fine-tuning the model. The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset''', 'https://docs.fast.ai/callback.schedule.html#Learner.fine_tune'),
     'arch' : ('Model Architecture', 'The architecture of the deep learning model.', 'https://matjesg.github.io/deepflash2/models.html'),
     'encoder_name' : ('Encoder', 'Encoders for architectures from Segmentation Models Pytorch.', 'https://github.com/qubvel/segmentation_models.pytorch#encoders-'),
     'encoder_weights' : ('Encoder Weights', 'Pretrained encoders weights for architectures from Segmentation Models Pytorch.', 'https://github.com/qubvel/segmentation_models.pytorch#encoders-'),
-    'bs' : ('Mini-Batch Size', 'The number of samples that will be propagated through the network during one iteration; 4 works best in our experiements; 4-8 works good for mixed precision training'),
-    'mpt'   : ('Mixed Precision Training', 'Mixed Precision Training', 'https://docs.fast.ai/callback.fp16.html'),
-    'wd'  : ('Weight Decay', 'Weight Decay.', 'https://arxiv.org/abs/1711.05101'),
+    'batch_size' : ('Mini-Batch Size', 'The number of samples that will be propagated through the network during one iteration; 4 works best in our experiements; 4-8 works good for mixed precision training'),
+    'mixed_precision_training'   : ('Mixed Precision Training', 'Mixed Precision Training', 'https://docs.fast.ai/callback.fp16.html'),
+    'weight_decay'  : ('Weight Decay', 'Weight Decay.', 'https://arxiv.org/abs/1711.05101'),
     'optim'  : ('Optimizer', 'Optimizer.', 'https://docs.fast.ai/optimizer.html'),
     'sample_mult' : ('Sample Multiplier', 'Defines how many are tiles are sampled from each image per epoch. Set to 0 for auto-mode.'),
     'flip'  : ('Flip', 'Randomly flip a training image.', 'https://matjesg.github.io/deepflash2/data.html#Data-augmentation'),
@@ -811,13 +823,16 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     'Widget for custom training parameters'
     _default = 'config'
     params = {
+        #'n_models': w.IntSlider(min=1, max=5, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
+        'n_iter':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
+        'base_lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px')),
         'arch' : w.Dropdown(options=ARCHITECTURES, layout=w.Layout(width='auto', min_width='1px')),
         'encoder_name' : w.Dropdown(options=ENCODERS, layout=w.Layout(width='auto', min_width='1px')),
         'encoder_weights' : w.Dropdown(options=['imagenet'],layout=w.Layout(width='auto', min_width='1px'), continuous_update=True),
-        'bs':w.IntSlider(min=2, max=32, step=2,layout=w.Layout(width='auto', min_width='1px')),
-        'mpt': w.ToggleButtons(options=[('Yes', True), ('No', False)],
+        'batch_size':w.IntSlider(min=2, max=32, step=2,layout=w.Layout(width='auto', min_width='1px')),
+        'mixed_precision_training': w.ToggleButtons(options=[('Yes', True), ('No', False)],
                               tooltips=['Enable Mixed-Precision Training','Disable Mixed-Precision Training']),
-        'wd':w.FloatText(min=0, max=1,layout=w.Layout(width='auto', min_width='1px')),
+        'weight_decay':w.FloatText(min=0, max=1,layout=w.Layout(width='auto', min_width='1px')),
         'optim':w.Dropdown(options=_optim_dict.keys(), layout=w.Layout(width='auto', min_width='1px')),
         'sample_mult' : w.IntText(layout= w.Layout(width='auto')),
         'flip':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
@@ -832,7 +847,7 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     }
 
 
-    params['mpt'].style.button_width = '25px'
+    params['mixed_precision_training'].style.button_width = '25px'
     params['flip'].style.button_width = '25px'
 
     #Close Button
@@ -843,13 +858,13 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     lbl = w.Label('Settings are saved automatically')
 
     #Grid
-    grid = w.GridspecLayout(18, 2, width='400px',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(20, 2, width='400px',  grid_gap="0px", align_items='center')
     i=0
     for k in params:
         grid[i, 0] = w.HTML(_html_wrap(*_dparam[k]))
         grid[i, 1] = params[k]
         i += 1
-        if i==8:
+        if i==10:
             grid[i, :] = w.HTML('<hr>')
             i += 1
             grid[i, :] = w.HTML('<b>Data Augmentation</b>')
@@ -863,9 +878,13 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
         self.widget.set_title(0, 'Training Parameters')
         self.widget.layout.display = "none"
         self.params['encoder_name'].observe(self.on_encoder_change, 'value')
+        #self.params['n_models'].observe(self.sel_update, 'value')
 
     def on_encoder_change(self, change):
         self.params['encoder_weights'].options = get_pretrained_options(change['new'])
+
+    #def sel_update(self, change):
+    #    self.sel.options = _get_model_list(change['new'])
 
 # Cell
 _dmw= {
@@ -940,7 +959,7 @@ class TrainUI(BaseUI):
         self.sb['train'].open_mw.on_click(self.open_mw)
         self.sb['train'].open_par.on_click(self.open_par)
         #Update model options from train in valid
-        self.sb['train'].params['n'].observe(self.sb['valid'].sel_update, 'value')
+        self.sb['train'].params['n_models'].observe(self.sb['valid'].sel_update, 'value')
 
         #Sidebar Accordion
         self.sb_acc = w.Accordion(children=[x.widget for x in self.sb.values()], layout=w.Layout(grid_area='sidebar'))
@@ -968,9 +987,6 @@ class TrainUI(BaseUI):
              **{k:w.Output() for k in self.sb.keys()}
         }
         self.main_box = w.VBox(list(self.main.values()))
-
-
-
         if hide: self.hide()
 
     def set_config(self, config):
@@ -999,6 +1015,9 @@ _dpred = {
     'min_pixel_export': ('Minimum Size', 'Minimumen ROI size (number of pixels) to be included in ImageJ export'),
     'imagej'  : ('ImageJ Export', 'Export predicted masks to ImageJ ROI sets. '),
     'cache'  : ('Clear Cache', 'Delete cached files used for ensembling and visualization. This will not affect the final results.'),
+    'cellpose_export_class': ('Class', 'Select class for instance segmentation. Repeat for each class.'),
+    'cellpose_model' :  ('Cellpose model', 'Pretrained cellpose model to be used on the softmax predictons of deepflash2. Try nuclei model first.', 'https://cellpose.readthedocs.io/en/latest/settings.html?highlight=diameter#cytoplasm-model-cyto'),
+    'cellpose_diameter': ('ROI diameter', 'ROI diameter in pixels. 0 for automated estimation.', 'https://cellpose.readthedocs.io/en/latest/settings.html?highlight=diameter#diameter'),
 }
 
 # Cell
@@ -1092,10 +1111,61 @@ class PredSB(BaseParamWidget, GetAttr):
         self.grid[5, 1:] = self.down.button
 
 # Cell
+class CellposeSB(BaseParamWidget, GetAttr):
+    'Layout for instance separation with cellpose'
+    _default = 'config'
+
+    #Hints
+    txt = 'Get instance segmentations'
+    hints = w.Label(txt)
+
+    params = {
+        'cellpose_export_class':w.IntText(layout= w.Layout(width='auto')),
+        'cellpose_model': w.Dropdown(options=['nuclei', 'cyto', 'cyto2'], layout=w.Layout(width='auto', min_width='1px')),
+        'cellpose_diameter' : w.IntText(layout= w.Layout(width='auto')),
+        'min_pixel_export' : w.IntText(layout= w.Layout(width='auto')),
+    }
+
+    #Grid
+    grid = w.GridspecLayout(8, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    #grid[0, 0] = w.HTML(_html_wrap(*_dpred['s_pred']))
+    grid[0, 0] = w.HTML(_html_wrap(*_dpred['cellpose_export_class']))
+    grid[0, 1:] = params['cellpose_export_class']
+    grid[1, 0] = w.HTML(_html_wrap(*_dpred['cellpose_model']))
+    grid[1, 1:] = params['cellpose_model']
+    grid[2, 0] = w.HTML(_html_wrap(*_dpred['cellpose_diameter']))
+    grid[2, 1:] = params['cellpose_diameter']
+    grid[3, 0] = w.HTML(_html_wrap(*_dpred['min_pixel_export']))
+    grid[3, 1:] = params['min_pixel_export']
+    grid[5, :] = w.HTML('<hr>')
+    grid[6, 0] = w.HTML(_html_wrap(*_dpred['imagej']))
+    grid[7, 0] = w.HTML('Downloads')
+    #grid[6, 0] = w.HTML(_html_wrap(*_dpred['cache']))
+
+    #Res
+    run = w.Button(description='Run Cellpose*', layout=w.Layout(width='auto'))
+    grid[4, 1:] = run
+
+    #Res
+    rois = w.Button(description='Export ROIs', layout=w.Layout(width='auto'))
+    grid[6, 1:] = rois
+
+    #Final Widget
+    widget = w.VBox([hints,grid])
+
+    def __init__(self, path=None, **kwargs):
+        super().__init__(**kwargs)
+        path = path or Path('.')
+        self.down  = PathDownloads(path, 'Select', tooltip='Click to download')
+        self.grid[7, 1:] = self.down.button
+
+# Cell
 class PredUI(BaseUI):
     'UI for prediction of new data'
 
-    sections = ['1 - Data and Ensemble', '2 - Prediction and Quality Control']
+    sections = ['1 - Data and Model Ensemble',
+                '2 - Prediction and Quality Control',
+                '3 - Cellpose Instance Segmentation']
 
     def __init__(self, hide=False, **kwargs):
         super().__init__(**kwargs)
@@ -1104,6 +1174,7 @@ class PredUI(BaseUI):
         self.sb = {
             'data':PredInputSB(path=self.path, config=self.config),
             'pred':PredSB(path=self.path, config=self.config),
+            'cellpose':CellposeSB(path=self.path, config=self.config),
         }
 
         #Sidebar Accordion
@@ -1118,6 +1189,7 @@ class PredUI(BaseUI):
             'ens':self.sb['data'].ens.dialog,
             'msk':self.sb['data'].msk.dialog,
             'down':self.sb['pred'].down.dialog,
+            'down2':self.sb['cellpose'].down.dialog,
              **{k:w.Output() for k in self.sb.keys()}
         }
         self.main_box = w.VBox(list(self.main.values()))
@@ -1153,7 +1225,7 @@ class GUI(GetAttr):
     def __init__(self, path=Path('.'), reinit=False):
         self.config = Config()
         self.base_path = path.resolve()
-        self.config.proj_dir = str(self.base_path/self.proj_dir) if self.proj_dir=='deepflash2' else self.proj_dir
+        self.config.project_dir = str(self.base_path/self.project_dir) if self.project_dir=='deepflash2' else self.project_dir
 
         #Project Dir
         self.proj = PathSelector(self.base_path, 'Select Project Folder', tooltip='Project Folder \ndefault: <deepflash2>')
@@ -1165,7 +1237,7 @@ class GUI(GetAttr):
             v.on_click(self.cat_clicked)
 
         #Categories
-        self.gt = GTEstUI(hide=True, path=self.proj_path)
+        self.gt = GTEstUI(hide=True, path=self.proj_path, config=self.config)
         self.train = TrainUI(hide=True,path=self.proj_path, config=self.config)
         self.pred = PredUI(hide=True, path=self.proj_path, config=self.config)
         self.cat = {'gt':self.gt, 'train':self.train, 'pred':self.pred}
@@ -1195,6 +1267,8 @@ class GUI(GetAttr):
         self.pred.sb['data'].msk.button_select.on_click(self.pred_data_msk_save_clicked)
         self.pred.sb['pred'].run.on_click(self.pred_run_clicked)
         self.pred.sb['pred'].rois.on_click(self.pred_rois_clicked)
+        self.pred.sb['cellpose'].run.on_click(self.cellpose_run_clicked)
+        self.pred.sb['cellpose'].rois.on_click(self.cellpose_rois_clicked)
         #self.pred.sb['pred'].cache.on_click(self.pred_cache_clicked)
 
         # Init Project
@@ -1225,12 +1299,13 @@ class GUI(GetAttr):
 
     @property
     def proj_path(self):
-        return Path(self.proj_dir)
+        return Path(self.project_dir)
 
     def _set_download_dirs(self):
         self.gt.sb['gt'].down.set_path(self.proj_path/self.gt_dir)
         self.train.sb['valid'].down.set_path(self.proj_path/self.train_dir)
         self.pred.sb['pred'].down.set_path(self.proj_path/self.pred_dir)
+        self.pred.sb['cellpose'].down.set_path(self.proj_path/self.pred_dir)
         #Models dir
         self.pred.sb['data'].ens.path = self.proj_path/self.train_dir/self.ens_dir
 
@@ -1252,7 +1327,7 @@ class GUI(GetAttr):
 
     def set_project_dir(self, b):
         self.proj.button.button_style=''
-        self.config.proj_dir = str(self.proj.path)
+        self.config.project_dir = str(self.proj.path)
         self._set_selection_dirs()
         self._init_proj()
 
@@ -1376,8 +1451,8 @@ class GUI(GetAttr):
             print('Please watch the logs below. The final results will be printed here.')
 
         sel = self.train.sb['train'].sel.value
-        self.el.set_n(self.n)
-        for i in range(1, self.n+1):
+        self.el.set_n(self.n_classes)
+        for i in range(1, self.n_classes+1):
             if (sel != 'ensemble') and (sel != f'model_{i}'): continue
             with out: print(f'Training of model {i}')
             if COLAB:
@@ -1390,7 +1465,7 @@ class GUI(GetAttr):
                     self.el.fit(i)
                     self.tmp.clear_output()
             with out:
-                print(f'Metrics for model {i} of {self.n}')
+                print(f'Metrics for model {i} of {self.n_classes}')
                 self.el.recorder[i].plot_metrics()
 
     def train_valid_run_clicked(self, b):
@@ -1505,9 +1580,9 @@ class GUI(GetAttr):
                 print(f'Saving scoring results to {export_dir}')
                 self.el_pred.df_ens.to_csv(export_dir/f'scored_prediction.csv', index=False)
                 self.el_pred.df_ens.to_excel(export_dir/f'scored_prediction.xlsx')
-                items = {r.file:r.mean_energy for _, r in self.el_pred.df_ens.iterrows()}
-                print(f'A lower mean_energy score indicates difficult or anomalous data.')
-                ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_by='Energy Score', unc_metric='mean_energy')
+                items = {r.file:r.mean_uncertainty for _, r in self.el_pred.df_ens.iterrows()}
+                print(f'A high uncertainty score indicates ambiguo or out-of-distribution data.')
+                ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_index=1, srt_by='Uncertainty score', unc_metric='mean_uncertainty')
                 display(ipp.widget)
                 #items = {x.name:x.name for x in self.el_pred.files}
                 #ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
@@ -1515,11 +1590,48 @@ class GUI(GetAttr):
 
     def pred_rois_clicked(self, b):
         export_dir = self.pred.sb['pred'].down.path
-        output_folder=Path(export_dir)/'ImageJ_ROIs'
+        output_folder=Path(export_dir)/'ROI_sets'
         out = self.pred.main['pred']
         with out:
             print('Exporting ROIs to ImageJ ROI Sets...')
             self.el_pred.export_imagej_rois(output_folder, min_pixel=self.min_pixel_export)
+            print(f'Saved ROIs to {output_folder}. Click on `Select` to to download.')
+
+    def cellpose_run_clicked(self, b, show=True):
+        out = self.pred.main['cellpose']
+        out.clear_output()
+        export_dir = self.pred.sb['cellpose'].down.path
+
+        with out:
+            assert type(self.el_pred)==EnsembleLearner, 'Please load data first!'
+            print('Starting cellpose prediction. Please wait...')
+
+        if COLAB:
+            with colab.output.temporary():
+                print('Temporary Logs:')
+                self.el_pred.get_cellpose_results(export_dir=export_dir)
+        else:
+            with self.tmp:
+                print('Temporary Logs:')
+                self.el_pred.get_cellpose_results(export_dir=export_dir)
+                self.tmp.clear_output()
+        if show:
+            with out:
+                items = {r.file:r.mean_uncertainty for _, r in self.el_pred.df_ens.iterrows()}
+                print(f'A high uncertainty score indicates ambiguo or out-of-distribution data.')
+                ipp = ItemsPerPage(self.proj_path, self.el_pred.show_cellpose_results, items=items, srt_index=1, srt_by='Uncertainty score', unc_metric='mean_uncertainty')
+                display(ipp.widget)
+                #items = {x.name:x.name for x in self.el_pred.files}
+                #ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
+                #display(ipp.widget)
+
+    def cellpose_rois_clicked(self, b):
+        export_dir = self.pred.sb['cellpose'].down.path
+        output_folder=Path(export_dir)/'cellpose_ROI_sets'
+        out = self.pred.main['cellpose']
+        with out:
+            print('Exporting cellpose ROIs to ImageJ ROI Sets...')
+            self.el_pred.export_cellpose_rois(output_folder)
             print(f'Saved ROIs to {output_folder}. Click on `Select` to to download.')
 
     def pred_cache_clicked(self, b):
