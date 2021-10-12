@@ -74,7 +74,7 @@ class Config:
     optim:str = 'Adam'
     loss:str = 'CrossEntropyDiceLoss'
     n_iter:int = 2500
-    sample_mult:int = 0
+    sample_mult:int = 1
 
     # Validation and Prediction Settings
     tta:bool = True
