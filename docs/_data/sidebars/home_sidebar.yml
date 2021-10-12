@@ -13,9 +13,6 @@ entries:
       title: Tutorial
       url: tutorial.html
     - output: web,pdf
-      title: Model Library
-      url: model_library.html
-    - output: web,pdf
       title: Additional Information
       url: add_information.html
       subfolders:

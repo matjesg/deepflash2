@@ -101,10 +101,6 @@ All docker containers are configured to start a jupyter server. **deepflash2** n
 
 For more information on how to run docker see [docker orientation and setup](https://docs.docker.com/get-started/) and [fastai docker](https://github.com/fastai/docker-containers).
 
-## Model Library
-
-We provide a model library with pretrained model weights. Visit our [model library documentation](https://matjesg.github.io/deepflash2/model_library.html) for information on the datasets of the pretrained models.
-
 ## Creating segmentation masks with Fiji/ImageJ
 
 If you don't have labelled training data available, you can use this [instruction manual](https://github.com/matjesg/DeepFLaSH/raw/master/ImageJ/create_maps_howto.pdf) for creating segmentation maps.

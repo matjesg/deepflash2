@@ -2,7 +2,6 @@
   "deepflash2": {
     "Getting Started": "/", 
     "Tutorial" : "tutorial.html",
-    "Model Library": "model_library.html",
     "Additional Information": "add_information.html",
     "": {
         "Legacy Version" : {
