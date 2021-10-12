@@ -452,7 +452,7 @@ class EnsembleLearner(GetAttr):
         self.recorder[i]=self.learn.recorder
 
     def fit_ensemble(self, n_iter, skip=False, **kwargs):
-        for i in range(1, self.n+1):
+        for i in range(1, self.n_models+1):
             if skip and (i in self.models): continue
             self.fit(i, n_iter,  **kwargs)
 
