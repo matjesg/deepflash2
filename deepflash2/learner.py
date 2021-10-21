@@ -74,7 +74,7 @@ class Config:
     optim:str = 'Adam'
     loss:str = 'CrossEntropyDiceLoss'
     n_iter:int = 2500
-    sample_mult:int = 1
+    sample_mult:int = 0
 
     # Validation and Prediction Settings
     tta:bool = True
@@ -355,7 +355,7 @@ class EnsembleLearner(GetAttr):
         self.recorder = {}
         self._set_splits()
         self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, stats=self.stats, n_classes=self.n_classes,
-                                    sample_mult=self.sample_mult, verbose=0)
+                                    sample_mult=self.sample_mult if self.sample_mult>0 else None, verbose=0)
         self.stats = stats or self.ds.stats
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None

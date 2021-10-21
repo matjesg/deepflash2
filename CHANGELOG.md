@@ -2,6 +2,20 @@
 
 <!-- do not remove -->
 
+## 0.1.3
+
+### New Features
+
+- Adding tifffile imread ([#13](https://github.com/matjesg/deepflash2/pull/13)), thanks to [@matjesg](https://github.com/matjesg)
+  - Closes #12
+
+- Multichannel tiffs are imported as single channel greyscale when imported via ui ([#12](https://github.com/matjesg/deepflash2/issues/12))
+  - Problem: .tiff images are with shape z,c,y,x = 1,4,1024,2048 are selected in the user deepflash google colab user interface. Image preview only shows first channel. After inspecting the image import, I saw, that the tiffile has dimensions 1024x2048 after import.
+
+Proposed solution: Images may be imported with tifffile.imread instead of imageio.imread. Here, the channel dimensions are preserved.
+
+
+
 ## 0.1.2
 
 ### New Features

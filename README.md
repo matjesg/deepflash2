@@ -79,14 +79,14 @@ You can use **deepflash2** by using [Google Colab](colab.research.google.com). Y
 You can install **deepflash2**  on your own machines with conda (highly recommended):
 
 ```bash
-conda install -c fastai -c pytorch -c matjesg deepflash2 
+conda install -c fastchan -c matjesg deepflash2 
 ```
 To install with pip, use
 
 ```bash
 pip install deepflash2
 ```
-If you install with pip, you should install PyTorch first by following the PyTorch [installation instructions](https://pytorch.org/get-started/locally/).
+If you install with pip, you should install PyTorch first by following the installation instructions of [pytorch](https://pytorch.org/get-started/locally/) or [fastai](https://docs.fast.ai/#Installing).
 
 ## Using Docker
 
