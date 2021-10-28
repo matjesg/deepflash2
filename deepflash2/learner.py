@@ -4,6 +4,7 @@ __all__ = ['Config', 'energy_score', 'EnsemblePredict', 'EnsembleLearner']
 
 # Cell
 import shutil, gc, joblib, json, zarr, numpy as np, pandas as pd
+import time
 import tifffile, cv2
 import torch, torch.nn as nn, torch.nn.functional as F
 from torch.utils.data import DataLoader
@@ -25,6 +26,7 @@ from fastai import optimizer
 from fastai.torch_core import TensorImage
 from fastai.learner import Learner
 from fastai.callback.tracker import SaveModelCallback
+from fastai.callback.progress import CSVLogger
 from fastai.data.core import DataLoaders
 from fastai.data.transforms import get_image_files, get_files
 from fastai.vision.augment import Brightness, Contrast, Saturation
@@ -437,7 +439,16 @@ class EnsembleLearner(GetAttr):
         model = self._create_model()
         files_train, files_val = self.splits[i]
         dls = self._get_dls(files_train, files_val)
-        self.learn = Learner(dls, model, metrics=self.metrics, wd=self.weight_decay, loss_func=self.loss_fn, opt_func=_optim_dict[self.optim], cbs=self.cbs)
+        log_name = f'model{i}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+        log_dir = self.ensemble_dir/'logs'
+        log_dir.mkdir(exist_ok=True, parents=True)
+        cbs = self.cbs.append(CSVLogger(fname=log_dir/log_name))
+        self.learn = Learner(dls, model,
+                             metrics=self.metrics,
+                             wd=self.weight_decay,
+                             loss_func=self.loss_fn,
+                             opt_func=_optim_dict[self.optim],
+                             cbs=self.cbs)
         self.learn.model_dir = self.ensemble_dir.parent/'.tmp'
         if self.mixed_precision_training: self.learn.to_fp16()
         print(f'Starting training for {name.name}')

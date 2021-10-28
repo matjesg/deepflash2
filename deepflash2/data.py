@@ -415,17 +415,18 @@ class RandomTileDataset(BaseDataset):
     Pytorch Dataset that creates random tiles with augmentations from the input images.
     """
     n_inp = 1
-    def __init__(self, *args, sample_mult=None, flip=True, rotation_range_deg=(0, 360), scale_range=(0, 0), albumentations_tfms=[A.RandomGamma()], **kwargs):
+    def __init__(self, *args, sample_mult=None, flip=True, rotation_range_deg=(0, 360), scale_range=(0, 0),
+                 albumentations_tfms=[A.RandomGamma()], min_length=400, **kwargs):
         super().__init__(*args, **kwargs)
         store_attr('sample_mult, flip, rotation_range_deg, scale_range, albumentations_tfms')
 
         # Sample mulutiplier: Number of random samplings from augmented image
         if self.sample_mult is None:
-            tile_shape = np.array(self.tile_shape)-np.array(self.padding)
-            msk_shape = np.array(self.get_data(max_n=1)[0].shape[:-1])
+            #tile_shape = np.array(self.tile_shape)-np.array(self.padding)
+            #msk_shape = np.array(self.get_data(max_n=1)[0].shape[:-1])
             #msk_shape = np.array(lbl.shape[-2:])
-            self.sample_mult = int(np.product(np.floor(msk_shape/tile_shape)))
-
+            #sample_mult = int(np.product(np.floor(msk_shape/tile_shape)))
+            self.sample_mult = max(1, min_length//len(self.files))
 
         tfms = self.albumentations_tfms
         if self.normalize:
