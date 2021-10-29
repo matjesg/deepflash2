@@ -219,8 +219,11 @@ def get_instance_segmentation_metrics(a, b, is_binary=False, thresholds=None, **
     Computes instance segmentation metric based on cellpose/stardist implementation.
     https://cellpose.readthedocs.io/en/latest/api.html#cellpose.metrics.average_precision
     '''
-    check_cellpose_installation()
-    from cellpose import metrics
+    try:
+        from cellpose import metrics
+    except:
+        check_cellpose_installation()
+        from cellpose import metrics
 
     # Find connected components in binary mask
     if is_binary:
