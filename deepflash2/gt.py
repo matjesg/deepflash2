@@ -153,7 +153,6 @@ class GTEstimator(GetAttr):
         from IPython.display import Markdown, display
         if not files: files = list(t.masks.keys())[:max_n]
         for f in files:
-            display(Markdown('---'))
             fig, ax = plt.subplots(ncols=2, figsize=figsize, **kwargs)
             # GT
             msk_show(ax[0], self.gt[method][f], f'{method} (binary mask)', cbar='', cmap=self.cmap)
@@ -174,3 +173,4 @@ class GTEstimator(GetAttr):
             plt.tight_layout()
             plt.show()
             display(plt_df)
+            display(Markdown('---'))

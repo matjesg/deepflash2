@@ -32,7 +32,6 @@ try:
     from google import colab
     COLAB = True
     from google.colab import data_table
-    data_table.enable_dataframe_formatter()
 except ImportError:
     COLAB = False
 
@@ -1403,7 +1402,10 @@ class GUI(GetAttr):
             print(f'- {b.name} similiarity results are saved to folder: {self.gt_dir}.')
             print(f'- You can download masks and results in the "Downloads" Section.')
             display(self.gt_to_train)
-            if COLAB: data_table.DataTable(self.gt_est.df_res, include_index=False, num_rows_per_page=10)
+            if COLAB:
+                data_table.enable_dataframe_formatter()
+                display(data_table.DataTable(self.gt_est.df_res, include_index=False, num_rows_per_page=10))
+                data_table.disable_dataframe_formatter()
             display(d.Markdown('---'))
 
             items = {x:x for x in self.gt_est.masks.keys()}
