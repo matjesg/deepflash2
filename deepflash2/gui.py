@@ -1404,7 +1404,10 @@ class GUI(GetAttr):
             display(self.gt_to_train)
             if COLAB:
                 data_table.enable_dataframe_formatter()
+                print(f'- Data Table Test')
                 display(data_table.DataTable(self.gt_est.df_res, include_index=False, num_rows_per_page=10))
+                print(f'- Data Table Test 2')
+                display(self.gt_est.df_res)
                 data_table.disable_dataframe_formatter()
             display(d.Markdown('---'))
 

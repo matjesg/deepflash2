@@ -151,7 +151,7 @@ class GTEstimator(GetAttr):
 
     def show_gt(self, method='STAPLE', max_n=6, files=None, figsize=(15,7), **kwargs):
         from IPython.display import Markdown, display
-        if not files: files = list(t.masks.keys())[:max_n]
+        if not files: files = list(self.masks.keys())[:max_n]
         for f in files:
             fig, ax = plt.subplots(ncols=2, figsize=figsize, **kwargs)
             # GT
