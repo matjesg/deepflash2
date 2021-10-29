@@ -7,10 +7,14 @@ __all__ = ['GRID_COLS', 'set_css_in_cell_output', 'tooltip_css', 'ZipUpload', 'I
 
 # Cell
 import os, sys, shutil, time, zipfile, urllib, subprocess
-import ipywidgets as w, numpy as np, pandas as pd, IPython.display as d
+import numpy as np, pandas as pd
+
+import ipywidgets as w
+from ipywidgets.embed import embed_minimal_html
+import IPython.display as d
 from IPython.utils.io import ask_yes_no
 from IPython.core.getipython import get_ipython
-from ipywidgets.embed import embed_minimal_html
+
 from pathlib import Path
 from fastcore.foundation import store_attr
 from fastcore.basics import GetAttr
@@ -27,6 +31,8 @@ from .losses import LOSSES
 try:
     from google import colab
     COLAB = True
+    from google.colab import data_table
+    data_table.enable_dataframe_formatter()
 except ImportError:
     COLAB = False
 
@@ -426,6 +432,7 @@ _dgt = {
     'sd'  : ('Sample Data', 'Sample data for demonstration and testing.'),
     'staple': ("STAPLE", "Simultaneous truth and performance level estimation (STAPLE)", "https://pubmed.ncbi.nlm.nih.gov/15250643/"),
     'mv'  :("Majority Voting", "Pixelwise majority voting to obtain the reference segmentation.", "https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1LabelVotingImageFilter.html"),
+    'instance_segmentation_metrics': ("Instance Metrics", "Compute instance segmentation metrics: mean Average Precision (mAP) and Average Precsion (AP) at IoU 0.5.", "https://cellpose.readthedocs.io/en/latest/api.html#cellpose.metrics.average_precision"),
     'majority_vote_undec': ("MV undecided", "If majority voting is undecided, set pixels to this class label.", "https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1LabelVotingImageFilter.html"),
 }
 
@@ -473,17 +480,20 @@ class GTEstSB(BaseParamWidget, GetAttr):
 
     params = {
         'majority_vote_undec': w.IntText(layout= w.Layout(width='auto')),
+        'instance_segmentation_metrics':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
     }
-
-    grid = w.GridspecLayout(5, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    params['instance_segmentation_metrics'].style.button_width = '50px'
+    grid = w.GridspecLayout(6, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
 
     #Labels
     grid[0, 0] = w.HTML(_html_wrap(*_dgt['staple']))
     grid[1, 0] = w.HTML(_html_wrap(*_dgt['mv']))
     grid[2, :] = w.HTML('<hr>')
-    grid[3, 1:]= params['majority_vote_undec']
-    grid[3, 0] = w.HTML(_html_wrap(*_dgt['majority_vote_undec']))
-    grid[4, 0] = w.HTML('Downloads')
+    grid[3, 1:]= params['instance_segmentation_metrics']
+    grid[3, 0] = w.HTML(_html_wrap(*_dgt['instance_segmentation_metrics']))
+    grid[4, 1:]= params['majority_vote_undec']
+    grid[4, 0] = w.HTML(_html_wrap(*_dgt['majority_vote_undec']))
+    grid[5, 0] = w.HTML('Downloads')
 
     #Run Staple
     staple = w.Button(description='Run', layout=w.Layout(width='auto'),
@@ -504,7 +514,7 @@ class GTEstSB(BaseParamWidget, GetAttr):
         super().__init__(**kwargs)
         path = path or Path('.')
         self.down  = PathDownloads(path, 'Select', tooltip='Click to download file or directory')
-        self.grid[4, 1:] = self.down.button
+        self.grid[5, 1:] = self.down.button
 
 # Cell
 class GTEstUI(BaseUI):
@@ -1393,7 +1403,8 @@ class GUI(GetAttr):
             print(f'- {b.name} similiarity results are saved to folder: {self.gt_dir}.')
             print(f'- You can download masks and results in the "Downloads" Section.')
             display(self.gt_to_train)
-            print(f'--------------------------------------------------------------')
+            if COLAB: data_table.DataTable(self.gt_est.df_res, include_index=False, num_rows_per_page=10)
+            display(d.Markdown('---'))
 
             items = {x:x for x in self.gt_est.masks.keys()}
             ipp = ItemsPerPage(self.proj_path, self.gt_est.show_gt, items=items, method=b.name)

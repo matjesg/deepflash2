@@ -104,10 +104,11 @@ class Config:
     pred_tta:bool = True
     min_pixel_export:int = 0
 
-    # Cellpose Settings
+    # Instance Segmentation Settings
     cellpose_model:str='nuclei'
     cellpose_diameter:int=0
     cellpose_export_class:int=1
+    instance_segmentation_metrics:bool=False
 
     # Folder Structure
     gt_dir:str = 'GT_Estimation'
