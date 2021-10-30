@@ -546,7 +546,6 @@ class EnsembleLearner(GetAttr):
     def load_ensemble(self, path=None):
         path = path or self.ensemble_dir
         models = sorted(get_files(path, extensions='.pth', recurse=False))
-        assert len(models)>0, f'No models found in {path}'
         self.models = {}
         for i, m in enumerate(models,1):
             if i==0: self.n_classes = int(m.name.split('_')[2][0])
