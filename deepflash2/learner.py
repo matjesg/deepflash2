@@ -338,7 +338,9 @@ class EnsembleLearner(GetAttr):
         self.loss_fn = self.get_loss()
         self.cbs = cbs or [SaveModelCallback(monitor='dice' if self.n_classes==2 else 'dice_multi')] #ShowGraphCallback
         self.ensemble_dir = ensemble_path or self.path/self.ens_dir
-        if ensemble_path is not None: self.load_ensemble(path=ensemble_path)
+        if ensemble_path is not None:
+            ensemble_path.mkdir(exist_ok=True, parents=True)
+            self.load_ensemble(path=ensemble_path)
         else: self.models = {}
 
         self.files = L(files) or get_image_files(self.path/image_dir, recurse=False)

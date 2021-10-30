@@ -491,7 +491,7 @@ class GTDataSB(BaseParamWidget, GetAttr):
 
     #Data Upload
     sd = w.Button(description='Load Sample Data',layout=w.Layout(width='auto'),tooltip='Click to download sample data')
-    grid[4, 1:] = sd
+    grid[5, 1:] = sd
 
     #Load Data
     run = w.Button(description='Load Data*', layout=w.Layout(width='auto'))
