@@ -128,7 +128,7 @@ def show_results(x:TensorImage, y:tuple, samples, outs, max_n=4, figsize=None, *
 
 # Cell
 # adapted from Falk, Thorsten, et al. "U-Net: deep learning for cell counting, detection, and morphometry." Nature methods 16.1 (2019): 67-70.
-def preprocess_mask(clabels=None, instlabels=None, ignore=None, remove_overlap=True, n_dims = 2):
+def preprocess_mask(clabels=None, instlabels=None, remove_connectivity=True, n_classes = 2):
     "Calculates the weights from the given mask (classlabels `clabels` or `instlabels`)."
 
     assert not (clabels is None and instlabels is None), "Provide either clabels or instlabels"
@@ -139,7 +139,7 @@ def preprocess_mask(clabels=None, instlabels=None, ignore=None, remove_overlap=T
         clabels = (instlabels[:] > 0).astype(int)
     else: clabels = np.array(clabels[:])
 
-    if remove_overlap:
+    if remove_connectivity:
         # Initialize label and weights arrays with background
         labels = np.zeros_like(clabels)
         classes = np.unique(clabels)[1:]
@@ -162,12 +162,12 @@ def preprocess_mask(clabels=None, instlabels=None, ignore=None, remove_overlap=T
 
             # Generate background ridges between touching instances
             # of that class, avoid overlapping instances
-            dil = cv2.morphologyEx(il, cv2.MORPH_CLOSE, kernel=np.ones((3,) * n_dims))
+            dil = cv2.morphologyEx(il, cv2.MORPH_CLOSE, kernel=np.ones((3,) * n_classes))
             overlap_cand = np.unique(np.where(dil!=il, dil, 0))
             labels[np.isin(il, overlap_cand, invert=True)] = c
 
             for instance in overlap_cand[1:]:
-                objectMaskDil = cv2.dilate((labels == c).astype('uint8'), kernel=np.ones((3,) * n_dims),iterations = 1)
+                objectMaskDil = cv2.dilate((labels == c).astype('uint8'), kernel=np.ones((3,) * n_classes),iterations = 1)
                 labels[(instlabels == instance) & (objectMaskDil == 0)] = c
     else:
         labels = clabels
@@ -265,28 +265,32 @@ def _read_img(path, **kwargs):
     return img
 
 # Cell
-def _read_msk(path, n_classes=2, instance_labels=False, **kwargs):
+def _read_msk(path, n_classes=2, instance_labels=False, remove_connectivity=True, **kwargs):
     "Read image and check classes"
     if path.suffix == '.zarr':
         msk = zarr.convenience.open(path.as_posix())
     else:
         msk = imageio.imread(path, **kwargs)
-    if not instance_labels:
-        if np.max(msk)>n_classes:
-            msk = msk//np.iinfo(msk.dtype).max
+    if instance_labels:
+        msk = preprocess_mask(clabels=None, instlabels=msk, remove_connectivity=remove_connectivity, n_classes=n_classes)
+    else:
+        # handle binary labels that are scaled different from 0 and 1
+        if n_classes==2 and np.max(msk)>1 and len(np.unique(msk))==2:
+            msk = msk//np.max(msk)
         # Remove channels if no extra information given
         if len(msk.shape)==3:
             if np.array_equal(msk[...,0], msk[...,1]):
                 msk = msk[...,0]
         # Mask check
-        # assert len(np.unique(msk))<=n_classes, 'Check n_classes and provided mask'
-    return msk
+    assert len(np.unique(msk))<=n_classes, f'Expected mask with {n_classes} classes but got mask with {len(np.unique(msk))} classes {np.unique(msk)} . Are you using instance labels?'
+    assert len(msk.shape)==2, 'Currently, only masks with a single channel are supported.'
+    return msk.astype('uint8')
 
 # Cell
 class BaseDataset(Dataset):
-    def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, ignore={},remove_overlap=False,stats=None,normalize=True,
-                 tile_shape=(512,512), padding=(0,0),preproc_dir=None, verbose=1, scale=1, pdf_reshape=512, **kwargs):
-        store_attr('files, label_fn, instance_labels, n_classes, ignore, tile_shape, remove_overlap, padding, normalize, scale, pdf_reshape')
+    def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, ignore={},remove_connectivity=True,stats=None,normalize=True,
+                 tile_shape=(512,512), padding=(0,0),preproc_dir=None, verbose=1, scale=1, pdf_reshape=512, use_preprocessed_labels=False, **kwargs):
+        store_attr('files, label_fn, instance_labels, n_classes, ignore, tile_shape, remove_connectivity, padding, normalize, scale, pdf_reshape, use_preprocessed_labels')
         self.c = n_classes
 
         if self.normalize:
@@ -330,30 +334,27 @@ class BaseDataset(Dataset):
     def _preproc_file(self, file):
         "Preprocesses and saves labels (msk), weights, and pdf."
         label_path = self.label_fn(file)
-        if self.instance_labels:
-            clabels = None
-            instlabels = self.read_mask(label_path,  self.c, instance_labels=True)
-        else:
-            clabels = self.read_mask(label_path, self.c)
-            instlabels = None
         ign = self.ignore[file.name] if file.name in self.ignore else None
-        lbl = preprocess_mask(clabels, instlabels, n_dims=self.c, remove_overlap=self.remove_overlap)
+        lbl = self.read_mask(label_path,  n_classes=self.c, instance_labels=self.instance_labels, remove_connectivity=self.remove_connectivity)
         self.labels[file.name] = lbl
         self.pdfs[file.name] = self._create_cdf(lbl, ignore=ign)
 
     def _preproc(self, verbose=0):
         using_cache = False
         for f in self.files:
-            try:
-                #lbl, wgt, pdf = _get_cached_data(self._cache_fn(f.name))
-                self.labels[f.name]
-                self.pdfs[f.name]
-                if not using_cache:
-                    if verbose>0: print(f'Using preprocessed masks from {self.preproc_dir}')
-                    using_cache = True
-            except:
+            if self.use_preprocessed_labels:
+                try:
+                    self.labels[f.name]
+                    self.pdfs[f.name]
+                    if not using_cache:
+                        if verbose>0: print(f'Using preprocessed masks from {self.preproc_dir}')
+                        using_cache = True
+                except:
                     if verbose>0: print('Preprocessing', f.name)
                     self._preproc_file(f)
+            else:
+                if verbose>0: print('Preprocessing', f.name)
+                self._preproc_file(f)
 
     def get_data(self, files=None, max_n=None, mask=False):
         if files is not None:

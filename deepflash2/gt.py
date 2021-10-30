@@ -99,7 +99,10 @@ class GTEstimator(GetAttr):
         for m, exps in files:
             fig, axs = plt.subplots(nrows=1, ncols=len(exps), figsize=figsize, **kwargs)
             for i, exp in enumerate(exps):
-                msk = _read_msk(self.mask_fn(exp,m))
+                try:
+                    msk = _read_msk(self.mask_fn(exp,m), instance_labels=self.instance_labels)
+                except:
+                    raise ValueError('Ground truth estimation currently only suppports two classes (binary masks or instance labels)')
                 msk_show(axs[i], msk, exp, cmap=self.cmap)
             fig.text(0, .5, m, ha='center', va='center', rotation=90)
             plt.tight_layout()
@@ -111,7 +114,7 @@ class GTEstimator(GetAttr):
         refs = {}
         print(f'Starting ground truth estimation - {method}')
         for m, exps in progress_bar(self.masks.items()):
-            masks = [_read_msk(self.mask_fn(exp,m)) for exp in exps]
+            masks = [_read_msk(self.mask_fn(exp,m), instance_labels=self.instance_labels) for exp in exps]
             if method=='STAPLE':
                 ref = staple(masks, self.staple_fval, self.staple_thres)
             elif method=='majority_voting':
@@ -157,7 +160,7 @@ class GTEstimator(GetAttr):
             # GT
             msk_show(ax[0], self.gt[method][f], f'{method} (binary mask)', cbar='', cmap=self.cmap)
             # Experts
-            masks = [_read_msk(self.mask_fn(exp,f)) for exp in self.masks[f]]
+            masks = [_read_msk(self.mask_fn(exp,f), instance_labels=self.instance_labels) for exp in self.masks[f]]
             masks_av = np.array(masks).sum(axis=0)#/len(masks)
             msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)+1))
             # Results

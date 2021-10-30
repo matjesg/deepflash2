@@ -82,7 +82,7 @@ def ensemble_results(res_dict, file, std=False):
     return a
 
 # Cell
-def plot_results(*args, df, hastarget=False, model=None, unc_metric=None, figsize=(20, 20), **kwargs):
+def plot_results(*args, df, hastarget=False, model=None, metric_name='dice_score', unc_metric=None, figsize=(20, 20), **kwargs):
     "Plot images, (masks), predictions and uncertainties side-by-side."
     if len(args)==4:
         img, msk, pred, pred_std = args
@@ -108,7 +108,7 @@ def plot_results(*args, df, hastarget=False, model=None, unc_metric=None, figsiz
         axs[1].set_title('Target')
         axs[2].imshow(pred)
         axs[2].set_axis_off()
-        axs[2].set_title(f'{pred_title} \n Dice Score: {df.dice_score:.2f}')
+        axs[2].set_title(f'{pred_title} \n {metric_name}: {df[metric_name]:.2f}')
         axs[3].imshow(pred_std)
         axs[3].set_axis_off()
         axs[3].set_title(unc_title)
@@ -125,7 +125,7 @@ def plot_results(*args, df, hastarget=False, model=None, unc_metric=None, figsiz
         axs[1].set_title('Target')
         axs[2].imshow(pred)
         axs[2].set_axis_off()
-        axs[2].set_title(f'{pred_title} \n Dice Score: {df.dice_score:.2f}')
+        axs[2].set_title(f'{pred_title} \n {metric_name}: {df[metric_name]:.2f}')
     elif len(args)==2:
         axs[1].imshow(pred)
         axs[1].set_axis_off()
@@ -175,7 +175,7 @@ def dice_score(*args, **kwargs):
     return 2*iou_score/(iou_score+1)
 
 # Cell
-def label_mask(mask, threshold=0.5, connectivity=4, min_pixel=15, do_watershed=False, exclude_border=False):
+def label_mask(mask, threshold=0.5, connectivity=4, min_pixel=0, do_watershed=False, exclude_border=False):
     '''Analyze regions and return labels'''
     if mask.ndim == 3:
         mask = np.squeeze(mask, axis=2)
