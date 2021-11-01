@@ -77,47 +77,6 @@ nb_path: "nbs/09_gt.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -164,47 +123,6 @@ nb_path: "nbs/09_gt.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -243,47 +161,6 @@ nb_path: "nbs/09_gt.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
-
-</div>
-</div>
 
 </div>
     {% endraw %}
@@ -355,47 +232,6 @@ nb_path: "nbs/09_gt.ipynb"
     
 <div class="cell border-box-sizing code_cell rendered">
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -406,8 +242,9 @@ nb_path: "nbs/09_gt.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">exp_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;deepflash2/sample_data/expert_segmentations&#39;</span><span class="p">)</span>
-<span class="n">_get_expert_sample_masks</span><span class="p">(</span><span class="n">exp_dir</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">exp_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;gt_tmp&#39;</span><span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/matjesg/deepflash2/releases/download/sample_data/&#39;</span>
+<span class="n">download_sample_data</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;wue1_cFOS_expert_segmentation_samples.zip&#39;</span><span class="p">,</span> <span class="n">exp_dir</span> <span class="p">,</span> <span class="n">extract</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">files</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;0004_mask.png&#39;</span><span class="p">,</span> <span class="s1">&#39;0001_mask.png&#39;</span><span class="p">]</span>
 </pre></div>
 
@@ -422,33 +259,24 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
 
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
+    <div>
+        <style>
+            /* Turns off some styling */
+            progress {
+                /* gets rid of default border in Firefox and Opera. */
+                border: none;
+                /* Needs to be in here for Safari polyfill so background images work as expected. */
+                background-size: auto;
+            }
+            .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+                background: #F44336;
+            }
+        </style>
+      <progress value='229376' class='' max='228011' style='width:300px; height:20px; vertical-align: middle;'></progress>
+      100.60% [229376/228011 00:00<00:00]
+    </div>
+    
 </div>
 
 </div>
@@ -478,41 +306,6 @@ nb_path: "nbs/09_gt.ipynb"
 
 <div class="output_area">
 
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
-
-<div class="output_area">
-
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Found 5 unique segmentation mask(s) from 5 expert(s)
 </pre>
@@ -539,47 +332,6 @@ nb_path: "nbs/09_gt.ipynb"
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -600,41 +352,6 @@ nb_path: "nbs/09_gt.ipynb"
 
 <div class="output_wrapper">
 <div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
 
 <div class="output_area">
 
@@ -673,7 +390,7 @@ nb_path: "nbs/09_gt.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>2021-10-30 11:27:53,760 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
+<pre>2021-11-01 14:49:30,353 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
 </pre>
 </div>
 </div>
@@ -721,38 +438,38 @@ nb_path: "nbs/09_gt.ipynb"
     <tr>
       <th>expert_1</th>
       <td>0.610313</td>
-      <td>0.271233</td>
-      <td>0.491228</td>
+      <td>0.258657</td>
+      <td>0.466667</td>
     </tr>
     <tr>
       <th>expert_2</th>
       <td>0.857131</td>
-      <td>0.523397</td>
-      <td>0.777778</td>
+      <td>0.499589</td>
+      <td>0.739837</td>
     </tr>
     <tr>
       <th>expert_3</th>
       <td>0.682427</td>
-      <td>0.265794</td>
-      <td>0.485577</td>
+      <td>0.258915</td>
+      <td>0.471963</td>
     </tr>
     <tr>
       <th>expert_4</th>
       <td>0.822903</td>
-      <td>0.385321</td>
-      <td>0.808000</td>
+      <td>0.369849</td>
+      <td>0.770992</td>
     </tr>
     <tr>
       <th>expert_5</th>
       <td>0.850710</td>
-      <td>0.496570</td>
-      <td>0.822034</td>
+      <td>0.474451</td>
+      <td>0.782258</td>
     </tr>
     <tr>
       <th>average</th>
       <td>0.764697</td>
-      <td>0.388463</td>
-      <td>0.676923</td>
+      <td>0.372292</td>
+      <td>0.646343</td>
     </tr>
   </tbody>
 </table>
@@ -814,38 +531,38 @@ nb_path: "nbs/09_gt.ipynb"
     <tr>
       <th>expert_1</th>
       <td>0.615232</td>
-      <td>0.214394</td>
-      <td>0.393701</td>
+      <td>0.209793</td>
+      <td>0.384615</td>
     </tr>
     <tr>
       <th>expert_2</th>
       <td>0.831553</td>
-      <td>0.336851</td>
-      <td>0.542253</td>
+      <td>0.330434</td>
+      <td>0.531034</td>
     </tr>
     <tr>
       <th>expert_3</th>
       <td>0.701515</td>
-      <td>0.235470</td>
-      <td>0.431925</td>
+      <td>0.232453</td>
+      <td>0.425926</td>
     </tr>
     <tr>
       <th>expert_4</th>
       <td>0.854105</td>
-      <td>0.456743</td>
-      <td>0.744361</td>
+      <td>0.447582</td>
+      <td>0.727941</td>
     </tr>
     <tr>
       <th>expert_5</th>
       <td>0.800831</td>
-      <td>0.304183</td>
-      <td>0.652174</td>
+      <td>0.298439</td>
+      <td>0.638298</td>
     </tr>
     <tr>
       <th>average</th>
       <td>0.760647</td>
-      <td>0.309528</td>
-      <td>0.552883</td>
+      <td>0.303740</td>
+      <td>0.541563</td>
     </tr>
   </tbody>
 </table>
@@ -877,7 +594,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span><span class="o">.</span><span class="n">gt_estimation</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;majority_voting&#39;</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;mv_test&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span><span class="o">.</span><span class="n">gt_estimation</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;majority_voting&#39;</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">exp_dir</span><span class="o">/</span><span class="s1">&#39;mv_test&#39;</span><span class="p">)</span>
 <span class="n">t</span><span class="o">.</span><span class="n">show_gt</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;majority_voting&#39;</span><span class="p">,</span> <span class="n">max_n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 
@@ -887,41 +604,6 @@ nb_path: "nbs/09_gt.ipynb"
 
 <div class="output_wrapper">
 <div class="output">
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea ">
-<style>
-.tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: max-content;
-  max-width: 280px;
-  background-color: #00bcd4;
-  text-align: left;
-  color: white;
-  border-radius: 4px;
-  padding: 4px 4px;
-  border: solid 0px black;
-  line-height: 1em;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
-</style>
-</div>
-
-</div>
 
 <div class="output_area">
 
@@ -1000,38 +682,38 @@ nb_path: "nbs/09_gt.ipynb"
     <tr>
       <th>expert_1</th>
       <td>0.710698</td>
-      <td>0.328238</td>
-      <td>0.557692</td>
+      <td>0.314402</td>
+      <td>0.532110</td>
     </tr>
     <tr>
       <th>expert_2</th>
       <td>0.837439</td>
-      <td>0.413665</td>
-      <td>0.728814</td>
+      <td>0.398583</td>
+      <td>0.699187</td>
     </tr>
     <tr>
       <th>expert_3</th>
       <td>0.619365</td>
-      <td>0.172836</td>
-      <td>0.400966</td>
+      <td>0.169128</td>
+      <td>0.391509</td>
     </tr>
     <tr>
       <th>expert_4</th>
       <td>0.805809</td>
-      <td>0.431244</td>
-      <td>0.656489</td>
+      <td>0.416399</td>
+      <td>0.632353</td>
     </tr>
     <tr>
       <th>expert_5</th>
       <td>0.860788</td>
-      <td>0.468052</td>
-      <td>0.820513</td>
+      <td>0.450650</td>
+      <td>0.786885</td>
     </tr>
     <tr>
       <th>average</th>
       <td>0.766820</td>
-      <td>0.362807</td>
-      <td>0.632895</td>
+      <td>0.349832</td>
+      <td>0.608409</td>
     </tr>
   </tbody>
 </table>
@@ -1143,6 +825,23 @@ nb_path: "nbs/09_gt.ipynb"
 
 </div>
 
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">exp_dir</span><span class="p">)</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 

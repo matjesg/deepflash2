@@ -9,6 +9,7 @@ import segmentation_models_pytorch as smp
 from fastcore.basics import patch
 import cv2
 import subprocess, sys
+from pathlib import Path
 from pip._internal.operations import freeze
 
 # Cell
@@ -45,18 +46,21 @@ def create_smp_model(arch, **kwargs):
     return model
 
 # Cell
-def save_smp_model(model, arch, file,  stats=None, pickle_protocol=2):
+def save_smp_model(model, arch, path, stats=None, pickle_protocol=2):
     'Save smp model, optionally including  stats'
+    path = Path(path)
     state = model.state_dict()
     save_dict = {'model': state, 'arch': arch, 'stats': stats, **model.kwargs}
-    torch.save(save_dict, file, pickle_protocol=pickle_protocol, _use_new_zipfile_serialization=False)
+    torch.save(save_dict, path, pickle_protocol=pickle_protocol, _use_new_zipfile_serialization=False)
+    return path
 
 # Cell
-def load_smp_model(file, device=None, strict=True, **kwargs):
+def load_smp_model(path, device=None, strict=True, **kwargs):
     'Loads smp model from file '
+    path = Path(path)
     if isinstance(device, int): device = torch.device('cuda', device)
     elif device is None: device = 'cpu'
-    model_dict = torch.load(file, map_location=device)
+    model_dict = torch.load(path, map_location=device)
     state = model_dict.pop('model')
     stats = model_dict.pop('stats')
     model = create_smp_model(**model_dict)

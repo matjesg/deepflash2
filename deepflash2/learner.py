@@ -130,10 +130,11 @@ class Config:
 
     def save(self, path):
         'Save configuration to path'
-        path = Path(path)
-        with open(path.with_suffix('.json'), 'w') as config_file:
+        path = Path(path).with_suffix('.json')
+        with open(path, 'w') as config_file:
             json.dump(asdict(self), config_file)
         print(f'Saved current configuration to {path}.json')
+        return path
 
     def load(self, path):
         'Load configuration from path'

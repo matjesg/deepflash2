@@ -20,12 +20,10 @@ from pathlib import Path
 from fastcore.foundation import store_attr
 from fastcore.basics import GetAttr
 from fastai.data.transforms import get_files
-from fastprogress.fastprogress import progress_bar
-from fastdownload import download_url
 import segmentation_models_pytorch as smp
 import matplotlib.pyplot as plt
 
-from .utils import unzip, get_label_fn
+from .utils import unzip, get_label_fn, download_sample_data
 from .learner import EnsembleLearner, Config, _optim_dict
 from .gt import GTEstimator
 from .models import ARCHITECTURES, ENCODERS, get_pretrained_options
@@ -104,24 +102,6 @@ def _connect_to_drive(path=None):
 # Cell
 def _get_model_list(n):
     return ["ensemble"]+[f'model_{x}' for x in range(1, n+1)]
-
-# Cell
-def _get_sample_data(base_url, name, dest, extract=False, timeout=4, show_progress=True):
-    dest = Path(dest)
-    dest.mkdir(exist_ok=True, parents=True)
-    file = download_url(f'{base_url}{name}', dest, show_progress=show_progress, timeout=timeout)
-    if extract:
-        unzip(dest, file)
-        file.unlink()
-
-# Cell
-def _get_sample_model_ensemble(path):
-    path = Path(path)
-    path.mkdir(exist_ok=True, parents=True)
-    url = "https://github.com/matjesg/deepflash2/releases/download/sample_data"
-    folds = [1,2]
-    for i in folds:
-        urllib.request.urlretrieve(f'{url}/Unet_resnet34_2classes-fold{e}.pth')
 
 # Cell
 class ZipUpload():
@@ -1462,7 +1442,7 @@ class GUI(GetAttr):
         with out:
             path = self.proj_path/'deepflash2_sample_data'/'expert_segmentations'
             print(f'Dowloading expert sample data into {path.relative_to(self.proj_path)}...')
-            _get_sample_data(SAMPLE_DATA_URL, 'wue1_cFOS_expert_segmentation_samples.zip', path, extract=True)
+            download_sample_data(SAMPLE_DATA_URL, 'wue1_cFOS_expert_segmentation_samples.zip', path, extract=True)
             self.gt.sb['data'].msk.path = path
             self.gt_data_run_clicked('')
 
@@ -1532,7 +1512,7 @@ class GUI(GetAttr):
         with out:
             path = self.proj_path/'deepflash2_sample_data'
             print(f'Dowloading sample data into {path.relative_to(self.proj_path)}')
-            _get_sample_data(SAMPLE_DATA_URL, 'wue1_cFOS_small.zip', path, extract=True)
+            download_sample_data(SAMPLE_DATA_URL, 'wue1_cFOS_small.zip', path, extract=True)
             self.train.sb['data'].img.path = path/'images'
             self.train.sb['data'].msk.path = path/'masks'
             self.train_data_run_clicked(b)
@@ -1566,15 +1546,13 @@ class GUI(GetAttr):
         for i in range(1, self.n_models+1):
             if (sel != 'ensemble') and (sel != f'model_{i}'): continue
             with out: print(f'Training of model {i}')
-            if COLAB:
-                with colab.output.temporary():
-                    print('Temporary Logs:')
-                    self.el.fit(i)
-            else:
-                with self.tmp:
-                    print('Temporary Logs:')
-                    self.el.fit(i)
-                    self.tmp.clear_output()
+            tout = colab.output.temporary() if COLAB else self.tmp
+
+            with tout:
+                print('Temporary Logs:')
+                self.el.fit(i)
+                if not COLAB: self.tmp.clear_output()
+
             with out:
                 print(f'Metrics for model {i} of {self.n_models}')
                 self.el.recorder[i].plot_metrics()
@@ -1585,19 +1563,17 @@ class GUI(GetAttr):
         sel = self.train.sb['valid'].sel.value
         model_no = None if sel == 'ensemble' else int(sel[6:])
         export_dir = self.proj_path/self.train_dir/self.val_dir
+        tout = colab.output.temporary() if COLAB else self.tmp
+
         with out:
             assert type(self.el)==EnsembleLearner, 'Please load data first!'
             assert len(self.el.models)>0, 'Please train models first!'
             print(f'Validating {sel}. This may take a while!')
-        if COLAB:
-            with colab.output.temporary():
-                print('Temporary Logs:')
-                df_val = self.el.get_valid_results(model_no, export_dir=export_dir, use_tta=self.tta)
-        else:
-            with self.tmp:
-                print('Temporary Logs:')
-                df_val = self.el.get_valid_results(model_no, export_dir=export_dir, use_tta=self.tta)
-                self.tmp.clear_output()
+
+        with tout:
+            print('Temporary Logs:')
+            df_val = self.el.get_valid_results(model_no, export_dir=export_dir, use_tta=self.tta)
+            if not COLAB: self.tmp.clear_output()
 
         out.clear_output()
         with out:
@@ -1630,10 +1606,6 @@ class GUI(GetAttr):
             print(sug_lrs)
             rec.plot_lr_find()
             plt.show()
-
-    #Mask weights
-    #def mw_open(self,b):
-    #    self.mw.widget.layout.display = "block"
 
     #Train Settings
     def par_open(self,b):
@@ -1668,10 +1640,10 @@ class GUI(GetAttr):
             print('Temporary Logs:')
             path = self.proj_path/'deepflash2_sample_data'
             print(f'Dowloading sample data into {path.relative_to(self.proj_path)}')
-            _get_sample_data(SAMPLE_DATA_URL, 'wue1_cFOS_small.zip', path, extract=True)
+            download_sample_data(SAMPLE_DATA_URL, 'wue1_cFOS_small.zip', path, extract=True)
             print(f'Dowloading trained models for sample data into {path.relative_to(self.proj_path)}')
             for fold in [1,2]:
-                _get_sample_data(SAMPLE_DATA_URL, f'Unet_resnet34_2classes-fold{fold}.pth', path/'models')
+                download_sample_data(SAMPLE_DATA_URL, f'Unet_resnet34_2classes-fold{fold}.pth', path/'models')
             self.pred.sb['data'].img.path = path/'images'
             self.pred.sb['data'].msk.path = path/'masks'
             self.pred.sb['data'].ens.path = path/'models'
@@ -1708,9 +1680,6 @@ class GUI(GetAttr):
                 print(f'A high uncertainty score indicates ambiguos or out-of-distribution data.')
                 ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, srt_index=1, srt_by='Uncertainty score', unc_metric='uncertainty_score')
                 display(ipp.widget)
-                #items = {x.name:x.name for x in self.el_pred.files}
-                #ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
-                #display(ipp.widget)
 
     def pred_rois_clicked(self, b):
         export_dir = self.pred.sb['pred'].down.path
@@ -1718,6 +1687,7 @@ class GUI(GetAttr):
         out = self.pred.main['pred']
         tout = colab.output.temporary() if COLAB else self.tmp
 
+        with out: print('Exporting cellpose ROIs to ImageJ ROI Sets...')
         with tout:
             print('Temporary Logs:')
             print('Exporting ROIs to ImageJ ROI Sets...')
@@ -1734,28 +1704,25 @@ class GUI(GetAttr):
         with out:
             df = self.el_pred.df_ens[COLS_PRED_KEEP]
             if COLAB:
-                display(data_table.DataTable(df, include_index=False, num_rows_per_page=10))
+                display(data_table.DataTable(df, include_index=False, num_rows_per_page=10, min_width='1'))
             else:
                 display(df)
 
     def cellpose_run_clicked(self, b, show=True):
         out = self.pred.main['cellpose']
         out.clear_output()
+        tout = colab.output.temporary() if COLAB else self.tmp
         export_dir = self.pred.sb['cellpose'].down.path
 
         with out:
             assert type(self.el_pred)==EnsembleLearner, 'Please load data first!'
             print('Starting cellpose prediction. Please wait...')
 
-        if COLAB:
-            with colab.output.temporary():
-                print('Temporary Logs:')
-                self.el_pred.get_cellpose_results(export_dir=export_dir)
-        else:
-            with self.tmp:
-                print('Temporary Logs:')
-                self.el_pred.get_cellpose_results(export_dir=export_dir)
-                self.tmp.clear_output()
+        with tout:
+            print('Temporary Logs:')
+            self.el_pred.get_cellpose_results(export_dir=export_dir)
+            if not COLAB: self.tmp.clear_output()
+
         if show:
             with out:
                 if self.test_masks_provided:
@@ -1768,18 +1735,19 @@ class GUI(GetAttr):
                 print(f'A high uncertainty score indicates ambiguos or out-of-distribution data.')
                 ipp = ItemsPerPage(self.proj_path, self.el_pred.show_cellpose_results, items=items, srt_index=1, srt_by='Uncertainty score', unc_metric='uncertainty_score')
                 display(ipp.widget)
-                #items = {x.name:x.name for x in self.el_pred.files}
-                #ipp = ItemsPerPage(self.proj_path, self.el_pred.show_ensemble_results, items=items, unc=use_tta)
-                #display(ipp.widget)
+
 
     def cellpose_rois_clicked(self, b):
         export_dir = self.pred.sb['cellpose'].down.path
         output_folder=Path(export_dir)/'cellpose_ROI_sets'
         out = self.pred.main['cellpose']
-        with out:
-            print('Exporting cellpose ROIs to ImageJ ROI Sets...')
+        tout = colab.output.temporary() if COLAB else self.tmp
+        with out: print('Exporting cellpose ROIs to ImageJ ROI Sets...')
+        with tout:
+            print('Temporary Logs:')
             self.el_pred.export_cellpose_rois(output_folder)
-            print(f'Saved ROIs to {output_folder}. Click on `Select` to to download.')
+            if not COLAB: self.tmp.clear_output()
+        with out: print(f'Saved ROIs to {output_folder}. Click on `Select` to to download.')
 
     # Pred results table
     def pred_cp_show_results_clicked(self, b):
@@ -1788,7 +1756,7 @@ class GUI(GetAttr):
         with out:
             df = self.el_pred.df_ens[COLS_PRED_KEEP_CP]
             if COLAB:
-                display(data_table.DataTable(df, include_index=False, num_rows_per_page=10))
+                display(data_table.DataTable(df, include_index=False, num_rows_per_page=10, min_width='1'))
             else:
                 display(df)
 
