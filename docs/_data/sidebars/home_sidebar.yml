@@ -9,22 +9,25 @@ entries:
     - output: web,pdf
       title: Getting Started
       url: /
+    - output: web,pdf
+      title: Additional Information
+      url: add_information.html
       subfolders:
       - output: web
         subfolderitems:
         - output: web,pdf
+          title: Overview
+          url: tutorial.html
+        - output: web,pdf
           title: Ground Truth Estimation
-          url: gt_estimation.html
+          url: tutorial_gt.html
         - output: web,pdf
           title: Model Training
-          url: train.html
+          url: tutorial_train.html
         - output: web,pdf
           title: Prediction on new Data
-          url: predict.html
-        title: Legacy Version
-    - output: web,pdf
-      title: Additional Information
-      url: add_information.html
+          url: tutorial_pred.html
+        title: Tutorials
     output: web
     title: deepflash2
   - folderitems:
