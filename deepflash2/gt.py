@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from .data import _read_msk
 from .learner import Config
-from .utils import save_mask, dice_score, install_package
+from .utils import save_mask, dice_score, install_package, get_instance_segmentation_metrics
 
 # Cell
 def import_sitk():
@@ -99,7 +99,10 @@ class GTEstimator(GetAttr):
         for m, exps in files:
             fig, axs = plt.subplots(nrows=1, ncols=len(exps), figsize=figsize, **kwargs)
             for i, exp in enumerate(exps):
-                msk = _read_msk(self.mask_fn(exp,m))
+                try:
+                    msk = _read_msk(self.mask_fn(exp,m), instance_labels=self.instance_labels)
+                except:
+                    raise ValueError('Ground truth estimation currently only suppports two classes (binary masks or instance labels)')
                 msk_show(axs[i], msk, exp, cmap=self.cmap)
             fig.text(0, .5, m, ha='center', va='center', rotation=90)
             plt.tight_layout()
@@ -111,7 +114,7 @@ class GTEstimator(GetAttr):
         refs = {}
         print(f'Starting ground truth estimation - {method}')
         for m, exps in progress_bar(self.masks.items()):
-            masks = [_read_msk(self.mask_fn(exp,m)) for exp in exps]
+            masks = [_read_msk(self.mask_fn(exp,m), instance_labels=self.instance_labels) for exp in exps]
             if method=='STAPLE':
                 ref = staple(masks, self.staple_fval, self.staple_thres)
             elif method=='majority_voting':
@@ -119,6 +122,14 @@ class GTEstimator(GetAttr):
             refs[m] = ref
             #assert ref.mean() > 0, 'Please try again!'
             df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'dice_score': [dice_score(ref, msk) for msk in masks]})
+            if self.instance_segmentation_metrics:
+                mAP, AP = [],[]
+                for msk in masks:
+                    ap, tp, fp, fn = get_instance_segmentation_metrics(ref, msk, is_binary=True, **kwargs)
+                    mAP.append(ap.mean())
+                    AP.append(ap[0])
+                df_tmp['mean_average_precision'] = mAP
+                df_tmp['average_precision_at_iou_50'] = AP
             res.append(df_tmp)
             if save_dir:
                 path = self.path/save_dir
@@ -127,6 +138,13 @@ class GTEstimator(GetAttr):
         self.gt[method] = refs
         self.df_res = pd.concat(res)
         self.df_agg = self.df_res.groupby('exp').agg(average_dice_score=('dice_score', 'mean'), std_dice_score=('dice_score', 'std'))
+        if self.instance_segmentation_metrics:
+            self.df_agg = self.df_res.groupby('exp').agg(average_dice_score=('dice_score', 'mean'),
+                                                         std_dice_score=('dice_score', 'std'),
+                                                         average_mean_average_precision=('mean_average_precision', 'mean'),
+                                                         std_mean_average_precision=('mean_average_precision', 'std'),
+                                                         average_average_precision_at_iou_50=('average_precision_at_iou_50', 'mean'),
+                                                         std_average_precision_at_iou_50=('average_precision_at_iou_50', 'std'))
         if save_dir:
             self.df_res.to_csv(path.parent/f'{method}_vs_experts.csv', index=False)
             self.df_agg.to_csv(path.parent/f'{method}_vs_experts_agg.csv', index=False)
@@ -134,24 +152,28 @@ class GTEstimator(GetAttr):
                 self.df_res.to_excel(writer, sheet_name='raw')
                 self.df_agg.to_excel(writer, sheet_name='aggregated')
 
-    def show_gt(self, method='STAPLE', max_n=6, files=None, figsize=(15,5), **kwargs):
-        if not files: files = list(t.masks.keys())[:max_n]
+    def show_gt(self, method='STAPLE', max_n=6, files=None, figsize=(15,7), **kwargs):
+        from IPython.display import Markdown, display
+        if not files: files = list(self.masks.keys())[:max_n]
         for f in files:
-            fig, ax = plt.subplots(ncols=3, figsize=figsize, **kwargs)
+            fig, ax = plt.subplots(ncols=2, figsize=figsize, **kwargs)
             # GT
             msk_show(ax[0], self.gt[method][f], f'{method} (binary mask)', cbar='', cmap=self.cmap)
             # Experts
-            masks = [_read_msk(self.mask_fn(exp,f)) for exp in self.masks[f]]
+            masks = [_read_msk(self.mask_fn(exp,f), instance_labels=self.instance_labels) for exp in self.masks[f]]
             masks_av = np.array(masks).sum(axis=0)#/len(masks)
             msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)+1))
             # Results
-            av_df = pd.DataFrame([self.df_res[self.df_res.file==f][['dice_score']].mean()], index=['average'], columns=['dice_score'])
-            plt_df = self.df_res[self.df_res.file==f].set_index('exp')[['dice_score']].append(av_df)
-            plt_df.columns = [f'Similarity (Dice Score)']
-            tbl = pd.plotting.table(ax[2], np.round(plt_df,3), loc='center', colWidths=[.5])
-            tbl.set_fontsize(14)
-            tbl.scale(1, 2)
-            ax[2].set_axis_off()
+            metrics = ['dice_score', 'mean_average_precision', 'average_precision_at_iou_50'] if self.instance_segmentation_metrics else ['dice_score']
+            av_df = pd.DataFrame([self.df_res[self.df_res.file==f][metrics].mean()], index=['average'], columns=metrics)
+            plt_df = self.df_res[self.df_res.file==f].set_index('exp')[metrics].append(av_df)
+            #plt_df.columns = [f'Similarity (Dice Score)']
+            #tbl = pd.plotting.table(ax[2], np.round(plt_df,3), loc='center', colWidths=[.5])
+            #tbl.set_fontsize(14)
+            #tbl.scale(1, 2)
+            #ax[2].set_axis_off()
             fig.text(0, .5, f, ha='center', va='center', rotation=90)
             plt.tight_layout()
             plt.show()
+            display(plt_df)
+            display(Markdown('---'))

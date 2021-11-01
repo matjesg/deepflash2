@@ -36,7 +36,7 @@ from fastai.metrics import Dice, DiceMulti
 from .losses import get_loss
 from .models import create_smp_model, save_smp_model, load_smp_model, run_cellpose
 from .data import TileDataset, RandomTileDataset, _read_img, _read_msk
-from .utils import dice_score, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, export_roi_set
+from .utils import dice_score, plot_results, get_label_fn, calc_iterations, save_mask, save_unc, export_roi_set, get_instance_segmentation_metrics
 from .utils import compose_albumentations as _compose_albumentations
 import deepflash2.tta as tta
 
@@ -46,7 +46,7 @@ class Config:
     "Config class for settings."
 
     # Project
-    project_dir:str = 'deepflash2'
+    project_dir:str = '.'
 
     # GT Estimation Settings
     staple_thres:float = 0.5
@@ -104,16 +104,17 @@ class Config:
     pred_tta:bool = True
     min_pixel_export:int = 0
 
-    # Cellpose Settings
+    # Instance Segmentation Settings
     cellpose_model:str='nuclei'
     cellpose_diameter:int=0
     cellpose_export_class:int=1
+    instance_segmentation_metrics:bool=False
 
     # Folder Structure
     gt_dir:str = 'GT_Estimation'
     train_dir:str = 'Training'
     pred_dir:str = 'Prediction'
-    ens_dir:str = 'ensemble'
+    ens_dir:str = 'models'
     val_dir:str = 'valid'
 
     @property
@@ -129,10 +130,11 @@ class Config:
 
     def save(self, path):
         'Save configuration to path'
-        path = Path(path)
-        with open(path.with_suffix('.json'), 'w') as config_file:
+        path = Path(path).with_suffix('.json')
+        with open(path, 'w') as config_file:
             json.dump(asdict(self), config_file)
         print(f'Saved current configuration to {path}.json')
+        return path
 
     def load(self, path):
         'Load configuration from path'
@@ -322,7 +324,7 @@ class EnsemblePredict():
 # Cell
 class EnsembleLearner(GetAttr):
     _default = 'config'
-    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_dir=None, item_tfms=None,
+    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_path=None, item_tfms=None,
                  label_fn=None, metrics=None, cbs=None, ds_kwargs={}, dl_kwargs={}, model_kwargs={}, stats=None, files=None):
 
         self.config = config or Config()
@@ -336,7 +338,11 @@ class EnsembleLearner(GetAttr):
         self.metrics = metrics or default_metrics
         self.loss_fn = self.get_loss()
         self.cbs = cbs or [SaveModelCallback(monitor='dice' if self.n_classes==2 else 'dice_multi')] #ShowGraphCallback
-        self.ensemble_dir = ensemble_dir or self.path/'ensemble'
+        self.ensemble_dir = ensemble_path or self.path/self.ens_dir
+        if ensemble_path is not None:
+            ensemble_path.mkdir(exist_ok=True, parents=True)
+            self.load_ensemble(path=ensemble_path)
+        else: self.models = {}
 
         self.files = L(files) or get_image_files(self.path/image_dir, recurse=False)
         assert len(self.files)>0, f'Found {len(self.files)} images in "{image_dir}". Please check your images and image folder'
@@ -352,15 +358,16 @@ class EnsembleLearner(GetAttr):
         else:
             self.label_fn = label_fn
         self.n_splits=min(len(self.files), self.max_splits)
-
-        self.models = {}
-        self.recorder = {}
         self._set_splits()
-        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn, stats=self.stats, n_classes=self.n_classes,
+        self.ds = RandomTileDataset(self.files, label_fn=self.label_fn,
+                                    stats=self.stats,
+                                    instance_labels=self.instance_labels,
+                                    n_classes=self.n_classes,
                                     sample_mult=self.sample_mult if self.sample_mult>0 else None, verbose=0)
         self.stats = stats or self.ds.stats
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
+        self.recorder = {}
 
     def _set_splits(self):
         if self.n_splits>1:
@@ -376,6 +383,8 @@ class EnsembleLearner(GetAttr):
     def pred_ds_kwargs(self):
         # Setting default shapes and padding
         ds_kwargs = self.add_ds_kwargs.copy()
+        ds_kwargs['use_preprocessed_labels']= True
+        ds_kwargs['instance_labels']= self.instance_labels
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
         ds_kwargs['n_classes']= self.n_classes
         ds_kwargs['shift']= self.shift
@@ -387,6 +396,8 @@ class EnsembleLearner(GetAttr):
         # Setting default shapes and padding
         ds_kwargs = self.add_ds_kwargs.copy()
         # Settings from config
+        ds_kwargs['use_preprocessed_labels']= True
+        ds_kwargs['instance_labels']= self.instance_labels
         ds_kwargs['stats']= self.stats
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
         ds_kwargs['n_classes']= self.n_classes
@@ -439,7 +450,7 @@ class EnsembleLearner(GetAttr):
         model = self._create_model()
         files_train, files_val = self.splits[i]
         dls = self._get_dls(files_train, files_val)
-        log_name = f'model{i}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+        log_name = f'{name.name}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
         log_dir = self.ensemble_dir/'logs'
         log_dir.mkdir(exist_ok=True, parents=True)
         cbs = self.cbs.append(CSVLogger(fname=log_dir/log_name))
@@ -500,7 +511,7 @@ class EnsembleLearner(GetAttr):
                         'model_no' : i,
                         'dice_score': m_dice,
                         #'mean_energy': np.mean(g_eng[f.name][:][pred>0]),
-                        'mean_uncertainty': np.mean(g_std[f.name][:][pred>0]) if g_std is not None else None,
+                        'uncertainty_score': np.mean(g_std[f.name][:][pred>0]) if g_std is not None else None,
                         'image_path': f,
                         'mask_path': self.label_fn(f),
                         'softmax_path': f'{chunk_store}/{g_smx.path}/{f.name}',
@@ -536,12 +547,15 @@ class EnsembleLearner(GetAttr):
     def load_ensemble(self, path=None):
         path = path or self.ensemble_dir
         models = sorted(get_files(path, extensions='.pth', recurse=False))
-        assert len(models)>0, f'No models found in {path}'
         self.models = {}
         for i, m in enumerate(models,1):
+            if i==0: self.n_classes = int(m.name.split('_')[2][0])
+            else: assert self.n_classes==int(m.name.split('_')[2][0]), 'Check models. Models are trained on different number of classes.'
             self.models[i] = m
+        if len(self.models)>0: self.set_n(len(self.models))
         print(f'Found {len(self.models)} models in folder {path}')
-        print(self.models)
+        print([m.name for m in self.models.values()])
+
 
     def get_ensemble_results(self, files, zarr_store=None, export_dir=None, filetype='.png', **kwargs):
         ep = EnsemblePredict(models_paths=self.models.values(), zarr_store=zarr_store)
@@ -564,7 +578,7 @@ class EnsembleLearner(GetAttr):
                                 'ensemble' :  self.model_name,
                                 'n_models' : len(self.models),
                                 #'mean_energy': np.mean(g_eng[f.name][:][pred>0]),
-                                'mean_uncertainty': np.mean(g_std[f.name][:][pred>0]) if g_std is not None else None,
+                                'uncertainty_score': np.mean(g_std[f.name][:][pred>0]) if g_std is not None else None,
                                 'image_path': f,
                                 'softmax_path': f'{chunk_store}/{g_smx.path}/{f.name}',
                                 'uncertainty_path': f'{chunk_store}/{g_std.path}/{f.name}' if g_std is not None else None,
@@ -581,31 +595,36 @@ class EnsembleLearner(GetAttr):
         return g_smx, g_std, g_eng
 
     def score_ensemble_results(self, mask_dir=None, label_fn=None):
-        if not label_fn:
+        if mask_dir is not None and label_fn is None:
             label_fn = get_label_fn(self.df_ens.image_path[0], self.path/mask_dir)
-        for idx, r in self.df_ens.iterrows():
-            msk_path = self.label_fn(r.image_path)
-            msk = _read_msk(msk_path, n_classes=self.n_classes)
-            self.df_ens.loc[idx, 'mask_path'] = msk_path
+        for i, r in self.df_ens.iterrows():
+            if label_fn is not None:
+                msk_path = self.label_fn(r.image_path)
+                msk = _read_msk(msk_path, n_classes=self.n_classes, instance_labels=self.instance_labels)
+                self.df_ens.loc[i, 'mask_path'] = msk_path
+            else:
+                msk = self.ds.labels[r.file][:]
             pred = np.argmax(zarr.load(r.softmax_path), axis=-1).astype('uint8')
-            self.df_ens.loc[idx, 'dice_score'] = dice_score(msk, pred)
+            self.df_ens.loc[i, 'dice_score'] = dice_score(msk, pred)
         return self.df_ens
 
-    def show_ensemble_results(self, files=None, unc=True, unc_metric=None):
+    def show_ensemble_results(self, files=None, unc=True, unc_metric=None, metric_name='dice_score'):
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
         df = self.df_ens
         if files is not None: df = df.reset_index().set_index('file', drop=False).loc[files]
         for _, r in df.iterrows():
             imgs = []
             imgs.append(_read_img(r.image_path)[:])
-            if 'dice_score' in r.index:
-                imgs.append(_read_msk(r.mask_path, n_classes=self.n_classes))
+            if metric_name in r.index:
+                try: msk = self.ds.labels[r.file][:]
+                except: msk = _read_msk(r.mask_path, n_classes=self.n_classes, instance_labels=self.instance_labels)
+                imgs.append(msk)
                 hastarget=True
             else:
                 hastarget=False
             imgs.append(np.argmax(zarr.load(r.softmax_path), axis=-1).astype('uint8'))
             if unc: imgs.append(zarr.load(r.uncertainty_path))
-            plot_results(*imgs, df=r, hastarget=hastarget, unc_metric=unc_metric)
+            plot_results(*imgs, df=r, hastarget=hastarget, metric_name=metric_name, unc_metric=unc_metric)
 
     def get_cellpose_results(self, export_dir=None):
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
@@ -631,20 +650,41 @@ class EnsembleLearner(GetAttr):
             cp_path = export_dir/'cellpose_masks'
             cp_path.mkdir(parents=True, exist_ok=True)
             for idx, r in self.df_ens.iterrows():
-                tifffile.imwrite(cp_path/f'{r.name}_class{cl}.tif', cp_masks[idx], compress=6)
+                tifffile.imwrite(cp_path/f'{r.file}_class{cl}.tif', cp_masks[idx], compress=6)
 
         self.cellpose_masks = cp_masks
         return cp_masks
 
-    def show_cellpose_results(self, files=None, unc=True, unc_metric=None):
+    def score_cellpose_results(self, mask_dir=None, label_fn=None):
+        assert self.cellpose_masks is not None, 'Run get_cellpose_results() first'
+        if mask_dir is not None and label_fn is None:
+            label_fn = get_label_fn(self.df_ens.image_path[0], self.path/mask_dir)
+        for i, r in self.df_ens.iterrows():
+            if label_fn is not None:
+                msk_path = self.label_fn(r.image_path)
+                msk = _read_msk(msk_path, n_classes=self.n_classes, instance_labels=self.instance_labels)
+                self.df_ens.loc[i, 'mask_path'] = msk_path
+            else:
+                msk = self.ds.labels[r.file][:]
+            _, msk = cv2.connectedComponents(msk, connectivity=4)
+            pred = self.cellpose_masks[i]
+            ap, tp, fp, fn = get_instance_segmentation_metrics(msk, pred, is_binary=False, min_pixel=self.min_pixel_export)
+            self.df_ens.loc[i, 'mean_average_precision'] = ap.mean()
+            self.df_ens.loc[i, 'average_precision_at_iou_50'] = ap[0]
+        return self.df_ens
+
+    def show_cellpose_results(self, files=None, unc=True, unc_metric=None, metric_name='mean_average_precision'):
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
         df = self.df_ens.reset_index()
         if files is not None: df = df.set_index('file', drop=False).loc[files]
         for _, r in df.iterrows():
             imgs = []
             imgs.append(_read_img(r.image_path)[:])
-            if 'dice_score' in r.index:
-                mask = _read_msk(r.mask_path, n_classes=self.n_classes)
+            if metric_name in r.index:
+                try:
+                    mask = self.ds.labels[idx][:]
+                except:
+                    mask = _read_msk(r.mask_path, n_classes=self.n_classes, instance_labels=self.instance_labels)
                 _, comps = cv2.connectedComponents((mask==self.cellpose_export_class).astype('uint8'), connectivity=4)
                 imgs.append(label2rgb(comps, bg_label=0))
                 hastarget=True
@@ -652,7 +692,7 @@ class EnsembleLearner(GetAttr):
                 hastarget=False
             imgs.append(label2rgb(self.cellpose_masks[r['index']], bg_label=0))
             if unc: imgs.append(zarr.load(r.uncertainty_path))
-            plot_results(*imgs, df=r, hastarget=hastarget, unc_metric=unc_metric)
+            plot_results(*imgs, df=r, hastarget=hastarget, metric_name=metric_name, unc_metric=unc_metric)
 
     def lr_find(self, files=None, **kwargs):
         files = files or self.files
@@ -699,11 +739,12 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          show_valid_results="Plot results of all or `file` validation images",
          #ensemble_results="Merge single model results",
          get_ensemble_results="Get models and ensemble results",
-         score_ensemble_results="Compare ensemble results (Intersection over the Union) to given segmentation masks.",
+         score_ensemble_results="Compare ensemble results to given segmentation masks.",
          show_ensemble_results="Show result of ensemble or `model_no`",
          load_ensemble="Get models saved at `path`",
          get_cellpose_results='Get instance segmentation results using the cellpose integration',
-         show_cellpose_results='Show instance segmentation results from cellpose predictions',
+         score_cellpose_results="Compare cellpose nstance segmentation results to given masks.",
+         show_cellpose_results='Show instance segmentation results from cellpose predictions.',
          #compose_albumentations="Helper function to compose albumentations augmentations",
          #get_dls="Create datasets and dataloaders from files",
          #get_model="Get model architecture",

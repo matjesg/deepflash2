@@ -2,9 +2,9 @@
 
 
 
-![deepflash2](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/logo/logo_deepflash2_transp-02.png)
+![deepflash2](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/logo/deepflash2_logo_medium.png)
 
-Official repository of deepflash2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images.
+Official repository of deepflash2 - a deep-learning pipeline for segmentation of ambiguous microscopic images.
 
 ![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) 
 [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) 
@@ -19,29 +19,21 @@ Official repository of deepflash2 - a deep learning pipeline for segmentation of
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb)
 
-![deepflash2 training getting started](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/screen_captures/GUI_Train_start.gif)
-
-Examplary training workflow.
+<video src="https://user-images.githubusercontent.com/13711052/139750569-4ccabb8d-09dc-46f9-8900-9f116e018e30.mov" controls width="100%"></video>
 
 ## Why using deepflash2?
 
 __The best of two worlds:__
 Combining state of the art deep learning with a barrier free environment for life science researchers.
 
+![bioimage_workflow](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/workflow.png)
+
 - End-to-end process for life science researchers
     - graphical user interface - no coding skills required
     - free usage on _Google Colab_ at no costs
     - easy deployment on own hardware
-- Rigorously evaluated deep learning models
-    - Model Library
-    - easy integration new (*pytorch*) models
-- Best practices model training
-    - leveraging the _fastai_ library
-    - mixed precision training
-    - learning rate finder and fit one cycle policy 
-    - advanced augementation 
 - Reliable prediction on new data
-    - leveraging Bayesian Uncertainties
+    - Quality assurance and out-of-distribution detection
 
 **Kaggle Gold Medal and Innovation Price Winner**
 
@@ -65,10 +57,6 @@ We're working on a peer reviewed publication. Until than, the preliminary citati
   howpublished = {\url{https://github.com/matjesg/deepflash2}}
 }
 ```
-
-## Workflow
-
-tbd
 
 ## Installing
 

@@ -1,13 +1,13 @@
 {
   "deepflash2": {
-    "Getting Started": "/", 
-    "Tutorial" : "tutorial.html",
+    "Getting Started": "/",
     "Additional Information": "add_information.html",
     "": {
-        "Legacy Version" : {
-            "Ground Truth Estimation": "gt_estimation.html",
-            "Model Training": "train.html",
-            "Prediction on new Data": "predict.html"
+        "Tutorials" : {
+             "Overview": "tutorial.html",
+             "Ground Truth Estimation": "tutorial_gt.html",
+             "Model Training": "tutorial_train.html",
+             "Prediction on new Data": "tutorial_pred.html"
             }
     }
   },

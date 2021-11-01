@@ -68,7 +68,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_pretrained_options" class="doc_header"><code>get_pretrained_options</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L22" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_pretrained_options</code>(<strong><code>encoder_name</code></strong>)</p>
+<h4 id="get_pretrained_options" class="doc_header"><code>get_pretrained_options</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L23" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_pretrained_options</code>(<strong><code>encoder_name</code></strong>)</p>
 </blockquote>
 <p>Return available options for pretrained weights for a given encoder</p>
 
@@ -100,7 +100,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_smp_model" class="doc_header"><code>create_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L28" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="create_smp_model" class="doc_header"><code>create_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L29" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Create segmentation_models_pytorch model</p>
 
@@ -155,21 +155,6 @@ nb_path: "nbs/01_models.ipynb"
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/media/data/anaconda3/envs/fastai2/lib/python3.8/site-packages/torch/nn/functional.py:718: UserWarning: Named tensors and all their associated APIs are an experimental feature and subject to change. Please do not use them for anything important until they are released as stable. (Triggered internally at  /opt/conda/conda-bld/pytorch_1623448278899/work/c10/core/TensorImpl.h:1156.)
-  return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
     {% endraw %}
 
@@ -184,7 +169,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_smp_model" class="doc_header"><code>save_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L48" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_smp_model</code>(<strong><code>model</code></strong>, <strong><code>arch</code></strong>, <strong><code>file</code></strong>, <strong><code>stats</code></strong>=<em><code>None</code></em>, <strong><code>pickle_protocol</code></strong>=<em><code>2</code></em>)</p>
+<h4 id="save_smp_model" class="doc_header"><code>save_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L49" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_smp_model</code>(<strong><code>model</code></strong>, <strong><code>arch</code></strong>, <strong><code>path</code></strong>, <strong><code>stats</code></strong>=<em><code>None</code></em>, <strong><code>pickle_protocol</code></strong>=<em><code>2</code></em>)</p>
 </blockquote>
 <p>Save smp model, optionally including  stats</p>
 
@@ -213,11 +198,11 @@ nb_path: "nbs/01_models.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;Unet&#39;</span>
-<span class="n">file</span> <span class="o">=</span> <span class="s1">&#39;tst.pth&#39;</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;tst.pth&#39;</span>
 <span class="n">stats</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;encoder_name&#39;</span><span class="p">:</span> <span class="s1">&#39;resnet34&#39;</span><span class="p">}</span>
 <span class="n">tst</span> <span class="o">=</span> <span class="n">create_smp_model</span><span class="p">(</span><span class="n">arch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="n">save_smp_model</span><span class="p">(</span><span class="n">tst</span><span class="p">,</span> <span class="n">arch</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">save_smp_model</span><span class="p">(</span><span class="n">tst</span><span class="p">,</span> <span class="n">arch</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -238,7 +223,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L55" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>file</code></strong>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>strict</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L58" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>path</code></strong>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>strict</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Loads smp model from file</p>
 
@@ -266,10 +251,11 @@ nb_path: "nbs/01_models.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst2</span><span class="p">,</span> <span class="n">stats2</span> <span class="o">=</span> <span class="n">load_smp_model</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst2</span><span class="p">,</span> <span class="n">stats2</span> <span class="o">=</span> <span class="n">load_smp_model</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tst</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">tst2</span><span class="o">.</span><span class="n">parameters</span><span class="p">()):</span>
     <span class="n">test_eq</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">p2</span><span class="o">.</span><span class="n">detach</span><span class="p">())</span>
 <span class="n">test_eq</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">stats2</span><span class="p">)</span>
+<span class="n">path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -298,7 +284,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="check_cellpose_installation" class="doc_header"><code>check_cellpose_installation</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L67" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>check_cellpose_installation</code>()</p>
+<h4 id="check_cellpose_installation" class="doc_header"><code>check_cellpose_installation</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L71" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>check_cellpose_installation</code>()</p>
 </blockquote>
 
 </div>
@@ -329,7 +315,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_diameters" class="doc_header"><code>get_diameters</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L76" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_diameters</code>(<strong><code>masks</code></strong>)</p>
+<h4 id="get_diameters" class="doc_header"><code>get_diameters</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L80" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_diameters</code>(<strong><code>masks</code></strong>)</p>
 </blockquote>
 <p>Get diameters from deepflash2 prediction</p>
 
@@ -361,7 +347,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="run_cellpose" class="doc_header"><code>run_cellpose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L86" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run_cellpose</code>(<strong><code>probs</code></strong>, <strong><code>masks</code></strong>, <strong><code>model_type</code></strong>=<em><code>'nuclei'</code></em>, <strong><code>diameter</code></strong>=<em><code>0</code></em>, <strong><code>min_size</code></strong>=<em><code>-1</code></em>, <strong><code>gpu</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="run_cellpose" class="doc_header"><code>run_cellpose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L90" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run_cellpose</code>(<strong><code>probs</code></strong>, <strong><code>masks</code></strong>, <strong><code>model_type</code></strong>=<em><code>'nuclei'</code></em>, <strong><code>diameter</code></strong>=<em><code>0</code></em>, <strong><code>min_size</code></strong>=<em><code>-1</code></em>, <strong><code>gpu</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 <p>Run cellpose on deepflash2 predictions</p>
 
@@ -406,10 +392,11 @@ nb_path: "nbs/01_models.ipynb"
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Using diameter of 17.0
-2021-10-03 21:17:53,554 [INFO] ** TORCH CUDA version installed and working. **
-2021-10-03 21:17:53,554 [INFO] &gt;&gt;&gt;&gt; using GPU
-2021-10-03 21:17:53,598 [INFO] ~~~ FINDING MASKS ~~~
-2021-10-03 21:17:55,255 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 1.66 sec
+2021-11-01 14:59:42,181 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
+2021-11-01 14:59:43,359 [INFO] ** TORCH CUDA version installed and working. **
+2021-11-01 14:59:43,359 [INFO] &gt;&gt;&gt;&gt; using GPU
+2021-11-01 14:59:43,406 [INFO] ~~~ FINDING MASKS ~~~
+2021-11-01 14:59:45,239 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 1.83 sec
 </pre>
 </div>
 </div>
