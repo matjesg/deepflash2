@@ -1,6 +1,10 @@
-0 Getting Started
+0.0 Overview
 
-https://user-images.githubusercontent.com/13711052/139749202-5e061ccf-f570-4afc-bfef-7a1d50640656.mp4
+https://user-images.githubusercontent.com/13711052/139750569-4ccabb8d-09dc-46f9-8900-9f116e018e30.mov
+
+0.0 Getting Started
+
+https://user-images.githubusercontent.com/13711052/139751414-acf737db-2d8a-4203-8a34-7a38e5326b5e.mov
 
 ---
 
