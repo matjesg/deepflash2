@@ -1,6 +1,6 @@
 0 Getting Started
 
-https://user-images.githubusercontent.com/13711052/139746630-0ad96c0b-7b62-4d4c-b8f2-06f6d209e1d0.mov
+https://user-images.githubusercontent.com/13711052/139749202-5e061ccf-f570-4afc-bfef-7a1d50640656.mp4
 
 ---
 
