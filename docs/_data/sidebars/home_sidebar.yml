@@ -9,12 +9,6 @@ entries:
     - output: web,pdf
       title: Getting Started
       url: /
-    - output: web,pdf
-      title: Tutorial
-      url: tutorial.html
-    - output: web,pdf
-      title: Additional Information
-      url: add_information.html
       subfolders:
       - output: web
         subfolderitems:
@@ -28,6 +22,9 @@ entries:
           title: Prediction on new Data
           url: predict.html
         title: Legacy Version
+    - output: web,pdf
+      title: Additional Information
+      url: add_information.html
     output: web
     title: deepflash2
   - folderitems:
