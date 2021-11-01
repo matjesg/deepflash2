@@ -36,43 +36,124 @@ nb_path: "nbs/tutorial.ipynb"
 </div>
 </div>
 </div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Run</span> <span class="n">deepflash2</span> <span class="ow">in</span> <span class="n">Colab</span>
+<span class="n">Connect</span> <span class="n">to</span> <span class="n">Google</span> <span class="n">Drive</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Ground-Truth-Estimation">Ground Truth Estimation<a class="anchor-link" href="#Ground-Truth-Estimation"> </a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>INPUTS
-Input volumes to the STAPLE filter must be binary segmentations of an image, that is, there must be a single foreground value that represents positively classified pixels (pixels that are considered to belong inside the segmentation). Any number of background pixel values may be present in the input images. You can, for example, input volumes with many different labels as long as the structure you are interested in creating ground truth for is consistently labeled among all input volumes. Pixel type of the input volumes does not matter. Specify the label value for positively classified pixels using SetForegroundValue. All other labels will be considered to be negatively classified pixels (background).</p>
+<h2 id="Ground-Truth-Estimation">Ground Truth Estimation<a class="anchor-link" href="#Ground-Truth-Estimation"> </a></h2><blockquote><p>Derive reference segmentations from segmentations of multiple experts.</p>
+</blockquote>
+<p><img src="https://img.shields.io/badge/INPUT-expert%20segmentations-blue" alt=""> <img src="https://img.shields.io/badge/OUTPUT-ground%20truth%20segmentations-success" alt=""> 
+<img src="https://img.shields.io/badge/OUTPUT-expert%20performance%20scores-success" alt=""></p>
+<p><strong><em>INPUT - Expert Segmentations</em></strong></p>
+<ul>
+<li>binary segmentations of an image, that is, there must be a single foreground value that represents positively classified pixels</li>
+<li>instance segmentations of an image (instances represent positively classified pixels)</li>
+</ul>
+<p>Examplary input folder structure:</p>
+<blockquote>
+<pre><code>expert_segmentations  -&gt; one parent folder
+│                     
+│───expert1           -&gt; one folder per expert
+│   │   mask1.png     -&gt; segmentation masks
+│   │   mask2.png
+│   
+└───expert2
+    │   mask1.png
+    │   mask2.png</code></pre>
+</blockquote>
+<p>All common image formats (tif, png, etc.) are supported. See <a href="https://imageio.readthedocs.io/en/stable/formats/index.html">imageio docs</a>.
+<img src="https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/screen_captures/GUI_Train_start.gif" alt="deepflash2 training getting started"></p>
+<hr>
+<p><strong><em>OUTPUT -  Ground Truth Estimation</em></strong></p>
+<p><img src="https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/screen_captures/GUI_Train_start.gif" alt="deepflash2 training getting started"></p>
+<ul>
+<li><strong>Simultaneous truth and performance level estimation (STAPLE).</strong> The STAPLE algorithm considers a collection of segmentations and computes a probabilistic estimate of the true segmentation and a measure of the performance level represented by each segmentation. <em>Source: Warfield, Simon K., Kelly H. Zou, and William M. Wells. "Simultaneous truth and performance level estimation (STAPLE): an algorithm for the validation of image segmentation." IEEE transactions on medical imaging 23.7 (2004): 903-921</em></li>
+<li><strong>Majority Voting.</strong> Use majority voting to obtain the reference segmentation. Note that this filter does not resolve ties. In case of ties it will assign the indicated <em>MV undecided</em> label to the result. </li>
+</ul>
+<p>EXAMPLE</p>
+<hr>
+<p><strong><em>OUTPUT -  Expert Performance Scores</em></strong></p>
+<p>EXAMPLE</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Training">Training<a class="anchor-link" href="#Training"> </a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>tbd.</p>
+<h2 id="Training">Training<a class="anchor-link" href="#Training"> </a></h2><blockquote><p>Train models ensembles for image segmentation</p>
+</blockquote>
+<p><img src="https://img.shields.io/badge/INPUT-image%20segmentations%20pairs-blue" alt="">   <img src="https://img.shields.io/badge/OUTPUT-trained%20model%20ensemble-success" alt=""></p>
+<p>load data
+training
+validation</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Prediction">Prediction<a class="anchor-link" href="#Prediction"> </a></h2>
+<h2 id="Prediction-for-Evaluation">Prediction for Evaluation<a class="anchor-link" href="#Prediction-for-Evaluation"> </a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>tbd.</p>
+<ul>
+<li><strong>One folder for training images</strong><ul>
+<li>Images must have unique name or ID<ul>
+<li>_0001.tif --&gt; name/ID: 0001; img_5.png --&gt; name/ID: img<em>5, ...</em> </li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>One folder containing trained models (ensemble)</strong><ul>
+<li>Ensemble folder and models will be created during Training__<ul>
+<li>Do not change the naming of the models</li>
+<li>If you want to train different ensembles, simply rename the ensemble folder</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><em>Examplary structure:</em></p>
+<ul>
+<li>[folder] images<ul>
+<li>[file] 0001.tif</li>
+<li>[file] 0002.tif</li>
+</ul>
+</li>
+<li>[folder] ensemble<ul>
+<li>[file] unext50_deepflash2_model-1.pth</li>
+<li>[file] unext50_deepflash2_model-2.pth</li>
+</ul>
+</li>
+</ul>
+<p>load data
+prediction and QA
+cellpose prediction</p>
 
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Prediction-with-Quality-Assurance">Prediction with Quality Assurance<a class="anchor-link" href="#Prediction-with-Quality-Assurance"> </a></h2>
 </div>
 </div>
 </div>

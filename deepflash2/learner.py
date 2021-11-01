@@ -449,7 +449,7 @@ class EnsembleLearner(GetAttr):
         model = self._create_model()
         files_train, files_val = self.splits[i]
         dls = self._get_dls(files_train, files_val)
-        log_name = f'model{i}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
+        log_name = f'{name.name}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
         log_dir = self.ensemble_dir/'logs'
         log_dir.mkdir(exist_ok=True, parents=True)
         cbs = self.cbs.append(CSVLogger(fname=log_dir/log_name))
