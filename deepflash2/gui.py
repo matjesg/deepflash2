@@ -1486,10 +1486,11 @@ class GUI(GetAttr):
         out = self.gt.xtr['result'].output
         out.clear_output()
         with out:
+            df = self.gt_est.df_res.round(3)
             if COLAB:
-                display(data_table.DataTable(self.gt_est.df_res, include_index=False, num_rows_per_page=10, min_width='1'))
+                display(data_table.DataTable(df, include_index=False, num_rows_per_page=10, min_width='1'))
             else:
-                display(self.gt_est.df_res)
+                display(df)
 
     # Train
     def train_data_run_clicked(self, b):
@@ -1702,7 +1703,7 @@ class GUI(GetAttr):
         out = self.pred.xtr['result'].output
         out.clear_output()
         with out:
-            df = self.el_pred.df_ens[COLS_PRED_KEEP]
+            df = self.el_pred.df_ens[COLS_PRED_KEEP].round(3)
             if COLAB:
                 display(data_table.DataTable(df, include_index=False, num_rows_per_page=10, min_width='1'))
             else:
@@ -1754,7 +1755,7 @@ class GUI(GetAttr):
         out = self.pred.xtr['result_cp'].output
         out.clear_output()
         with out:
-            df = self.el_pred.df_ens[COLS_PRED_KEEP_CP]
+            df = self.el_pred.df_ens[COLS_PRED_KEEP_CP].round(3)
             if COLAB:
                 display(data_table.DataTable(df, include_index=False, num_rows_per_page=10, min_width='1'))
             else:
