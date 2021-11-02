@@ -19,14 +19,14 @@ Official repository of deepflash2 - a deep-learning pipeline for segmentation of
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb)
 
-<video src="https://user-images.githubusercontent.com/13711052/139750569-4ccabb8d-09dc-46f9-8900-9f116e018e30.mov" controls width="100%"></video>
+<video src="https://user-images.githubusercontent.com/13711052/139820660-79514f0d-f075-4e8f-9c84-debbce4355da.mov" controls width="100%"></video>
 
 ## Why using deepflash2?
 
 __The best of two worlds:__
 Combining state of the art deep learning with a barrier free environment for life science researchers.
-
-![bioimage_workflow](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/workflow.png)
+    
+<img src="https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/workflow.png" width="100%" style="max-width: 100%px">
 
 - End-to-end process for life science researchers
     - graphical user interface - no coding skills required
