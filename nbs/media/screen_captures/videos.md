@@ -1,10 +1,11 @@
-0.0 Overview
+0.0 Train Start
 
 https://user-images.githubusercontent.com/13711052/139750569-4ccabb8d-09dc-46f9-8900-9f116e018e30.mov
 
 0.0 Getting Started
 
-https://user-images.githubusercontent.com/13711052/139751414-acf737db-2d8a-4203-8a34-7a38e5326b5e.mov
+https://user-images.githubusercontent.com/13711052/139820660-79514f0d-f075-4e8f-9c84-debbce4355da.mov
+
 
 ---
 
