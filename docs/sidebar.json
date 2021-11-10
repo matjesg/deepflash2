@@ -16,11 +16,10 @@
     "Models": "models.html",
     "Data": "data.html",
     "Transforms": "transforms.html",
-    "Callbacks": "callbacks.html",
     "Losses": "losses.html",
     "Utility functions": "utils.html",
     "Test-time augmentation": "tta.html",
-    "User Interface": "gui.html",
-    "Ground Truth Estimation": "gt.html"
+    "Ground Truth Estimation": "gt.html",
+    "User Interface": "gui.html"
   }
 }

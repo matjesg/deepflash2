@@ -44,9 +44,6 @@ entries:
       title: Transforms
       url: transforms.html
     - output: web,pdf
-      title: Callbacks
-      url: callbacks.html
-    - output: web,pdf
       title: Losses
       url: losses.html
     - output: web,pdf
@@ -56,11 +53,11 @@ entries:
       title: Test-time augmentation
       url: tta.html
     - output: web,pdf
-      title: User Interface
-      url: gui.html
-    - output: web,pdf
       title: Ground Truth Estimation
       url: gt.html
+    - output: web,pdf
+      title: User Interface
+      url: gui.html
     output: web
     title: deepflash2 API
   output: web
