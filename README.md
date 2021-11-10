@@ -60,7 +60,7 @@ We're working on a peer reviewed publication. Until than, the preliminary citati
 
 ## Installing
 
-You can use **deepflash2** by using [Google Colab](colab.research.google.com). You can run every page of the [documentation](matjesg.github.io/deepflash2/) as an interactive notebook - click "Open in Colab" at the top of any page to open it.
+You can use **deepflash2** by using [Google Colab](colab.research.google.com). You can run every page of the [documentation](https://matjesg.github.io/deepflash2/) as an interactive notebook - click "Open in Colab" at the top of any page to open it.
  - Be sure to change the Colab runtime to "GPU" to have it run fast!
  - Use Firefox or Google Chrome if you want to upload your images.
 
