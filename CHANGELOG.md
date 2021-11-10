@@ -2,6 +2,16 @@
 
 <!-- do not remove -->
 
+## 0.1.4
+
+### New Features
+
+- Instance segmentation metrics ([#32](https://github.com/matjesg/deepflash2/pull/32)), thanks to [@matjesg](https://github.com/matjesg)
+  - - Instance segmentation metrics for GT estimation and prediction
+- Tutorials
+
+
+
 ## 0.1.3
 
 ### New Features
