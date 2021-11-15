@@ -45,16 +45,14 @@ Have a look at our [solution](https://www.kaggle.com/matjes/hubmap-deepflash2-ju
 
 ## Citing
 
-We're working on a peer reviewed publication. Until than, the preliminary citation is:
+The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.06693). Please cite
 
 ```
 @misc{griebel2021deepflash2,
-  author = {Matthias Griebel},
-  title = {DeepFLasH2 - a deep learning pipeline for segmentation of fluorescent labels in microscopy images},
-  year = {2021},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/matjesg/deepflash2}}
+    title={Deep-learning in the bioimaging wild: Handling ambiguous data with deepflash2}, 
+    author={Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
+    year={2021},
+    eprint={2111.06693}
 }
 ```
 
