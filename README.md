@@ -52,7 +52,8 @@ The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.066
     title={Deep-learning in the bioimaging wild: Handling ambiguous data with deepflash2}, 
     author={Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
     year={2021},
-    eprint={2111.06693}
+    eprint={2111.06693},
+    archivePrefix={arXiv}
 }
 ```
 

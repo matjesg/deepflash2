@@ -94,7 +94,7 @@ def _connect_to_drive(path=None):
     if COLAB:
         subprocess.call(['rm', '-rf', '/content/sample_data/'])
         with colab.output.temporary():
-            con = ask_yes_no("Connect to Google Drive?")
+            con = ask_yes_no("Connect to Google Drive? (yes/no)")
         if con:
             with colab.output.temporary(): colab.drive.mount('/content/drive/')
             path = Path('/content/drive/My Drive')
