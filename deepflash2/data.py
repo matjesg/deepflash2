@@ -297,10 +297,9 @@ class BaseDataset(Dataset):
             self.stats = stats or self.compute_stats()
 
         if label_fn is not None:
-            if not preproc_dir: self.preproc_dir = Path(label_fn(files[0])).parent/'.cache'
-            else: self.preproc_dir = Path(preproc_dir)
-            self.labels = zarr.group((self.preproc_dir/'labels').as_posix())
-            self.pdfs = zarr.group((self.preproc_dir/'pdfs').as_posix())
+            self.preproc_dir = preproc_dir or zarr.storage.TempStore()
+            root = zarr.group(store=self.preproc_dir, overwrite= not use_preprocessed_labels)
+            self.labels, self.pdfs = root.require_groups('labels','pdfs')
             self._preproc(verbose)
 
     def read_img(self, *args, **kwargs):
@@ -386,13 +385,6 @@ class BaseDataset(Dataset):
                 show(img, lbl, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
             else:
                 show(img, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
-
-    def clear_cached_weights(self):
-        "Clears cache directory with pretrained weights."
-        try:
-            shutil.rmtree(self.preproc_dir)
-            print(f"Deleting all cache at {self.preproc_dir}")
-        except: print(f"No temporary files to delete at {self.preproc_dir}")
 
     #https://stackoverflow.com/questions/60101240/finding-mean-and-standard-deviation-across-image-channels-pytorch/60803379#60803379
     def compute_stats(self, max_samples=50):

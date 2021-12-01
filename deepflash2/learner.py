@@ -324,7 +324,7 @@ class EnsemblePredict():
 # Cell
 class EnsembleLearner(GetAttr):
     _default = 'config'
-    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_path=None, item_tfms=None,
+    def __init__(self, image_dir='images', mask_dir=None, config=None, path=None, ensemble_path=None, preproc_dir=None,
                  label_fn=None, metrics=None, cbs=None, ds_kwargs={}, dl_kwargs={}, model_kwargs={}, stats=None, files=None):
 
         self.config = config or Config()
@@ -332,7 +332,6 @@ class EnsembleLearner(GetAttr):
         self.dl_kwargs = dl_kwargs
         self.model_kwargs = model_kwargs
         self.add_ds_kwargs = ds_kwargs
-        self.item_tfms = item_tfms
         self.path = Path(path) if path is not None else Path('.')
         default_metrics = [Dice()] if self.n_classes==2 else [DiceMulti()]
         self.metrics = metrics or default_metrics
@@ -360,6 +359,7 @@ class EnsembleLearner(GetAttr):
         self.n_splits=min(len(self.files), self.max_splits)
         self._set_splits()
         self.ds = RandomTileDataset(self.files, label_fn=self.label_fn,
+                                    preproc_dir=preproc_dir,
                                     stats=self.stats,
                                     instance_labels=self.instance_labels,
                                     n_classes=self.n_classes,
@@ -384,6 +384,7 @@ class EnsembleLearner(GetAttr):
         # Setting default shapes and padding
         ds_kwargs = self.add_ds_kwargs.copy()
         ds_kwargs['use_preprocessed_labels']= True
+        ds_kwargs['preproc_dir']=self.ds.preproc_dir
         ds_kwargs['instance_labels']= self.instance_labels
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
         ds_kwargs['n_classes']= self.n_classes
@@ -397,6 +398,7 @@ class EnsembleLearner(GetAttr):
         ds_kwargs = self.add_ds_kwargs.copy()
         # Settings from config
         ds_kwargs['use_preprocessed_labels']= True
+        ds_kwargs['preproc_dir']=self.ds.preproc_dir
         ds_kwargs['instance_labels']= self.instance_labels
         ds_kwargs['stats']= self.stats
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
@@ -730,14 +732,10 @@ class EnsembleLearner(GetAttr):
 
 # Cell
 add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with `n` models",
-         #save_model= "Save `model` to `file` along with `arch`, `stats`, and `c` classes",
-         #load_model="Load `model` from `file` along with `arch`, `stats`, and `c` classes",
          fit="Fit model number `i`",
          fit_ensemble="Fit `i` models and `skip` existing",
-         #predict="Predict `files` with model at `model_path`",
          get_valid_results="Validate models on validation data and save results",
          show_valid_results="Plot results of all or `file` validation images",
-         #ensemble_results="Merge single model results",
          get_ensemble_results="Get models and ensemble results",
          score_ensemble_results="Compare ensemble results to given segmentation masks.",
          show_ensemble_results="Show result of ensemble or `model_no`",
@@ -745,17 +743,9 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          get_cellpose_results='Get instance segmentation results using the cellpose integration',
          score_cellpose_results="Compare cellpose nstance segmentation results to given masks.",
          show_cellpose_results='Show instance segmentation results from cellpose predictions.',
-         #compose_albumentations="Helper function to compose albumentations augmentations",
-         #get_dls="Create datasets and dataloaders from files",
-         #get_model="Get model architecture",
          get_loss="Get loss function from loss name (config)",
          set_n="Change to `n` models per ensemble",
          lr_find="Wrapper for learning rate finder",
-         #show_mask_weights='Plot fn for masks and weights',
-         #ood_train="Train SVM for OOD Detection",
-         #ood_score="Get OOD score",
-         #ood_save='Save OOD model to path',
-         #ood_load='Load OOD model from path',
          export_imagej_rois='Export ImageJ ROI Sets to `ouput_folder`',
          export_cellpose_rois='Export cellpose predictions to ImageJ ROI Sets in `ouput_folder`',
          clear_tmp="Clear directory with temporary files"

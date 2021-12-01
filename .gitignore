@@ -3,6 +3,7 @@ _fastai/
 _lab_data/
 _df_old/
 _nbs_old/
+deepflash2_GUI.ipynb
 
 *.bak
 .gitattributes
