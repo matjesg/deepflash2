@@ -76,10 +76,11 @@ def check_cellpose_installation():
         assert extract==tarball[-15:]
     except:
         print(f'Installing cellpose. Please wait.')
+        home_dir = Path.home()/'.deepflash2'
+        home_dir.mkdir(exist_ok=True, parents=True)
         url = f'https://github.com/matjesg/deepflash2/releases/download/0.1.4/{tarball}'
-        file = download_url(url, show_progress=False)
+        file = download_url(url, home_dir, show_progress=False)
         main(['install', '--no-deps', file.as_posix()])
-        file.unlink()
 
 # Cell
 def get_diameters(masks):
