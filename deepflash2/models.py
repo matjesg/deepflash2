@@ -74,7 +74,7 @@ def check_cellpose_installation():
         assert [x for x in freeze.freeze() if x.startswith('cellpose')][0][-len(commit_hash):]==commit_hash
     except:
         print(f'Installing cellpose. Please wait.')
-        subprocess.check_call([sys.executable, "-m", "pip", "install", f'git+https://github.com/MouseLand/cellpose.git@{commit_hash}'])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", '--no-deps', f'git+https://github.com/MouseLand/cellpose.git@{commit_hash}'])
 
 # Cell
 def get_diameters(masks):
