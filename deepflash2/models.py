@@ -10,7 +10,7 @@ import segmentation_models_pytorch as smp
 from fastcore.basics import patch
 from fastdownload import download_url
 from pathlib import Path
-from pip._internal import main
+import sys, subprocess
 from pip._internal.operations import freeze
 
 # Cell
@@ -69,7 +69,7 @@ def load_smp_model(path, device=None, strict=True, **kwargs):
     return model, stats
 
 # Cell
-def check_cellpose_installation():
+def check_cellpose_installation(show_progress=True):
     tarball = 'cellpose-0.6.6.dev13+g316927e.tar.gz' # '316927eff7ad2201391957909a2114c68baee309'
     try:
         extract = [x for x in freeze.freeze() if x.startswith('cellpose')][0][-15:]
@@ -79,8 +79,8 @@ def check_cellpose_installation():
         home_dir = Path.home()/'.deepflash2'
         home_dir.mkdir(exist_ok=True, parents=True)
         url = f'https://github.com/matjesg/deepflash2/releases/download/0.1.4/{tarball}'
-        file = download_url(url, home_dir, show_progress=False)
-        main(['install', '--no-deps', file.as_posix()])
+        file = download_url(url, home_dir, show_progress=show_progress)
+        subprocess.check_call([sys.executable, "-m", "pip", "install", '--no-deps', file.as_posix()])
 
 # Cell
 def get_diameters(masks):
