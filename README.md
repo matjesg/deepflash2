@@ -23,7 +23,7 @@ Combining state-of-the-art deep learning with a barrier free environment for lif
 - **Quality assurance and out-of-distribution detection** for reliable prediction on new data 
 - **Best-in-class performance** for semantic and instance segmentation
 
-<img src="nbs/media/sample_images.png" width="800px" style="max-width: 800pxpx">
+<img src="https://github.com/matjesg/deepflash2/blob/master/nbs/media/sample_images.png?raw=true" width="800px" style="max-width: 800pxpx">
 
 
 <img style="float: left;padding: 0px 10px 0px 0px;" src="https://www.kaggle.com/static/images/medals/competitions/goldl@1x.png">
