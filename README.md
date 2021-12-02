@@ -97,7 +97,7 @@ Excute the `Set up environment` cell or follow the `pip` instructions.
 We recommend installation into a new, clean [environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
 
 ```bash
-conda install -c fastchan -c matjesg deepflash2 
+conda install -c conda-forge -c fastchan -c matjesg deepflash2 
 ```
 
 ##### [pip](https://pip.pypa.io/en/stable/)
@@ -121,9 +121,10 @@ Then, open `deepflash2_GUI.ipynb` within Notebook environment.
 Docker images for __deepflash2__ are built on top of [the latest pytorch image](https://hub.docker.com/r/pytorch/pytorch/). 
 
 - CPU only
-> `docker run -p 8888:8888 matjes/deepflash2`
+> `docker run -p 8888:8888 matjes/deepflash2 ./run_jupyter.sh`
 - For training, we recommend to run docker with GPU support (You need to install [Nvidia-Docker](https://github.com/NVIDIA/nvidia-docker) to enable gpu compatibility with these containers.)
-> `docker run --gpus all --shm-size=256m -p 8888:8888 matjes/deepflash2`
+> `docker run --gpus all --shm-size=256m -p 8888:8888 matjes/deepflash2 ./run_jupyter.sh`
+
 All docker containers are configured to start a jupyter server. To add data, we recomment using [bind mounts](https://docs.docker.com/storage/bind-mounts/) with `/workspace` as target. To start the GUI, open `deepflash2_GUI.ipynb` within Notebook environment.
 
 For more information on how to run docker see [docker orientation and setup](https://docs.docker.com/get-started/).

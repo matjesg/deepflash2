@@ -60,7 +60,7 @@ oops_url = 'https://cdn-icons-png.flaticon.com/512/1049/1049967.png'
 def exception_handler(exception_type, exception, traceback):
     err_html = f'''
     <div>
-        <p style="float: left;padding: 0px 10px 0px 0px;<"><img src={oops_url} alt="Oops!" height=50px/></p>
+        <p style="float: left;padding: 0px 10px 0px 0px;<"><img style="height:50px;" src={oops_url} alt="Oops!"/></p>
         <p><b>Something went wrong!</b> Please revise your input and retry! <br> Error message: {exception}</p>
     </div>
     '''
@@ -1330,6 +1330,8 @@ class GUI(GetAttr):
     def __init__(self, path=Path('.'), reinit=False):
         # Activate better exception logging
         get_ipython()._showtraceback = exception_handler
+        # Allow 100% GUI width
+        display(w.HTML("<style>.container { width:100% !important; }</style>"))
         self.config = Config()
         self.base_path = path.resolve()
         self.config.project_dir = str(self.base_path/self.project_dir) if self.project_dir=='deepflash2' else self.project_dir

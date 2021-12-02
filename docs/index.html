@@ -150,7 +150,7 @@ To run <em>deepflash2</em> locally, we recommend using a system with a GPU (e.g.
 <h4 id="Google-Colab">Google Colab<a class="anchor-link" href="#Google-Colab"> </a></h4><p>Excute the <code>Set up environment</code> cell or follow the <code>pip</code> instructions.</p>
 <p><a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
 <h4 id="Other-systems">Other systems<a class="anchor-link" href="#Other-systems"> </a></h4><h5 id="conda"><a href="https://docs.conda.io/en/latest/">conda</a><a class="anchor-link" href="#conda"> </a></h5><p>We recommend installation into a new, clean <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">environment</a>.</p>
-<div class="highlight"><pre><span></span>conda install -c fastchan -c matjesg deepflash2
+<div class="highlight"><pre><span></span>conda install -c conda-forge -c fastchan -c matjesg deepflash2
 </pre></div>
 <h5 id="pip"><a href="https://pip.pypa.io/en/stable/">pip</a><a class="anchor-link" href="#pip"> </a></h5><p>You should install PyTorch first by following the installation instructions of <a href="https://pytorch.org/get-started/locally/">pytorch</a>.</p>
 <div class="highlight"><pre><span></span>pip install deepflash2
@@ -162,14 +162,14 @@ jupyter notebook
 <p>Then, open <code>deepflash2_GUI.ipynb</code> within Notebook environment.</p>
 <h5 id="Docker">Docker<a class="anchor-link" href="#Docker"> </a></h5><p>Docker images for <strong>deepflash2</strong> are built on top of <a href="https://hub.docker.com/r/pytorch/pytorch/">the latest pytorch image</a>.</p>
 <ul>
-<li>CPU only<blockquote><p><code>docker run -p 8888:8888 matjes/deepflash2</code></p>
+<li>CPU only<blockquote><p><code>docker run -p 8888:8888 matjes/deepflash2 ./run_jupyter.sh</code></p>
 </blockquote>
 </li>
-<li>For training, we recommend to run docker with GPU support (You need to install <a href="https://github.com/NVIDIA/nvidia-docker">Nvidia-Docker</a> to enable gpu compatibility with these containers.)<blockquote><p><code>docker run --gpus all --shm-size=256m -p 8888:8888 matjes/deepflash2</code>
-All docker containers are configured to start a jupyter server. To add data, we recomment using <a href="https://docs.docker.com/storage/bind-mounts/">bind mounts</a> with <code>/workspace</code> as target. To start the GUI, open <code>deepflash2_GUI.ipynb</code> within Notebook environment.</p>
+<li>For training, we recommend to run docker with GPU support (You need to install <a href="https://github.com/NVIDIA/nvidia-docker">Nvidia-Docker</a> to enable gpu compatibility with these containers.)<blockquote><p><code>docker run --gpus all --shm-size=256m -p 8888:8888 matjes/deepflash2 ./run_jupyter.sh</code></p>
 </blockquote>
 </li>
 </ul>
+<p>All docker containers are configured to start a jupyter server. To add data, we recomment using <a href="https://docs.docker.com/storage/bind-mounts/">bind mounts</a> with <code>/workspace</code> as target. To start the GUI, open <code>deepflash2_GUI.ipynb</code> within Notebook environment.</p>
 <p>For more information on how to run docker see <a href="https://docs.docker.com/get-started/">docker orientation and setup</a>.</p>
 
 </div>
