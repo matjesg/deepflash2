@@ -19,23 +19,40 @@ __The best of two worlds:__
 Combining state-of-the-art deep learning with a barrier free environment for life science researchers. 
 > Read the [paper](https://arxiv.org/abs/2111.06693), watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html), or read the [docs](https://matjesg.github.io/deepflash2/).    
 - **No coding skills required** (graphical user interface)
+- **Ground truth estimation** from the annotations of multiple experts for model training and validation
 - **Quality assurance and out-of-distribution detection** for reliable prediction on new data 
 - **Best-in-class performance** for semantic and instance segmentation
+
+<img src="nbs/media/sample_images.png" width="800px" style="max-width: 800pxpx">
+
 
 <img style="float: left;padding: 0px 10px 0px 0px;" src="https://www.kaggle.com/static/images/medals/competitions/goldl@1x.png">
 
 **Kaggle Gold Medal and Innovation Price Winner:** The *deepflash2* Python API built the foundation for winning the [Innovation Award](https://hubmapconsortium.github.io/ccf/pages/kaggle.html) a Kaggle Gold Medal in the [HuBMAP - Hacking the Kidney](https://www.kaggle.com/c/hubmap-kidney-segmentation) challenge. 
 Have a look at our [solution](https://www.kaggle.com/matjes/hubmap-deepflash2-judge-price)
 
-## Quick Start
-> Get started in less than a minute
-
-Run *deepflash2* in Google Colaboratory with free access to graphics processing units (GPUs) for faster model training
+## Quick Start and Demo
+> Get started in less than a minute. Watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html) for help.
+For a quick start, run *deepflash2* in Google Colaboratory with free access to graphics processing units (GPUs).
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) 
 
+To try the functionalities of *deepflash2*, open the *deepflash2* GUI in [Colab]((https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) or follow the installation instructions below. The GUI provides a build-in use for sample data. After starting the GUI, select the task (GT Estimation, Training, or Prediction) and click `Load Sample Data`. For futher instructions watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html).
 
-## Citing and Experiments 
+We provide an overview of the tasks below:
+
+|  | Ground Truth (GT) Estimation | Training | Prediction |
+|---|---|---|---|
+| Main Task | STAPLE or Majority Voting | Ensemble training  and validation | Semantic and instance segmentation |
+| Sample Data | 5 masks from 5 experts each | 5 image/mask pairs | 5 images and 2 trained models |
+| Expected Output | 5 GT Segmentation Masks | 5 models | 5 predicted segmentation masks  (semantic and instance) and uncertainty maps|
+| Estimated Time | ~ 1 min | ~ 150 min | ~ 4 min |
+
+Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU). You can download the sample data [here](https://github.com/matjesg/deepflash2/releases/tag/sample_data).
+
+## Paper and Experiments 
+
+We provide a complete guide to reproduce our experiments using the *deepflash2 Python API* [here](https://github.com/matjesg/deepflash2/tree/master/paper). The data is currently available on [Google Drive](xxx).
 
 The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.06693). Please cite
 
@@ -49,29 +66,49 @@ The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.066
 }
 ```
 
-We provide a complete guide to reproduce our experiments here.
-The data is currently avaialble on Google Drive.
+
+
+## System requirements
+> Works in the browser an on your local pc/server
+
+*deepflash2* is designed to run on Windows, Linux, or Mac (x86-64) if [pytorch](https://pytorch.org/get-started/locally/) is installable.
+We generally recommend using Google Colab as it only requires a Google Account and a device with a web browser. 
+To run *deepflash2* locally, we recommend using a system with a GPU (e.g., 2 CPUs, NVIDIA Tesla K80 GPU or better).
+
+Software dependencies: Python>=3.6, fastai>=2.1.7, zarr>=2.0, scikit-image>=0.18.1, imageio>=2.9.0, ipywidgets>=7.6.3, openpyxl>=3.0.7, albumentations>=1.0.0, opencv-python>=4.0 segmentation_models_pytorch>=0.2; The ground truth estimation functionalities are based on the simpleITK>=2.0.
+Instance segmentation capabilities are complemented using cellpose==0.6.1.
+
+*deepflash2* is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10 (tbd), MacOS 12.0.1 (tbd)).
 
 ## Installation Guide
 > Typical install time is about 1-5 minutes, depending on your internet connection
 
-The GUI of *deepflash2* runs as a web application inside a Jupyter Notebook, the de-facto standard of computational notebooks in the scientific community. The GUI is built on top of the *deepflash2* Python API, which can be used independently (read the [docs](https://matjesg.github.io/deepflash2/)).*deepflash2* can be installed locally or in cloud environments such as Google Colaboratory (Colab).
+The GUI of *deepflash2* runs as a web application inside a Jupyter Notebook, the de-facto standard of computational notebooks in the scientific community. The GUI is built on top of the *deepflash2* Python API, which can be used independently (read the [docs](https://matjesg.github.io/deepflash2/)).
+#### Google Colab
 
-#### Conda
+Excute the `Set up environment` cell or follow the `pip` instructions.
 
-You can install **deepflash2** with [conda](https://docs.conda.io/en/latest/). We recommend installation into a new, clean [environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html):
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) 
+
+
+#### Other systems
+
+##### [conda](https://docs.conda.io/en/latest/)
+
+We recommend installation into a new, clean [environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
 
 ```bash
 conda install -c fastchan -c matjesg deepflash2 
 ```
 
-#### Pip
+##### [pip](https://pip.pypa.io/en/stable/)
 
-You can also install **deepflash2** with [pip](https://pip.pypa.io/en/stable/). You should install PyTorch first by following the installation instructions of [pytorch](https://pytorch.org/get-started/locally/) or [fastai](https://docs.fast.ai/#Installing).
+You should install PyTorch first by following the installation instructions of [pytorch](https://pytorch.org/get-started/locally/).
 
 ```bash
 pip install deepflash2
 ```
+
 
 If you want to use the GUI, make sure to download the GUI notebook and start a Jupyter server. 
 ```bash
@@ -80,9 +117,7 @@ jupyter notebook
 ```
 Then, open `deepflash2_GUI.ipynb` within Notebook environment.
 
-
-
-#### Docker
+##### Docker
 
 Docker images for __deepflash2__ are built on top of [the latest pytorch image](https://hub.docker.com/r/pytorch/pytorch/). 
 
@@ -93,36 +128,6 @@ Docker images for __deepflash2__ are built on top of [the latest pytorch image](
 All docker containers are configured to start a jupyter server. To add data, we recomment using [bind mounts](https://docs.docker.com/storage/bind-mounts/) with `/workspace` as target. To start the GUI, open `deepflash2_GUI.ipynb` within Notebook environment.
 
 For more information on how to run docker see [docker orientation and setup](https://docs.docker.com/get-started/).
-
-## Demo
-> Get started in less than a minute on Google Colab. Watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html) for help.
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) 
-
-First, open the *deepflash2* GUI in [Colab]((https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) or follow the installation instructions above. The GUI provides a build-in use for sample data. Simply click `Load Sample Data` and follow the instructions or watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html) for help.
-
-<img src="nbs/media/gui_sample_data2.png" width="800px" style="max-width: 800pxpx">
-
-We provide an overview of the sample tasks below:
-
-|  | Ground Truth (GT) Estimation | Training | Prediction |
-|---|---|---|---|
-| Main Task | STAPLE or Majority Voting | Ensemble training  and validation | Semantic and instance segmentation |
-| Sample Data | 5 masks from 5 experts each | 5 image/mask pairs | 5 images and 2 trained models |
-| Expected Output | 5 GT Segmentation Masks | 5 models | 5 predicted segmentation masks  (semantic and instance) |
-| Estimated Time | ~ 1 min | ~ 150 min | ~ 4 min |
-
-Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU). You can download the sample data [here](https://github.com/matjesg/deepflash2/releases/tag/sample_data).
-
-## System requirements
-
-All software dependencies and operating systems (including version numbers)
-
-Python > 3.6
-list of requiremtens
-
-- Versions the software has been tested on
-
-- Any required non-standard hardware
 
 ## Creating segmentation masks with Fiji/ImageJ
 

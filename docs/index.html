@@ -52,10 +52,12 @@ Combining state-of-the-art deep learning with a barrier free environment for lif
 <blockquote><p>Read the <a href="https://arxiv.org/abs/2111.06693">paper</a>, watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a>, or read the <a href="https://matjesg.github.io/deepflash2/">docs</a>.</p>
 <ul>
 <li><strong>No coding skills required</strong> (graphical user interface)</li>
+<li><strong>Ground truth estimation</strong> from the annotations of multiple experts for model training and validation</li>
 <li><strong>Quality assurance and out-of-distribution detection</strong> for reliable prediction on new data </li>
 <li><strong>Best-in-class performance</strong> for semantic and instance segmentation</li>
 </ul>
 </blockquote>
+<p>{% include image.html width="800px" max-width="800px" file="/deepflash2/media/sample_images.png" %}</p>
 <p><img style="float: left;padding: 0px 10px 0px 0px;" src="https://www.kaggle.com/static/images/medals/competitions/goldl@1x.png"></p>
 <p><strong>Kaggle Gold Medal and Innovation Price Winner:</strong> The <em>deepflash2</em> Python API built the foundation for winning the <a href="https://hubmapconsortium.github.io/ccf/pages/kaggle.html">Innovation Award</a> a Kaggle Gold Medal in the <a href="https://www.kaggle.com/c/hubmap-kidney-segmentation">HuBMAP - Hacking the Kidney</a> challenge. 
 Have a look at our <a href="https://www.kaggle.com/matjes/hubmap-deepflash2-judge-price">solution</a></p>
@@ -65,70 +67,12 @@ Have a look at our <a href="https://www.kaggle.com/matjes/hubmap-deepflash2-judg
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Quick-Start">Quick Start<a class="anchor-link" href="#Quick-Start"> </a></h2><blockquote><p>Get started in less than a minute</p>
+<h2 id="Quick-Start-and-Demo">Quick Start and Demo<a class="anchor-link" href="#Quick-Start-and-Demo"> </a></h2><blockquote><p>Get started in less than a minute. Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a> for help.
+For a quick start, run <em>deepflash2</em> in Google Colaboratory with free access to graphics processing units (GPUs).</p>
 </blockquote>
-<p>Run <em>deepflash2</em> in Google Colaboratory with free access to graphics processing units (GPUs) for faster model training</p>
 <p><a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Citing-and-Experiments">Citing and Experiments<a class="anchor-link" href="#Citing-and-Experiments"> </a></h2><p>The preprint of our paper is available on <a href="https://arxiv.org/abs/2111.06693">arXiv</a>. Please cite</p>
-
-<pre><code>@misc{griebel2021deepflash2,
-    title={Deep-learning in the bioimaging wild: Handling ambiguous data with deepflash2}, 
-    author={Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
-    year={2021},
-    eprint={2111.06693},
-    archivePrefix={arXiv}
-}</code></pre>
-<p>We provide a complete guide to reproduce our experiments here.
-The data is currently avaialble on Google Drive.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Installation-Guide">Installation Guide<a class="anchor-link" href="#Installation-Guide"> </a></h2><blockquote><p>Typical install time is about 1-5 minutes, depending on your internet connection</p>
-</blockquote>
-<p>The GUI of <em>deepflash2</em> runs as a web application inside a Jupyter Notebook, the de-facto standard of computational notebooks in the scientific community. The GUI is built on top of the <em>deepflash2</em> Python API, which can be used independently (read the <a href="https://matjesg.github.io/deepflash2/">docs</a>).<em>deepflash2</em> can be installed locally or in cloud environments such as Google Colaboratory (Colab).</p>
-<h4 id="Conda">Conda<a class="anchor-link" href="#Conda"> </a></h4><p>You can install <strong>deepflash2</strong> with <a href="https://docs.conda.io/en/latest/">conda</a>. We recommend installation into a new, clean <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">environment</a>:</p>
-<div class="highlight"><pre><span></span>conda install -c fastchan -c matjesg deepflash2
-</pre></div>
-<h4 id="Pip">Pip<a class="anchor-link" href="#Pip"> </a></h4><p>You can also install <strong>deepflash2</strong> with <a href="https://pip.pypa.io/en/stable/">pip</a>. You should install PyTorch first by following the installation instructions of <a href="https://pytorch.org/get-started/locally/">pytorch</a> or <a href="https://docs.fast.ai/#Installing">fastai</a>.</p>
-<div class="highlight"><pre><span></span>pip install deepflash2
-</pre></div>
-<p>If you want to use the GUI, make sure to download the GUI notebook and start a Jupyter server.</p>
-<div class="highlight"><pre><span></span>curl -o deepflash2_GUI.ipynb https://raw.githubusercontent.com/matjesg/deepflash2/master/deepflash2_GUI.ipynb
-jupyter notebook
-</pre></div>
-<p>Then, open <code>deepflash2_GUI.ipynb</code> within Notebook environment.</p>
-<h4 id="Docker">Docker<a class="anchor-link" href="#Docker"> </a></h4><p>Docker images for <strong>deepflash2</strong> are built on top of <a href="https://hub.docker.com/r/pytorch/pytorch/">the latest pytorch image</a>.</p>
-<ul>
-<li>CPU only<blockquote><p><code>docker run -p 8888:8888 matjes/deepflash2</code></p>
-</blockquote>
-</li>
-<li>For training, we recommend to run docker with GPU support (You need to install <a href="https://github.com/NVIDIA/nvidia-docker">Nvidia-Docker</a> to enable gpu compatibility with these containers.)<blockquote><p><code>docker run --gpus all --shm-size=256m -p 8888:8888 matjes/deepflash2</code>
-All docker containers are configured to start a jupyter server. To add data, we recomment using <a href="https://docs.docker.com/storage/bind-mounts/">bind mounts</a> with <code>/workspace</code> as target. To start the GUI, open <code>deepflash2_GUI.ipynb</code> within Notebook environment.</p>
-</blockquote>
-</li>
-</ul>
-<p>For more information on how to run docker see <a href="https://docs.docker.com/get-started/">docker orientation and setup</a>.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Demo">Demo<a class="anchor-link" href="#Demo"> </a></h2><blockquote><p>Get started in less than a minute on Google Colab. Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a> for help.
-<a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
-</blockquote>
-<p>First, open the <em>deepflash2</em> GUI in <a href="(https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb">Colab</a> or follow the installation instructions above. The GUI provides a build-in use for sample data. Simply click <code>Load Sample Data</code> and follow the instructions or watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a> for help.</p>
-<p>{% include image.html width="800px" max-width="800px" file="/deepflash2/media/gui_sample_data2.png" %}</p>
-<p>We provide an overview of the sample tasks below:</p>
+<p>To try the functionalities of <em>deepflash2</em>, open the <em>deepflash2</em> GUI in <a href="(https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb">Colab</a> or follow the installation instructions below. The GUI provides a build-in use for sample data. After starting the GUI, select the task (GT Estimation, Training, or Prediction) and click <code>Load Sample Data</code>. For futher instructions watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a>.</p>
+<p>We provide an overview of the tasks below:</p>
 <table>
 <thead><tr>
 <th></th>
@@ -154,7 +98,7 @@ All docker containers are configured to start a jupyter server. To add data, we 
 <td>Expected Output</td>
 <td>5 GT Segmentation Masks</td>
 <td>5 models</td>
-<td>5 predicted segmentation masks  (semantic and instance)</td>
+<td>5 predicted segmentation masks  (semantic and instance) and uncertainty maps</td>
 </tr>
 <tr>
 <td>Estimated Time</td>
@@ -171,15 +115,63 @@ All docker containers are configured to start a jupyter server. To add data, we 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="System-requirements">System requirements<a class="anchor-link" href="#System-requirements"> </a></h2><p>All software dependencies and operating systems (including version numbers)</p>
-<p>Python &gt; 3.6
-list of requiremtens</p>
+<h2 id="Paper-and-Experiments">Paper and Experiments<a class="anchor-link" href="#Paper-and-Experiments"> </a></h2><p>We provide a complete guide to reproduce our experiments using the <em>deepflash2 Python API</em> <a href="https://github.com/matjesg/deepflash2/tree/master/paper">here</a>. The data is currently available on <a href="xxx">Google Drive</a>.</p>
+<p>The preprint of our paper is available on <a href="https://arxiv.org/abs/2111.06693">arXiv</a>. Please cite</p>
+
+<pre><code>@misc{griebel2021deepflash2,
+    title={Deep-learning in the bioimaging wild: Handling ambiguous data with deepflash2}, 
+    author={Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
+    year={2021},
+    eprint={2111.06693},
+    archivePrefix={arXiv}
+}</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="System-requirements">System requirements<a class="anchor-link" href="#System-requirements"> </a></h2><blockquote><p>Works in the browser an on your local pc/server</p>
+</blockquote>
+<p><em>deepflash2</em> is designed to run on Windows, Linux, or Mac (x86-64) if <a href="https://pytorch.org/get-started/locally/">pytorch</a> is installable.
+We generally recommend using Google Colab as it only requires a Google Account and a device with a web browser. 
+To run <em>deepflash2</em> locally, we recommend using a system with a GPU (e.g., 2 CPUs, NVIDIA Tesla K80 GPU or better).</p>
+<p>Software dependencies: Python&gt;=3.6, fastai&gt;=2.1.7, zarr&gt;=2.0, scikit-image&gt;=0.18.1, imageio&gt;=2.9.0, ipywidgets&gt;=7.6.3, openpyxl&gt;=3.0.7, albumentations&gt;=1.0.0, opencv-python&gt;=4.0 segmentation_models_pytorch&gt;=0.2; The ground truth estimation functionalities are based on the simpleITK&gt;=2.0.
+Instance segmentation capabilities are complemented using cellpose==0.6.1.</p>
+<p><em>deepflash2</em> is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10 (tbd), MacOS 12.0.1 (tbd)).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Installation-Guide">Installation Guide<a class="anchor-link" href="#Installation-Guide"> </a></h2><blockquote><p>Typical install time is about 1-5 minutes, depending on your internet connection</p>
+</blockquote>
+<p>The GUI of <em>deepflash2</em> runs as a web application inside a Jupyter Notebook, the de-facto standard of computational notebooks in the scientific community. The GUI is built on top of the <em>deepflash2</em> Python API, which can be used independently (read the <a href="https://matjesg.github.io/deepflash2/">docs</a>).</p>
+<h4 id="Google-Colab">Google Colab<a class="anchor-link" href="#Google-Colab"> </a></h4><p>Excute the <code>Set up environment</code> cell or follow the <code>pip</code> instructions.</p>
+<p><a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
+<h4 id="Other-systems">Other systems<a class="anchor-link" href="#Other-systems"> </a></h4><h5 id="conda"><a href="https://docs.conda.io/en/latest/">conda</a><a class="anchor-link" href="#conda"> </a></h5><p>We recommend installation into a new, clean <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">environment</a>.</p>
+<div class="highlight"><pre><span></span>conda install -c fastchan -c matjesg deepflash2
+</pre></div>
+<h5 id="pip"><a href="https://pip.pypa.io/en/stable/">pip</a><a class="anchor-link" href="#pip"> </a></h5><p>You should install PyTorch first by following the installation instructions of <a href="https://pytorch.org/get-started/locally/">pytorch</a>.</p>
+<div class="highlight"><pre><span></span>pip install deepflash2
+</pre></div>
+<p>If you want to use the GUI, make sure to download the GUI notebook and start a Jupyter server.</p>
+<div class="highlight"><pre><span></span>curl -o deepflash2_GUI.ipynb https://raw.githubusercontent.com/matjesg/deepflash2/master/deepflash2_GUI.ipynb
+jupyter notebook
+</pre></div>
+<p>Then, open <code>deepflash2_GUI.ipynb</code> within Notebook environment.</p>
+<h5 id="Docker">Docker<a class="anchor-link" href="#Docker"> </a></h5><p>Docker images for <strong>deepflash2</strong> are built on top of <a href="https://hub.docker.com/r/pytorch/pytorch/">the latest pytorch image</a>.</p>
 <ul>
-<li><p>Versions the software has been tested on</p>
+<li>CPU only<blockquote><p><code>docker run -p 8888:8888 matjes/deepflash2</code></p>
+</blockquote>
 </li>
-<li><p>Any required non-standard hardware</p>
+<li>For training, we recommend to run docker with GPU support (You need to install <a href="https://github.com/NVIDIA/nvidia-docker">Nvidia-Docker</a> to enable gpu compatibility with these containers.)<blockquote><p><code>docker run --gpus all --shm-size=256m -p 8888:8888 matjes/deepflash2</code>
+All docker containers are configured to start a jupyter server. To add data, we recomment using <a href="https://docs.docker.com/storage/bind-mounts/">bind mounts</a> with <code>/workspace</code> as target. To start the GUI, open <code>deepflash2_GUI.ipynb</code> within Notebook environment.</p>
+</blockquote>
 </li>
 </ul>
+<p>For more information on how to run docker see <a href="https://docs.docker.com/get-started/">docker orientation and setup</a>.</p>
 
 </div>
 </div>
