@@ -10,6 +10,7 @@ from fastcore.basics import patch
 import cv2
 import subprocess, sys
 from pathlib import Path
+from pip._internal import main
 from pip._internal.operations import freeze
 
 # Cell
@@ -69,12 +70,16 @@ def load_smp_model(path, device=None, strict=True, **kwargs):
 
 # Cell
 def check_cellpose_installation():
-    commit_hash = '316927eff7ad2201391957909a2114c68baee309' #version 0.6.6.dev13+g316927e
+    tarball = 'cellpose-0.6.6.dev13+g316927e.tar.gz' # '316927eff7ad2201391957909a2114c68baee309'
     try:
-        assert [x for x in freeze.freeze() if x.startswith('cellpose')][0][-len(commit_hash):]==commit_hash
+        extract = [x for x in freeze.freeze() if x.startswith('cellpose')][0][-15:]
+        assert extract==tarball[-15:]
     except:
         print(f'Installing cellpose. Please wait.')
-        subprocess.check_call([sys.executable, "-m", "pip", "install", '--no-deps', f'git+https://github.com/MouseLand/cellpose.git@{commit_hash}'])
+        url = f'https://github.com/matjesg/deepflash2/releases/download/0.1.4/{tarball}'
+        file = download_url(url, show_progress=False)
+        main(['install', '--no-deps', file.as_posix()])
+        file.unlink()
 
 # Cell
 def get_diameters(masks):
