@@ -311,28 +311,6 @@ nb_path: "nbs/01_models.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span>        
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Installing cellpose. Please wait.&#39;</span><span class="p">)</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://github.com/matjesg/deepflash2/releases/download/0.1.4/</span><span class="si">{</span><span class="n">tarball</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="n">file</span> <span class="o">=</span> <span class="n">download_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">show_progress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">main</span><span class="p">([</span><span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-deps&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()])</span>
-        <span class="n">file</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">check_cellpose_installation</span><span class="p">()</span>
 </pre></div>
 
@@ -421,6 +399,25 @@ nb_path: "nbs/01_models.ipynb"
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Using diameter of 17.0
+2021-12-02 21:57:26,265 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
+2021-12-02 21:57:31,709 [INFO] ** TORCH CUDA version installed and working. **
+2021-12-02 21:57:31,710 [INFO] &gt;&gt;&gt;&gt; using GPU
+2021-12-02 21:57:31,833 [INFO] ~~~ FINDING MASKS ~~~
+2021-12-02 21:57:35,709 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 3.88 sec
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 

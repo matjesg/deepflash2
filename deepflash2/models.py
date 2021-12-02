@@ -5,10 +5,10 @@ __all__ = ['ARCHITECTURES', 'ENCODERS', 'get_pretrained_options', 'create_smp_mo
 
 # Cell
 import torch, numpy as np
+import cv2
 import segmentation_models_pytorch as smp
 from fastcore.basics import patch
-import cv2
-import subprocess, sys
+from fastdownload import download_url
 from pathlib import Path
 from pip._internal import main
 from pip._internal.operations import freeze
