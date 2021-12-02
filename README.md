@@ -75,8 +75,7 @@ The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.066
 We generally recommend using Google Colab as it only requires a Google Account and a device with a web browser. 
 To run *deepflash2* locally, we recommend using a system with a GPU (e.g., 2 CPUs, NVIDIA Tesla K80 GPU or better).
 
-Software dependencies: Python>=3.6, fastai>=2.1.7, zarr>=2.0, scikit-image>=0.18.1, imageio>=2.9.0, ipywidgets>=7.6.3, openpyxl>=3.0.7, albumentations>=1.0.0, opencv-python>=4.0 segmentation_models_pytorch>=0.2; The ground truth estimation functionalities are based on the simpleITK>=2.0.
-Instance segmentation capabilities are complemented using cellpose==0.6.1.
+Software dependencies are defined in the [settings.ini](https://github.com/matjesg/deepflash2/blob/master/settings.ini) file. Additionally, the ground truth estimation functionalities are based on the simpleITK>=2.0 and the instance segmentation capabilities are complemented using cellpose with commit hash `316927eff7ad2201391957909a2114c68baee309`.
 
 *deepflash2* is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10 (tbd), MacOS 12.0.1 (tbd)).
 
