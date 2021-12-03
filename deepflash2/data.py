@@ -290,14 +290,14 @@ def _read_msk(path, n_classes=2, instance_labels=False, remove_connectivity=True
 class BaseDataset(Dataset):
     def __init__(self, files, label_fn=None, instance_labels = False, n_classes=2, ignore={},remove_connectivity=True,stats=None,normalize=True,
                  tile_shape=(512,512), padding=(0,0),preproc_dir=None, verbose=1, scale=1, pdf_reshape=512, use_preprocessed_labels=False, **kwargs):
-        store_attr('files, label_fn, instance_labels, n_classes, ignore, tile_shape, remove_connectivity, padding, normalize, scale, pdf_reshape, use_preprocessed_labels')
+        store_attr('files, label_fn, instance_labels, n_classes, ignore, tile_shape, remove_connectivity, padding, preproc_dir, normalize, scale, pdf_reshape, use_preprocessed_labels')
         self.c = n_classes
 
         if self.normalize:
             self.stats = stats or self.compute_stats()
 
         if label_fn is not None:
-            self.preproc_dir = preproc_dir or zarr.storage.TempStore()
+            self.preproc_dir = self.preproc_dir or zarr.storage.TempStore()
             root = zarr.group(store=self.preproc_dir, overwrite= not use_preprocessed_labels)
             self.labels, self.pdfs = root.require_groups('labels','pdfs')
             self._preproc(verbose)

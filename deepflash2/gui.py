@@ -61,7 +61,7 @@ def exception_handler(exception_type, exception, traceback):
     err_html = f'''
     <div>
         <p style="float: left;padding: 0px 10px 0px 0px;<"><img style="height:50px;" src={oops_url} alt="Oops!"/></p>
-        <p><b>Something went wrong!</b> Please revise your input and retry! <br> Error message: {exception}</p>
+        <p><b>Something went wrong!</b> Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html" target="_blank">tutorials</a> for help. <br> Error message: {exception}</p>
     </div>
     '''
     with err_out:
