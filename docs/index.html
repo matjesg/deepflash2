@@ -69,9 +69,15 @@ Have a look at our <a href="https://www.kaggle.com/matjes/hubmap-deepflash2-judg
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Quick-Start-and-Demo">Quick Start and Demo<a class="anchor-link" href="#Quick-Start-and-Demo"> </a></h2><blockquote><p>Get started in less than a minute. Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a> for help.</p>
 </blockquote>
-<p>For a quick start, run <em>deepflash2</em> in Google Colaboratory with free access to graphics processing units (GPUs).</p>
+<p>For a quick start, run <em>deepflash2</em> in Google Colaboratory (Google account required).</p>
 <p><a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
-<p>To try the functionalities of <em>deepflash2</em>, open the <em>deepflash2</em> GUI in <a href="(https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb">Colab</a> or follow the installation instructions below. The GUI provides a build-in use for sample data. After starting the GUI, select the task (GT Estimation, Training, or Prediction) and click <code>Load Sample Data</code>. For futher instructions watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a>.</p>
+<video src="https://user-images.githubusercontent.com/13711052/139751414-acf737db-2d8a-4203-8a34-7a38e5326b5e.mov" controls width="100%"></video><h4 id="Demo-usage">Demo usage<a class="anchor-link" href="#Demo-usage"> </a></h4><p>The GUI provides a build-in use for our <a href="https://github.com/matjesg/deepflash2/releases/tag/sample_data">sample data</a>.</p>
+<ol>
+<li>Starting the GUI (in <a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb">Colab</a> or follow the installation instructions below)</li>
+<li>Select the task (GT Estimation, Training, or Prediction) </li>
+<li>Click the <code>Load Sample Data</code> button in the sidebar and continue to the next sidebar section.</li>
+</ol>
+<p>For futher instructions watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a>.</p>
 <p>We provide an overview of the tasks below:</p>
 <table>
 <thead><tr>
@@ -108,7 +114,7 @@ Have a look at our <a href="https://www.kaggle.com/matjes/hubmap-deepflash2-judg
 </tr>
 </tbody>
 </table>
-<p>Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU). You can download the sample data <a href="https://github.com/matjesg/deepflash2/releases/tag/sample_data">here</a>.</p>
+<p>Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU).</p>
 
 </div>
 </div>
@@ -147,7 +153,7 @@ To run <em>deepflash2</em> locally, we recommend using a system with a GPU (e.g.
 <h2 id="Installation-Guide">Installation Guide<a class="anchor-link" href="#Installation-Guide"> </a></h2><blockquote><p>Typical install time is about 1-5 minutes, depending on your internet connection</p>
 </blockquote>
 <p>The GUI of <em>deepflash2</em> runs as a web application inside a Jupyter Notebook, the de-facto standard of computational notebooks in the scientific community. The GUI is built on top of the <em>deepflash2</em> Python API, which can be used independently (read the <a href="https://matjesg.github.io/deepflash2/">docs</a>).</p>
-<h4 id="Google-Colab">Google Colab<a class="anchor-link" href="#Google-Colab"> </a></h4><p>Excute the <code>Set up environment</code> cell or follow the <code>pip</code> instructions.</p>
+<h4 id="Google-Colab">Google Colab<a class="anchor-link" href="#Google-Colab"> </a></h4><p>Excute the <code>Set up environment</code> cell or follow the <code>pip</code> instructions. Colab provides free access to graphics processing units (GPUs) for fast model training and prediction (Google account required).</p>
 <p><a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
 <h4 id="Other-systems">Other systems<a class="anchor-link" href="#Other-systems"> </a></h4><h5 id="conda"><a href="https://docs.conda.io/en/latest/">conda</a><a class="anchor-link" href="#conda"> </a></h5><p>We recommend installation into a new, clean <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">environment</a>.</p>
 <div class="highlight"><pre><span></span>conda install -c conda-forge -c fastchan -c matjesg deepflash2

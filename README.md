@@ -34,11 +34,20 @@ Have a look at our [solution](https://www.kaggle.com/matjes/hubmap-deepflash2-ju
 ## Quick Start and Demo
 > Get started in less than a minute. Watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html) for help.
 
-For a quick start, run *deepflash2* in Google Colaboratory with free access to graphics processing units (GPUs).
+For a quick start, run *deepflash2* in Google Colaboratory (Google account required).
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) 
+<video src="https://user-images.githubusercontent.com/13711052/139751414-acf737db-2d8a-4203-8a34-7a38e5326b5e.mov" controls width="100%"></video>
 
-To try the functionalities of *deepflash2*, open the *deepflash2* GUI in [Colab]((https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) or follow the installation instructions below. The GUI provides a build-in use for sample data. After starting the GUI, select the task (GT Estimation, Training, or Prediction) and click `Load Sample Data`. For futher instructions watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html).
+
+#### Demo usage
+The GUI provides a build-in use for our [sample data](https://github.com/matjesg/deepflash2/releases/tag/sample_data).
+
+1. Starting the GUI (in [Colab](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) or follow the installation instructions below)
+2. Select the task (GT Estimation, Training, or Prediction) 
+3. Click the `Load Sample Data` button in the sidebar and continue to the next sidebar section.
+
+For futher instructions watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html).
 
 We provide an overview of the tasks below:
 
@@ -49,7 +58,7 @@ We provide an overview of the tasks below:
 | Expected Output | 5 GT Segmentation Masks | 5 models | 5 predicted segmentation masks  (semantic and instance) and uncertainty maps|
 | Estimated Time | ~ 1 min | ~ 150 min | ~ 4 min |
 
-Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU). You can download the sample data [here](https://github.com/matjesg/deepflash2/releases/tag/sample_data).
+Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU).
 
 ## Paper and Experiments 
 
@@ -86,7 +95,7 @@ Software dependencies are defined in the [settings.ini](https://github.com/matje
 The GUI of *deepflash2* runs as a web application inside a Jupyter Notebook, the de-facto standard of computational notebooks in the scientific community. The GUI is built on top of the *deepflash2* Python API, which can be used independently (read the [docs](https://matjesg.github.io/deepflash2/)).
 #### Google Colab
 
-Excute the `Set up environment` cell or follow the `pip` instructions.
+Excute the `Set up environment` cell or follow the `pip` instructions. Colab provides free access to graphics processing units (GPUs) for fast model training and prediction (Google account required).
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) 
 
