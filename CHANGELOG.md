@@ -2,9 +2,15 @@
 
 <!-- do not remove -->
 
+## 0.1.6
+
+- Removing git dependency for cellpose installation.
+
+
+
 ## 0.1.5
 
-
+- Bug fixes and minor improvements.
 
 
 ## 0.1.4
@@ -54,7 +60,7 @@ Proposed solution: Ensemble learner takes "num_workers" argument and passes it t
 
 ## 0.1.1
 
-- Bud fixes and minor improvements.
+- Bug fixes and minor improvements.
 
 ## 0.1.0
 

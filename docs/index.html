@@ -67,9 +67,9 @@ Have a look at our <a href="https://www.kaggle.com/matjes/hubmap-deepflash2-judg
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Quick-Start-and-Demo">Quick Start and Demo<a class="anchor-link" href="#Quick-Start-and-Demo"> </a></h2><blockquote><p>Get started in less than a minute. Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a> for help.
-For a quick start, run <em>deepflash2</em> in Google Colaboratory with free access to graphics processing units (GPUs).</p>
+<h2 id="Quick-Start-and-Demo">Quick Start and Demo<a class="anchor-link" href="#Quick-Start-and-Demo"> </a></h2><blockquote><p>Get started in less than a minute. Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a> for help.</p>
 </blockquote>
+<p>For a quick start, run <em>deepflash2</em> in Google Colaboratory with free access to graphics processing units (GPUs).</p>
 <p><a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
 <p>To try the functionalities of <em>deepflash2</em>, open the <em>deepflash2</em> GUI in <a href="(https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb">Colab</a> or follow the installation instructions below. The GUI provides a build-in use for sample data. After starting the GUI, select the task (GT Estimation, Training, or Prediction) and click <code>Load Sample Data</code>. For futher instructions watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html">tutorials</a>.</p>
 <p>We provide an overview of the tasks below:</p>
@@ -131,13 +131,13 @@ For a quick start, run <em>deepflash2</em> in Google Colaboratory with free acce
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="System-requirements">System requirements<a class="anchor-link" href="#System-requirements"> </a></h2><blockquote><p>Works in the browser an on your local pc/server</p>
+<h2 id="System-requirements">System requirements<a class="anchor-link" href="#System-requirements"> </a></h2><blockquote><p>Works in the browser or on your local pc/server</p>
 </blockquote>
 <p><em>deepflash2</em> is designed to run on Windows, Linux, or Mac (x86-64) if <a href="https://pytorch.org/get-started/locally/">pytorch</a> is installable.
 We generally recommend using Google Colab as it only requires a Google Account and a device with a web browser. 
 To run <em>deepflash2</em> locally, we recommend using a system with a GPU (e.g., 2 CPUs, NVIDIA Tesla K80 GPU or better).</p>
-<p>Software dependencies are defined in the <a href="https://github.com/matjesg/deepflash2/blob/master/settings.ini">settings.ini</a> file. Additionally, the ground truth estimation functionalities are based on the simpleITK&gt;=2.0 and the instance segmentation capabilities are complemented using cellpose with commit hash <code>316927eff7ad2201391957909a2114c68baee309</code>.</p>
-<p><em>deepflash2</em> is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10 (tbd), MacOS 12.0.1 (tbd)).</p>
+<p>Software dependencies are defined in the <a href="https://github.com/matjesg/deepflash2/blob/master/settings.ini">settings.ini</a> file. Additionally, the ground truth estimation functionalities are based on simpleITK&gt;=2.0 and the instance segmentation capabilities are complemented using cellpose v0.6.6.dev13+g316927e.</p>
+<p><em>deepflash2</em> is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10, MacOS 12.0.1).</p>
 
 </div>
 </div>
@@ -152,7 +152,7 @@ To run <em>deepflash2</em> locally, we recommend using a system with a GPU (e.g.
 <h4 id="Other-systems">Other systems<a class="anchor-link" href="#Other-systems"> </a></h4><h5 id="conda"><a href="https://docs.conda.io/en/latest/">conda</a><a class="anchor-link" href="#conda"> </a></h5><p>We recommend installation into a new, clean <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">environment</a>.</p>
 <div class="highlight"><pre><span></span>conda install -c conda-forge -c fastchan -c matjesg deepflash2
 </pre></div>
-<h5 id="pip"><a href="https://pip.pypa.io/en/stable/">pip</a><a class="anchor-link" href="#pip"> </a></h5><p>You should install PyTorch first by following the installation instructions of <a href="https://pytorch.org/get-started/locally/">pytorch</a>.</p>
+<h5 id="pip"><a href="https://pip.pypa.io/en/stable/">pip</a><a class="anchor-link" href="#pip"> </a></h5><p>For GPU support we recommend to install PyTorch first by following the <a href="https://pytorch.org/get-started/locally/">installation instructions</a>.</p>
 <div class="highlight"><pre><span></span>pip install deepflash2
 </pre></div>
 <p>If you want to use the GUI, make sure to download the GUI notebook and start a Jupyter server.</p>

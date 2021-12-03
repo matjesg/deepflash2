@@ -33,6 +33,7 @@ Have a look at our [solution](https://www.kaggle.com/matjes/hubmap-deepflash2-ju
 
 ## Quick Start and Demo
 > Get started in less than a minute. Watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html) for help.
+
 For a quick start, run *deepflash2* in Google Colaboratory with free access to graphics processing units (GPUs).
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) 
@@ -69,15 +70,15 @@ The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.066
 
 
 ## System requirements
-> Works in the browser an on your local pc/server
+> Works in the browser or on your local pc/server
 
 *deepflash2* is designed to run on Windows, Linux, or Mac (x86-64) if [pytorch](https://pytorch.org/get-started/locally/) is installable.
 We generally recommend using Google Colab as it only requires a Google Account and a device with a web browser. 
 To run *deepflash2* locally, we recommend using a system with a GPU (e.g., 2 CPUs, NVIDIA Tesla K80 GPU or better).
 
-Software dependencies are defined in the [settings.ini](https://github.com/matjesg/deepflash2/blob/master/settings.ini) file. Additionally, the ground truth estimation functionalities are based on the simpleITK>=2.0 and the instance segmentation capabilities are complemented using cellpose with commit hash `316927eff7ad2201391957909a2114c68baee309`.
+Software dependencies are defined in the [settings.ini](https://github.com/matjesg/deepflash2/blob/master/settings.ini) file. Additionally, the ground truth estimation functionalities are based on simpleITK>=2.0 and the instance segmentation capabilities are complemented using cellpose v0.6.6.dev13+g316927e.
 
-*deepflash2* is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10 (tbd), MacOS 12.0.1 (tbd)).
+*deepflash2* is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10, MacOS 12.0.1).
 
 ## Installation Guide
 > Typical install time is about 1-5 minutes, depending on your internet connection
@@ -102,7 +103,7 @@ conda install -c conda-forge -c fastchan -c matjesg deepflash2
 
 ##### [pip](https://pip.pypa.io/en/stable/)
 
-You should install PyTorch first by following the installation instructions of [pytorch](https://pytorch.org/get-started/locally/).
+For GPU support we recommend to install PyTorch first by following the [installation instructions](https://pytorch.org/get-started/locally/).
 
 ```bash
 pip install deepflash2
