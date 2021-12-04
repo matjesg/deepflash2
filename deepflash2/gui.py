@@ -11,6 +11,7 @@ __all__ = ['GRID_COLS', 'COLS_PRED_KEEP', 'COLS_PRED_KEEP_DS', 'COLS_PRED_KEEP_C
 import os, sys, shutil, time, zipfile, urllib, subprocess
 import numpy as np, pandas as pd
 import logging, datetime
+import traceback
 
 import ipywidgets as w
 from ipywidgets.embed import embed_minimal_html
@@ -57,11 +58,12 @@ err_out= w.Output()
 #oops_url = 'https://cdn-icons-png.flaticon.com/512/260/260190.png'
 oops_url = 'https://cdn-icons-png.flaticon.com/512/1049/1049967.png'
 
-def exception_handler(exception_type, exception, traceback):
+def exception_handler(exception_type, exception, tb):
+    first_error = traceback.format_exc(0).split('\n')[0].split(':')[1]
     err_html = f'''
     <div>
         <p style="float: left;padding: 0px 10px 0px 0px;<"><img style="height:50px;" src={oops_url} alt="Oops!"/></p>
-        <p><b>Something went wrong!</b> Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html" target="_blank">tutorials</a> for help. <br> Error message: {exception}</p>
+        <p><b>Something went wrong!</b> Watch the <u><a href="https://matjesg.github.io/deepflash2/tutorial.html" target="_blank">tutorials</a></u> for help. <br> Last error: {first_error}</p>
     </div>
     '''
     with err_out:
