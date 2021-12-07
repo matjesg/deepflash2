@@ -1,19 +1,6 @@
-# Title
+# Welcome to
 
 
-
-![deepflash2](https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/logo/deepflash2_logo_medium.png)
-
-Official repository of deepflash2 - a deep-learning pipeline for segmentation of ambiguous microscopic images.
-
-![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) 
-[![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) 
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/deepflash2)](https://pypistats.org/packages/deepflash2)
-[![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2)
-[![Build fastai images](https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg)](https://github.com/matjesg/deepflash2)
-[![GitHub stars](https://img.shields.io/github/stars/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
-[![GitHub forks](https://img.shields.io/github/forks/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
-***
 
 __The best of two worlds:__
 Combining state-of-the-art deep learning with a barrier free environment for life science researchers. 
@@ -102,14 +89,14 @@ Open <a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/m
 
 ### Other systems
 
-We recommend installation into a clean Python environment (e.g., using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
+We recommend installation into a clean Python 3.7, 3.8, or 3.9 environment (e.g., using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 
-#### [conda](https://docs.conda.io/en/latest/)/[mamba](https://github.com/mamba-org/mamba)
+#### [mamba](https://github.com/mamba-org/mamba)/[conda](https://docs.conda.io/en/latest/)
 
-If you replace `conda` with `mamba` the install process will be much faster and more reliable (you need to install [mamba](https://github.com/mamba-org/mamba) first):
+Installation with mamba (installaton [instructions](https://github.com/mamba-org/mamba)) allows a fast and realiable installation process (you can replace `mamba` with `conda` and add the `--update-all` flag to do the installation with conda).
 
 ```bash
-conda install -c fastchan -c conda-forge -c matjesg deepflash2 
+mamba install -c fastchan -c conda-forge -c matjesg deepflash2 
 ```
 
 #### [pip](https://pip.pypa.io/en/stable/)

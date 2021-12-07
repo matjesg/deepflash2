@@ -1,6 +1,6 @@
 ---
 
-title: Title
+title: Welcome to
 
 
 keywords: fastai
@@ -29,22 +29,6 @@ nb_path: "nbs/index.ipynb"
 </div>
     {% endraw %}
 
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><img src="https://raw.githubusercontent.com/matjesg/deepflash2/master/nbs/media/logo/deepflash2_logo_medium.png" alt="deepflash2"></p>
-<p>Official repository of deepflash2 - a deep-learning pipeline for segmentation of ambiguous microscopic images.</p>
-<p><img src="https://github.com/matjesg/deepflash2/workflows/CI/badge.svg" alt="CI"> 
-<a href="https://pypi.org/project/deepflash2/#description"><img src="https://img.shields.io/pypi/v/deepflash2?color=blue&amp;label=pypi%20version" alt="PyPI"></a> 
-<a href="https://pypistats.org/packages/deepflash2"><img src="https://img.shields.io/pypi/dm/deepflash2" alt="PyPI - Downloads"></a>
-<a href="https://anaconda.org/matjesg/deepflash2"><img src="https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&amp;label=conda%20version" alt="Conda (channel only)"></a>
-<a href="https://github.com/matjesg/deepflash2"><img src="https://github.com/matjesg/deepflash2/workflows/Build%20deepflash2%20images/badge.svg" alt="Build fastai images"></a>
-<a href="https://github.com/matjesg/deepflash2/"><img src="https://img.shields.io/github/stars/matjesg/deepflash2?style=social" alt="GitHub stars"></a>
-<a href="https://github.com/matjesg/deepflash2/"><img src="https://img.shields.io/github/forks/matjesg/deepflash2?style=social" alt="GitHub forks"></a></p>
-<hr>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>The best of two worlds:</strong>
@@ -155,9 +139,9 @@ To run <em>deepflash2</em> locally, we recommend using a system with a GPU (e.g.
 <p>The GUI of <em>deepflash2</em> runs as a web application inside a Jupyter Notebook, the de-facto standard of computational notebooks in the scientific community. The GUI is built on top of the <em>deepflash2</em> Python API, which can be used independently (read the <a href="https://matjesg.github.io/deepflash2/">docs</a>).</p>
 <h3 id="Google-Colab">Google Colab<a class="anchor-link" href="#Google-Colab"> </a></h3><p><a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab"></a></p>
 <p>Open <a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb" target="_blank">Colab</a> and excute the <code>Set up environment</code> cell or follow the <code>pip</code> instructions. Colab provides free access to graphics processing units (GPUs) for fast model training and prediction (Google account required).</p>
-<h3 id="Other-systems">Other systems<a class="anchor-link" href="#Other-systems"> </a></h3><p>We recommend installation into a clean Python environment (e.g., using <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda</a>).</p>
-<h4 id="conda/mamba"><a href="https://docs.conda.io/en/latest/">conda</a>/<a href="https://github.com/mamba-org/mamba">mamba</a><a class="anchor-link" href="#conda/mamba"> </a></h4><p>If you replace <code>conda</code> with <code>mamba</code> the install process will be much faster and more reliable (you need to install <a href="https://github.com/mamba-org/mamba">mamba</a> first):</p>
-<div class="highlight"><pre><span></span>conda install -c fastchan -c conda-forge -c matjesg deepflash2
+<h3 id="Other-systems">Other systems<a class="anchor-link" href="#Other-systems"> </a></h3><p>We recommend installation into a clean Python 3.7, 3.8, or 3.9 environment (e.g., using <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">conda</a>).</p>
+<h4 id="mamba/conda"><a href="https://github.com/mamba-org/mamba">mamba</a>/<a href="https://docs.conda.io/en/latest/">conda</a><a class="anchor-link" href="#mamba/conda"> </a></h4><p>Installation with mamba (installaton <a href="https://github.com/mamba-org/mamba">instructions</a>) allows a fast and realiable installation process (you can replace <code>mamba</code> with <code>conda</code> and add the <code>--update-all</code> flag to do the installation with conda).</p>
+<div class="highlight"><pre><span></span>mamba install -c fastchan -c conda-forge -c matjesg deepflash2
 </pre></div>
 <h4 id="pip"><a href="https://pip.pypa.io/en/stable/">pip</a><a class="anchor-link" href="#pip"> </a></h4><p>If you want to use your GPU and install with pip, we recommend installing PyTorch first by following the <a href="https://pytorch.org/get-started/locally/">installation instructions</a>.</p>
 <div class="highlight"><pre><span></span>pip install -U deepflash2

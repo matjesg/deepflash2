@@ -2,6 +2,12 @@
 
 <!-- do not remove -->
 
+## 0.1.7
+
+- Fixes bug when predicting on new data.
+
+
+
 ## 0.1.6
 
 - Removing git dependency for cellpose installation.
