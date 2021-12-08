@@ -23,9 +23,11 @@ ENCODERS = [*smp.encoders.encoders.keys()]
 
 # Cell
 class SegFormer(torch.nn.Module):
-    def __init__(self, classes=2, in_channels=1, **kwargs):
+    def __init__(self, classes=2, in_channels=1, encoder_weights='segformer-b0-finetuned-ade-512-512', **kwargs):
         super(SegFormer, self).__init__()
-        self.segformer = SegformerForSemanticSegmentation.from_pretrained("nvidia/mit-b0",
+        #print(f'Loading weights: {encoder_weights}')
+        self.segformer = SegformerForSemanticSegmentation.from_pretrained(
+                                                             f'nvidia/{encoder_weights}',
                                                              ignore_mismatched_sizes=True,
                                                              num_channels=in_channels,
                                                              num_labels=classes,
