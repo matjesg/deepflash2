@@ -45,6 +45,67 @@ nb_path: "nbs/01_models.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Transformers/Huggingface-Integration">Transformers/Huggingface Integration<a class="anchor-link" href="#Transformers/Huggingface-Integration"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="SegFormer" class="doc_header"><code>class</code> <code>SegFormer</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L25" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>SegFormer</code>(<strong><code>classes</code></strong>=<em><code>2</code></em>, <strong><code>in_channels</code></strong>=<em><code>1</code></em>, <strong>**<code>kwargs</code></strong>) :: <code>Module</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Segmenation-Models-Pytorch-Integration">Segmenation Models Pytorch Integration<a class="anchor-link" href="#Segmenation-Models-Pytorch-Integration"> </a></h2><p>From the website:</p>
 <ul>
 <li>High level API (just two lines to create a neural network)</li>
@@ -68,7 +129,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_pretrained_options" class="doc_header"><code>get_pretrained_options</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L24" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_pretrained_options</code>(<strong><code>encoder_name</code></strong>)</p>
+<h4 id="get_pretrained_options" class="doc_header"><code>get_pretrained_options</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L40" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_pretrained_options</code>(<strong><code>encoder_name</code></strong>)</p>
 </blockquote>
 <p>Return available options for pretrained weights for a given encoder</p>
 
@@ -100,7 +161,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="create_smp_model" class="doc_header"><code>create_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L30" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="create_smp_model" class="doc_header"><code>create_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L46" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>create_smp_model</code>(<strong><code>arch</code></strong>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Create segmentation_models_pytorch model</p>
 
@@ -155,6 +216,27 @@ nb_path: "nbs/01_models.ipynb"
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Some weights of the model checkpoint at nvidia/mit-b0 were not used when initializing SegformerForSemanticSegmentation: [&#39;classifier.weight&#39;, &#39;classifier.bias&#39;]
+- This IS expected if you are initializing SegformerForSemanticSegmentation from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing SegformerForSemanticSegmentation from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/mit-b0 and are newly initialized: [&#39;decode_head.linear_c.2.proj.weight&#39;, &#39;decode_head.linear_c.2.proj.bias&#39;, &#39;decode_head.linear_fuse.weight&#39;, &#39;decode_head.batch_norm.weight&#39;, &#39;decode_head.linear_c.1.proj.weight&#39;, &#39;decode_head.batch_norm.num_batches_tracked&#39;, &#39;decode_head.classifier.weight&#39;, &#39;decode_head.linear_c.3.proj.weight&#39;, &#39;decode_head.linear_c.3.proj.bias&#39;, &#39;decode_head.batch_norm.running_var&#39;, &#39;decode_head.linear_c.1.proj.bias&#39;, &#39;decode_head.linear_c.0.proj.bias&#39;, &#39;decode_head.batch_norm.bias&#39;, &#39;decode_head.linear_c.0.proj.weight&#39;, &#39;decode_head.batch_norm.running_mean&#39;, &#39;decode_head.classifier.bias&#39;]
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/mit-b0 and are newly initialized because the shapes did not match:
+- segformer.encoder.patch_embeddings.0.proj.weight: found shape torch.Size([32, 3, 7, 7]) in the checkpoint and torch.Size([32, 1, 7, 7]) in the model instantiated
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -169,7 +251,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_smp_model" class="doc_header"><code>save_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L50" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_smp_model</code>(<strong><code>model</code></strong>, <strong><code>arch</code></strong>, <strong><code>path</code></strong>, <strong><code>stats</code></strong>=<em><code>None</code></em>, <strong><code>pickle_protocol</code></strong>=<em><code>2</code></em>)</p>
+<h4 id="save_smp_model" class="doc_header"><code>save_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L67" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_smp_model</code>(<strong><code>model</code></strong>, <strong><code>arch</code></strong>, <strong><code>path</code></strong>, <strong><code>stats</code></strong>=<em><code>None</code></em>, <strong><code>pickle_protocol</code></strong>=<em><code>2</code></em>)</p>
 </blockquote>
 <p>Save smp model, optionally including  stats</p>
 
@@ -215,6 +297,49 @@ nb_path: "nbs/01_models.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;SegFormer&#39;</span>
+<span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;tst.pth&#39;</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;encoder_name&#39;</span><span class="p">:</span> <span class="s1">&#39;resnet34&#39;</span><span class="p">}</span>
+<span class="n">tst</span> <span class="o">=</span> <span class="n">create_smp_model</span><span class="p">(</span><span class="n">arch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">save_smp_model</span><span class="p">(</span><span class="n">tst</span><span class="p">,</span> <span class="n">arch</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">stats</span><span class="o">=</span><span class="n">stats</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Some weights of the model checkpoint at nvidia/mit-b0 were not used when initializing SegformerForSemanticSegmentation: [&#39;classifier.weight&#39;, &#39;classifier.bias&#39;]
+- This IS expected if you are initializing SegformerForSemanticSegmentation from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing SegformerForSemanticSegmentation from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/mit-b0 and are newly initialized: [&#39;decode_head.linear_c.2.proj.weight&#39;, &#39;decode_head.linear_c.2.proj.bias&#39;, &#39;decode_head.linear_fuse.weight&#39;, &#39;decode_head.batch_norm.weight&#39;, &#39;decode_head.linear_c.1.proj.weight&#39;, &#39;decode_head.batch_norm.num_batches_tracked&#39;, &#39;decode_head.classifier.weight&#39;, &#39;decode_head.linear_c.3.proj.weight&#39;, &#39;decode_head.linear_c.3.proj.bias&#39;, &#39;decode_head.batch_norm.running_var&#39;, &#39;decode_head.linear_c.1.proj.bias&#39;, &#39;decode_head.linear_c.0.proj.bias&#39;, &#39;decode_head.batch_norm.bias&#39;, &#39;decode_head.linear_c.0.proj.weight&#39;, &#39;decode_head.batch_norm.running_mean&#39;, &#39;decode_head.classifier.bias&#39;]
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/mit-b0 and are newly initialized because the shapes did not match:
+- segformer.encoder.patch_embeddings.0.proj.weight: found shape torch.Size([32, 3, 7, 7]) in the checkpoint and torch.Size([32, 1, 7, 7]) in the model instantiated
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 <div class="output_wrapper">
 <div class="output">
@@ -223,7 +348,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L59" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>path</code></strong>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>strict</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="load_smp_model" class="doc_header"><code>load_smp_model</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L76" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>load_smp_model</code>(<strong><code>path</code></strong>, <strong><code>device</code></strong>=<em><code>None</code></em>, <strong><code>strict</code></strong>=<em><code>True</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Loads smp model from file</p>
 
@@ -262,6 +387,27 @@ nb_path: "nbs/01_models.ipynb"
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Some weights of the model checkpoint at nvidia/mit-b0 were not used when initializing SegformerForSemanticSegmentation: [&#39;classifier.weight&#39;, &#39;classifier.bias&#39;]
+- This IS expected if you are initializing SegformerForSemanticSegmentation from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing SegformerForSemanticSegmentation from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/mit-b0 and are newly initialized: [&#39;decode_head.linear_c.2.proj.weight&#39;, &#39;decode_head.linear_c.2.proj.bias&#39;, &#39;decode_head.linear_fuse.weight&#39;, &#39;decode_head.batch_norm.weight&#39;, &#39;decode_head.linear_c.1.proj.weight&#39;, &#39;decode_head.batch_norm.num_batches_tracked&#39;, &#39;decode_head.classifier.weight&#39;, &#39;decode_head.linear_c.3.proj.weight&#39;, &#39;decode_head.linear_c.3.proj.bias&#39;, &#39;decode_head.batch_norm.running_var&#39;, &#39;decode_head.linear_c.1.proj.bias&#39;, &#39;decode_head.linear_c.0.proj.bias&#39;, &#39;decode_head.batch_norm.bias&#39;, &#39;decode_head.linear_c.0.proj.weight&#39;, &#39;decode_head.batch_norm.running_mean&#39;, &#39;decode_head.classifier.bias&#39;]
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/mit-b0 and are newly initialized because the shapes did not match:
+- segformer.encoder.patch_embeddings.0.proj.weight: found shape torch.Size([32, 3, 7, 7]) in the checkpoint and torch.Size([32, 1, 7, 7]) in the model instantiated
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -284,7 +430,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="check_cellpose_installation" class="doc_header"><code>check_cellpose_installation</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L72" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>check_cellpose_installation</code>(<strong><code>show_progress</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="check_cellpose_installation" class="doc_header"><code>check_cellpose_installation</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L89" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>check_cellpose_installation</code>(<strong><code>show_progress</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 
 </div>
@@ -315,7 +461,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_diameters" class="doc_header"><code>get_diameters</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L86" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_diameters</code>(<strong><code>masks</code></strong>)</p>
+<h4 id="get_diameters" class="doc_header"><code>get_diameters</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L103" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_diameters</code>(<strong><code>masks</code></strong>)</p>
 </blockquote>
 <p>Get diameters from deepflash2 prediction</p>
 
@@ -347,7 +493,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="run_cellpose" class="doc_header"><code>run_cellpose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L96" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run_cellpose</code>(<strong><code>probs</code></strong>, <strong><code>masks</code></strong>, <strong><code>model_type</code></strong>=<em><code>'nuclei'</code></em>, <strong><code>diameter</code></strong>=<em><code>0</code></em>, <strong><code>min_size</code></strong>=<em><code>-1</code></em>, <strong><code>gpu</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="run_cellpose" class="doc_header"><code>run_cellpose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L113" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run_cellpose</code>(<strong><code>probs</code></strong>, <strong><code>masks</code></strong>, <strong><code>model_type</code></strong>=<em><code>'nuclei'</code></em>, <strong><code>diameter</code></strong>=<em><code>0</code></em>, <strong><code>min_size</code></strong>=<em><code>-1</code></em>, <strong><code>gpu</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 <p>Run cellpose on deepflash2 predictions</p>
 
@@ -392,11 +538,11 @@ nb_path: "nbs/01_models.ipynb"
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Using diameter of 17.0
-2021-12-02 23:57:28,421 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
-2021-12-02 23:57:33,849 [INFO] ** TORCH CUDA version installed and working. **
-2021-12-02 23:57:33,851 [INFO] &gt;&gt;&gt;&gt; using GPU
-2021-12-02 23:57:33,972 [INFO] ~~~ FINDING MASKS ~~~
-2021-12-02 23:57:38,265 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 4.29 sec
+2021-12-08 13:48:42,625 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
+2021-12-08 13:48:43,818 [INFO] ** TORCH CUDA version installed and working. **
+2021-12-08 13:48:43,818 [INFO] &gt;&gt;&gt;&gt; using GPU
+2021-12-08 13:48:43,861 [INFO] ~~~ FINDING MASKS ~~~
+2021-12-08 13:48:46,569 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 2.71 sec
 </pre>
 </div>
 </div>
