@@ -39,23 +39,6 @@ nb_path: "nbs/01_models.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SegformerForSemanticSegmentation</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;nvidia/segformer-b0-finetuned-ade-512-512&quot;</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -117,49 +100,6 @@ parameters converted too when you call :meth:<code>to</code>, etc.</p>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SegFormer</span><span class="p">()</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Loading weights: segformer-b0-finetuned-ade-512-512
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/segformer-b0-finetuned-ade-512-512 and are newly initialized because the shapes did not match:
-- segformer.encoder.patch_embeddings.0.proj.weight: found shape torch.Size([32, 3, 7, 7]) in the checkpoint and torch.Size([32, 1, 7, 7]) in the model instantiated
-- decode_head.classifier.weight: found shape torch.Size([150, 256, 1, 1]) in the checkpoint and torch.Size([2, 256, 1, 1]) in the model instantiated
-- decode_head.classifier.bias: found shape torch.Size([150]) in the checkpoint and torch.Size([2]) in the model instantiated
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-</pre>
-</div>
-</div>
-
-</div>
-</div>
 
 </div>
     {% endraw %}
@@ -281,14 +221,6 @@ You should probably TRAIN this model on a down-stream task to be able to use it 
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Loading weights: segformer-b0-finetuned-ade-512-512
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/segformer-b0-finetuned-ade-512-512 and are newly initialized because the shapes did not match:
 - segformer.encoder.patch_embeddings.0.proj.weight: found shape torch.Size([32, 3, 7, 7]) in the checkpoint and torch.Size([32, 1, 7, 7]) in the model instantiated
@@ -383,14 +315,6 @@ You should probably TRAIN this model on a down-stream task to be able to use it 
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Loading weights: segformer-b0-finetuned-ade-512-512
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Some weights of SegformerForSemanticSegmentation were not initialized from the model checkpoint at nvidia/segformer-b0-finetuned-ade-512-512 and are newly initialized because the shapes did not match:
 - segformer.encoder.patch_embeddings.0.proj.weight: found shape torch.Size([32, 3, 7, 7]) in the checkpoint and torch.Size([32, 1, 7, 7]) in the model instantiated
@@ -459,14 +383,6 @@ You should probably TRAIN this model on a down-stream task to be able to use it 
 
 <div class="output_wrapper">
 <div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Loading weights: segformer-b0-finetuned-ade-512-512
-</pre>
-</div>
-</div>
 
 <div class="output_area">
 
@@ -603,25 +519,6 @@ You should probably TRAIN this model on a down-stream task to be able to use it 
 </pre></div>
 
     </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Using diameter of 17.0
-2021-12-08 18:18:19,522 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
-2021-12-08 18:18:20,717 [INFO] ** TORCH CUDA version installed and working. **
-2021-12-08 18:18:20,718 [INFO] &gt;&gt;&gt;&gt; using GPU
-2021-12-08 18:18:20,761 [INFO] ~~~ FINDING MASKS ~~~
-2021-12-08 18:18:22,600 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 1.84 sec
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
