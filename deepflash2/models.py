@@ -36,7 +36,7 @@ class SegFormer(torch.nn.Module):
 
     def forward(self, pixel_values):
         outputs = self.segformer(pixel_values=pixel_values)
-        return torch.nn.functional.interpolate(outputs.logits, scale_factor=4)
+        return torch.nn.functional.interpolate(outputs.logits, scale_factor=4, mode="bilinear", align_corners=False)
 
 # Cell
 def get_pretrained_options(encoder_name):
