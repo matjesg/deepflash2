@@ -155,6 +155,21 @@ nb_path: "nbs/01_models.ipynb"
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/home/magr/.conda/envs/df2/lib/python3.9/site-packages/torch/nn/functional.py:718: UserWarning: Named tensors and all their associated APIs are an experimental feature and subject to change. Please do not use them for anything important until they are released as stable. (Triggered internally at  /tmp/pip-req-build-19kunu9c/c10/core/TensorImpl.h:1156.)
+  return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -284,7 +299,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="check_cellpose_installation" class="doc_header"><code>check_cellpose_installation</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L72" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>check_cellpose_installation</code>(<strong><code>show_progress</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="check_cellpose_installation" class="doc_header"><code>check_cellpose_installation</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L74" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>check_cellpose_installation</code>(<strong><code>show_progress</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 
 </div>
@@ -315,7 +330,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_diameters" class="doc_header"><code>get_diameters</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L86" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_diameters</code>(<strong><code>masks</code></strong>)</p>
+<h4 id="get_diameters" class="doc_header"><code>get_diameters</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L88" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_diameters</code>(<strong><code>masks</code></strong>)</p>
 </blockquote>
 <p>Get diameters from deepflash2 prediction</p>
 
@@ -347,7 +362,7 @@ nb_path: "nbs/01_models.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="run_cellpose" class="doc_header"><code>run_cellpose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L96" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run_cellpose</code>(<strong><code>probs</code></strong>, <strong><code>masks</code></strong>, <strong><code>model_type</code></strong>=<em><code>'nuclei'</code></em>, <strong><code>diameter</code></strong>=<em><code>0</code></em>, <strong><code>min_size</code></strong>=<em><code>-1</code></em>, <strong><code>gpu</code></strong>=<em><code>True</code></em>)</p>
+<h4 id="run_cellpose" class="doc_header"><code>run_cellpose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/models.py#L98" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>run_cellpose</code>(<strong><code>probs</code></strong>, <strong><code>masks</code></strong>, <strong><code>model_type</code></strong>=<em><code>'nuclei'</code></em>, <strong><code>diameter</code></strong>=<em><code>0</code></em>, <strong><code>min_size</code></strong>=<em><code>-1</code></em>, <strong><code>gpu</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 <p>Run cellpose on deepflash2 predictions</p>
 
@@ -392,11 +407,11 @@ nb_path: "nbs/01_models.ipynb"
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Using diameter of 17.0
-2021-12-02 23:57:28,421 [INFO] WRITING LOG OUTPUT TO /media/data/home/mag01ud/.cellpose/run.log
-2021-12-02 23:57:33,849 [INFO] ** TORCH CUDA version installed and working. **
-2021-12-02 23:57:33,851 [INFO] &gt;&gt;&gt;&gt; using GPU
-2021-12-02 23:57:33,972 [INFO] ~~~ FINDING MASKS ~~~
-2021-12-02 23:57:38,265 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 4.29 sec
+2021-12-29 17:32:18,205 [INFO] WRITING LOG OUTPUT TO /home/magr/.cellpose/run.log
+2021-12-29 17:32:19,021 [INFO] ** TORCH CUDA version installed and working. **
+2021-12-29 17:32:19,022 [INFO] &gt;&gt;&gt;&gt; using GPU
+2021-12-29 17:32:19,061 [INFO] ~~~ FINDING MASKS ~~~
+2021-12-29 17:32:21,738 [INFO] &gt;&gt;&gt;&gt; TOTAL TIME 2.68 sec
 </pre>
 </div>
 </div>

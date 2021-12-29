@@ -64,7 +64,9 @@ def load_smp_model(path, device=None, strict=True, **kwargs):
     model_dict = torch.load(path, map_location=device)
     state = model_dict.pop('model')
     stats = model_dict.pop('stats')
-    model = create_smp_model(**model_dict)
+    # Ensure that no pretrained encoder weights are loaded
+    model_dict.pop('encoder_weights', None)
+    model = create_smp_model(**model_dict,  encoder_weights=None, **kwargs)
     model.load_state_dict(state, strict=strict)
     return model, stats
 
