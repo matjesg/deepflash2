@@ -363,7 +363,11 @@ class EnsembleLearner(GetAttr):
                                     stats=self.stats,
                                     instance_labels=self.instance_labels,
                                     n_classes=self.n_classes,
-                                    sample_mult=self.sample_mult if self.sample_mult>0 else None, verbose=0)
+                                    normalize = False,
+                                    sample_mult=self.sample_mult if self.sample_mult>0 else None,
+                                    verbose=0,
+                                    **self.add_ds_kwargs)
+
         self.stats = stats or self.ds.stats
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
@@ -550,13 +554,21 @@ class EnsembleLearner(GetAttr):
         path = path or self.ensemble_dir
         models = sorted(get_files(path, extensions='.pth', recurse=False))
         self.models = {}
+
         for i, m in enumerate(models,1):
             if i==0: self.n_classes = int(m.name.split('_')[2][0])
             else: assert self.n_classes==int(m.name.split('_')[2][0]), 'Check models. Models are trained on different number of classes.'
             self.models[i] = m
-        if len(self.models)>0: self.set_n(len(self.models))
-        print(f'Found {len(self.models)} models in folder {path}')
-        print([m.name for m in self.models.values()])
+
+        if len(self.models)>0:
+            self.set_n(len(self.models))
+            print(f'Found {len(self.models)} models in folder {path}:')
+            print([m.name for m in self.models.values()])
+
+            # Reset stats
+            self.stats = -1
+            print(f'Stats will be loaded from trained models.')
+
 
 
     def get_ensemble_results(self, files, zarr_store=None, export_dir=None, filetype='.png', **kwargs):
@@ -723,12 +735,12 @@ class EnsembleLearner(GetAttr):
             uncertainty = zarr.load(r.uncertainty_path)
             export_roi_set(mask, uncertainty, instance_labels=True, name=r.file, path=output_folder, ascending=False, **kwargs)
 
-    def clear_tmp(self):
-        try:
-            shutil.rmtree('/tmp/*', ignore_errors=True)
-            shutil.rmtree(self.path/'.tmp')
-            print(f'Deleted temporary files from {self.path/".tmp"}')
-        except: print(f'No temporary files to delete at {self.path/".tmp"}')
+    #def clear_tmp(self):
+    #    try:
+    #        shutil.rmtree('/tmp/*', ignore_errors=True)
+    #        shutil.rmtree(self.path/'.tmp')
+    #        print(f'Deleted temporary files from {self.path/".tmp"}')
+    #    except: print(f'No temporary files to delete at {self.path/".tmp"}')
 
 # Cell
 add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with `n` models",
@@ -748,5 +760,5 @@ add_docs(EnsembleLearner, "Meta class to train and predict model ensembles with 
          lr_find="Wrapper for learning rate finder",
          export_imagej_rois='Export ImageJ ROI Sets to `ouput_folder`',
          export_cellpose_rois='Export cellpose predictions to ImageJ ROI Sets in `ouput_folder`',
-         clear_tmp="Clear directory with temporary files"
+         #clear_tmp="Clear directory with temporary files"
 )
