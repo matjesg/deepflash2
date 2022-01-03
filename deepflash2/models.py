@@ -9,6 +9,7 @@ import cv2
 import segmentation_models_pytorch as smp
 from fastcore.basics import patch
 from fastdownload import download_url
+from fastprogress import progress_bar
 from pathlib import Path
 import sys, subprocess
 from pip._internal.operations import freeze
@@ -119,7 +120,7 @@ def run_cellpose(probs, masks, model_type='nuclei', diameter=0, min_size=-1, gpu
 
     model = models.Cellpose(gpu=gpu, model_type=model_type)
     cp_masks = []
-    for prob, mask in zip(probs, masks):
+    for prob, mask in progress_bar(zip(probs, masks), total=len(probs), leave=False):
         cp_pred, _, _, _ = model.eval(prob,
                                        net_avg=True,
                                        augment=True,

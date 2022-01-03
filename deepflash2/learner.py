@@ -360,15 +360,15 @@ class EnsembleLearner(GetAttr):
         self._set_splits()
         self.ds = RandomTileDataset(self.files, label_fn=self.label_fn,
                                     preproc_dir=preproc_dir,
-                                    stats=self.stats,
                                     instance_labels=self.instance_labels,
                                     n_classes=self.n_classes,
-                                    normalize = False,
+                                    stats=self.stats,
+                                    normalize = True,
                                     sample_mult=self.sample_mult if self.sample_mult>0 else None,
                                     verbose=0,
                                     **self.add_ds_kwargs)
 
-        self.stats = stats or self.ds.stats
+        self.stats = self.ds.stats
         self.in_channels = self.ds.get_data(max_n=1)[0].shape[-1]
         self.df_val, self.df_ens, self.df_model, self.ood = None,None,None,None
         self.recorder = {}
@@ -566,10 +566,8 @@ class EnsembleLearner(GetAttr):
             print([m.name for m in self.models.values()])
 
             # Reset stats
-            self.stats = -1
-            print(f'Stats will be loaded from trained models.')
-
-
+            print(f'Loading stats from {self.models[1].name}')
+            _, self.stats = load_smp_model(self.models[1])
 
     def get_ensemble_results(self, files, zarr_store=None, export_dir=None, filetype='.png', **kwargs):
         ep = EnsemblePredict(models_paths=self.models.values(), zarr_store=zarr_store)
