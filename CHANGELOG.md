@@ -2,6 +2,13 @@
 
 <!-- do not remove -->
 
+## 0.1.8
+
+- Dependency fix (opencv-python-headless>=4.1.1,<4.5.5)
+- Minor improvements and fixes
+
+
+
 ## 0.1.7
 
 - Fixes bug when predicting on new data.
