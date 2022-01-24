@@ -37,27 +37,30 @@ nb_path: "nbs/add_information.ipynb"
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Ground-Truth-Estimation">Ground Truth Estimation<a class="anchor-link" href="#Ground-Truth-Estimation"> </a></h3><ul>
-<li><strong>One parent folder</strong></li>
-<li><strong>One folder per expert</strong></li>
-<li><strong>Identical names for segmentations</strong></li>
-</ul>
-<p><em>Examplary structure:</em></p>
+<h3 id="Ground-Truth-Estimation">Ground Truth Estimation<a class="anchor-link" href="#Ground-Truth-Estimation"> </a></h3><p><strong>Input Details</strong>:  <em>deepflash2</em> fuses</p>
 <ul>
-<li>[folder] parent_folder<ul>
-<li>[folder] expert1<ul>
-<li>[file] mask1.png</li>
-<li>[file] mask2.png</li>
+<li>binary segmentations of an image, that is, there must be a single foreground value that represents positively classified pixels<ul>
+<li>Segmentation pixel values: background-class: 0; foreground-class: 1 or 255</li>
 </ul>
 </li>
-<li>[folder] expert1<ul>
-<li>[file] mask1.png</li>
-<li>[file] mask2.png</li>
+<li>instance segmentations of an image (instances represent positively classified pixels)<ul>
+<li>Segmentation pixel values: background-class: 0; foreground-instances: 1,2,...,I</li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
+<p>Examplary input folder structure:</p>
+<blockquote>
+<pre><code>expert_segmentations  -&gt; one parent folder
+│                     
+│───expert1           -&gt; one folder per expert
+│   │   mask1.png     -&gt; segmentation masks
+│   │   mask2.png
+│   
+└───expert2
+    │   mask1.png
+    │   mask2.png</code></pre>
+</blockquote>
+<p>All common image formats (tif, png, etc.) are supported. See <a href="https://imageio.readthedocs.io/en/stable/formats/index.html">imageio docs</a>.</p>
 
 </div>
 </div>
@@ -65,34 +68,33 @@ nb_path: "nbs/add_information.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Training">Training<a class="anchor-link" href="#Training"> </a></h3><ul>
-<li><strong>One folder for training images</strong><ul>
-<li>Images must have unique name or ID</li>
+<li><strong>Images must have unique name or ID</strong><ul>
 <li>_0001.tif --&gt; name/ID: 0001; img_5.png --&gt; name/ID: img<em>5, ...</em> </li>
+<li>Arbitrary number of channels (e.g., 1 greyscale; 3 RGB)</li>
 </ul>
 </li>
-<li><strong>One folder for segmentation masks</strong><ul>
-<li>Corresponding masks must start with name or ID + a mask suffix__<ul>
+<li><strong>Corresponding masks must start with name or ID + a mask suffix__</strong><ul>
+<li><strong>Semantic segmentation mask pixel values</strong>: background-class: 0; foreground-classes: 1,2,...,C (or 255 if binary)</li>
+<li><strong>Instance segmentation mask pixel values (binary only)</strong>: background-class: 0; foreground-instances: 1,2,...,I</li>
 <li>_0001 -&gt; 0001_mask.png (mask_suffix = "<em>mask.png")</em></li>
 <li>_0001 -&gt; 0001.png (mask<em>suffix = ".png")</em></li>
 <li>mask suffix is inferred automatically </li>
+<li>binary segmentations of an image, that is, there must be a single foreground value that represents positively classified pixels</li>
+<li>instance segmentations of an image (instances represent positively classified pixels</li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
-<p><em>Examplary structure:</em></p>
-<ul>
-<li>[folder] images<ul>
-<li>[file] 0001.tif</li>
-<li>[file] 0002.tif</li>
-</ul>
-</li>
-<li>[folder] masks<ul>
-<li>[file] 0001_mask.png</li>
-<li>[file] 0002_mask.png</li>
-</ul>
-</li>
-</ul>
+<p>Examplary input folder structure:</p>
+<blockquote><p>```<br>
+──images            -&gt; one image folder
+  │   0001.tif<br>
+  │   0002.tif</p>
+</blockquote>
+<p>──masks             -&gt; one masks folder
+  │   0001_mask.png
+  │   0002_mask.png
+```</p>
+<p>All common image formats (tif, png, etc.) are supported. See <a href="https://imageio.readthedocs.io/en/stable/formats/index.html">imageio docs</a>.</p>
 
 </div>
 </div>
@@ -100,15 +102,20 @@ nb_path: "nbs/add_information.ipynb"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Prediction">Prediction<a class="anchor-link" href="#Prediction"> </a></h3><ul>
-<li><strong>One folder for training images</strong><ul>
+<li><strong>One folder for images</strong><ul>
 <li>Images must have unique name or ID<ul>
 <li>_0001.tif --&gt; name/ID: 0001; img_5.png --&gt; name/ID: img<em>5, ...</em> </li>
 </ul>
 </li>
+<li>Same number of channels as training images (e.g., 1 greyscale; 3 RGB)</li>
+</ul>
+</li>
+<li><strong>For evaluation: Corresponding masks must start with name or ID + a mask suffix</strong><ul>
+<li>same requirements as for <a href="https://matjesg.github.io/deepflash2/add_information.html#Training">training</a></li>
 </ul>
 </li>
 <li><strong>One folder containing trained models (ensemble)</strong><ul>
-<li>Ensemble folder and models will be created during Training__<ul>
+<li>Ensemble folder and models will be created during Training<ul>
 <li>Do not change the naming of the models</li>
 <li>If you want to train different ensembles, simply rename the ensemble folder</li>
 </ul>
@@ -116,19 +123,20 @@ nb_path: "nbs/add_information.ipynb"
 </ul>
 </li>
 </ul>
-<p><em>Examplary structure:</em></p>
-<ul>
-<li>[folder] images<ul>
-<li>[file] 0001.tif</li>
-<li>[file] 0002.tif</li>
-</ul>
-</li>
-<li>[folder] ensemble<ul>
-<li>[file] unext50_deepflash2_model-1.pth</li>
-<li>[file] unext50_deepflash2_model-2.pth</li>
-</ul>
-</li>
-</ul>
+<p>Examplary input folder structure:
+&gt;</p>
+
+<pre><code>──images            -&gt; one image folder
+  │   0001.tif      
+  │   0002.tif
+
+──masks             -&gt; one masks folder (evaluation only)
+  │   0001_mask.png
+  │   0002_mask.png
+
+──ensemble          -&gt; one model folder
+  │   Unet_resnet34_2classes-fold1.pth
+  │   Unet_resnet34_2classes-fold2.pth</code></pre>
 
 </div>
 </div>

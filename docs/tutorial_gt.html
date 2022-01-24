@@ -44,8 +44,14 @@ nb_path: "nbs/tutorial_gt.ipynb"
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Input Details</strong>:  <em>deepflash2</em> fuses</p>
 <ul>
-<li>binary segmentations of an image, that is, there must be a single foreground value that represents positively classified pixels</li>
-<li>instance segmentations of an image (instances represent positively classified pixels)</li>
+<li>binary segmentations of an image, that is, there must be a single foreground value that represents positively classified pixels<ul>
+<li>Segmentation pixel values: background-class: 0; foreground-class: 1 or 255</li>
+</ul>
+</li>
+<li>instance segmentations of an image (instances represent positively classified pixels)<ul>
+<li>Segmentation pixel values: background-class: 0; foreground-instances: 1,2,...,I</li>
+</ul>
+</li>
 </ul>
 <p>Examplary input folder structure:</p>
 <blockquote>

@@ -38,11 +38,48 @@ nb_path: "nbs/tutorial_pred.ipynb"
 </ul>
 </li>
 <li>Click <em>Load</em></li>
-<li>For Evaluation: Select* masks folder</li>
+<li>For evaluation: Select* masks folder (same requirements as for <a href="https://matjesg.github.io/deepflash2/add_information.html#Training">training</a>.)</li>
 </ol>
 <p><strong>Evaluation (hold-out test set)</strong></p>
 <video src="https://user-images.githubusercontent.com/13711052/139746917-c2a6c68b-0572-4744-b9d2-109e42925f27.mov" controls width="100%"></video><p><strong>New data (no masks available)</strong></p>
-<video src="https://user-images.githubusercontent.com/13711052/139747050-d623d876-2349-43eb-82fb-87d6b5934e2f.mov" controls width="100%"></video>
+<video src="https://user-images.githubusercontent.com/13711052/139747050-d623d876-2349-43eb-82fb-87d6b5934e2f.mov" controls width="100%"></video><p><strong>Input Details</strong>:</p>
+<ul>
+<li><strong>One folder for images</strong><ul>
+<li>Images must have unique name or ID<ul>
+<li>_0001.tif --&gt; name/ID: 0001; img_5.png --&gt; name/ID: img<em>5, ...</em> </li>
+</ul>
+</li>
+<li>Same number of channels as training images (e.g., 1 greyscale; 3 RGB)</li>
+</ul>
+</li>
+<li><strong>For evaluation: Corresponding masks must start with name or ID + a mask suffix</strong><ul>
+<li>same requirements as for <a href="https://matjesg.github.io/deepflash2/add_information.html#Training">training</a></li>
+</ul>
+</li>
+<li><strong>One folder containing trained models (ensemble)</strong><ul>
+<li>Ensemble folder and models will be created during Training<ul>
+<li>Do not change the naming of the models</li>
+<li>If you want to train different ensembles, simply rename the ensemble folder</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Examplary input folder structure:
+&gt;</p>
+
+<pre><code>──images            -&gt; one image folder
+  │   0001.tif      
+  │   0002.tif
+
+──masks             -&gt; one masks folder (evaluation only)
+  │   0001_mask.png
+  │   0002_mask.png
+
+──ensemble          -&gt; one model folder
+  │   Unet_resnet34_2classes-fold1.pth
+  │   Unet_resnet34_2classes-fold2.pth</code></pre>
+
 </div>
 </div>
 </div>

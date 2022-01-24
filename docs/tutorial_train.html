@@ -45,11 +45,14 @@ nb_path: "nbs/tutorial_train.ipynb"
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Input Details</strong>:</p>
 <ul>
-<li>Images must have unique name or ID<ul>
+<li><strong>Images must have unique name or ID</strong><ul>
 <li>_0001.tif --&gt; name/ID: 0001; img_5.png --&gt; name/ID: img<em>5, ...</em> </li>
+<li>Arbitrary number of channels (e.g., 1 greyscale; 3 RGB)</li>
 </ul>
 </li>
-<li>Corresponding masks must start with name or ID + a mask suffix__<ul>
+<li><strong>Corresponding masks must start with name or ID + a mask suffix__</strong><ul>
+<li><strong>Semantic segmentation mask pixel values</strong>: background-class: 0; foreground-classes: 1,2,...,C (or 255 if binary)</li>
+<li><strong>Instance segmentation mask pixel values (binary only)</strong>: background-class: 0; foreground-instances: 1,2,...,I</li>
 <li>_0001 -&gt; 0001_mask.png (mask_suffix = "<em>mask.png")</em></li>
 <li>_0001 -&gt; 0001.png (mask<em>suffix = ".png")</em></li>
 <li>mask suffix is inferred automatically </li>
