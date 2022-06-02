@@ -53,7 +53,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="rot90" class="doc_header"><code>rot90</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L14" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>rot90</code>(<strong><code>x</code></strong>, <strong><code>k</code></strong>=<em><code>1</code></em>)</p>
+<h4 id="ScriptFunction object at 0x7f2acff38590>" class="doc_header"><code>ScriptFunction object at 0x7f2acff38590></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7f2acff38590></code>()</p>
 </blockquote>
 <p>rotate batch of images by 90 degrees k times</p>
 
@@ -78,7 +78,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="hflip" class="doc_header"><code>hflip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>hflip</code>(<strong><code>x</code></strong>)</p>
+<h4 id="ScriptFunction object at 0x7f2acff26e80>" class="doc_header"><code>ScriptFunction object at 0x7f2acff26e80></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7f2acff26e80></code>()</p>
 </blockquote>
 <p>flip batch of images horizontally</p>
 
@@ -103,7 +103,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="vflip" class="doc_header"><code>vflip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L22" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>vflip</code>(<strong><code>x</code></strong>)</p>
+<h4 id="ScriptFunction object at 0x7f2acff26f70>" class="doc_header"><code>ScriptFunction object at 0x7f2acff26f70></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7f2acff26f70></code>()</p>
 </blockquote>
 <p>flip batch of images vertically</p>
 
@@ -126,7 +126,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Base-Classes">Base Classes<a class="anchor-link" href="#Base-Classes"> </a></h2>
+<h2 id="Base-Class">Base Class<a class="anchor-link" href="#Base-Class"> </a></h2>
 </div>
 </div>
 </div>
@@ -141,111 +141,35 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="BaseTransform" class="doc_header"><code>class</code> <code>BaseTransform</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L27" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseTransform</code>(<strong><code>pname</code></strong>:<code>str</code>, <strong><code>params</code></strong>:<code>Union</code>[<code>list</code>, <code>tuple</code>])</p>
+<h2 id="BaseTransform" class="doc_header"><code>class</code> <code>BaseTransform</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L29" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>BaseTransform</code>(<strong><code>pname</code></strong>:<code>str</code>, <strong><code>params</code></strong>:<code>Union</code>[<code>list</code>, <code>tuple</code>]) :: <code>Module</code></p>
 </blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
 
-</div>
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
 
-</div>
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
 
-</div>
-</div>
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
 
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="Chain" class="doc_header"><code>class</code> <code>Chain</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L31" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Chain</code>(<strong><code>functions</code></strong>:<code>List</code>[<code>callable</code>])</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="Transformer" class="doc_header"><code>class</code> <code>Transformer</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L40" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transformer</code>(<strong><code>image_pipeline</code></strong>:<a href="/deepflash2/tta.html#Chain"><code>Chain</code></a>, <strong><code>mask_pipeline</code></strong>:<a href="/deepflash2/tta.html#Chain"><code>Chain</code></a>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="Compose" class="doc_header"><code>class</code> <code>Compose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L50" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Compose</code>(<strong><code>aug_transforms</code></strong>:<code>List</code>[<a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a>])</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="Merger" class="doc_header"><code>class</code> <code>Merger</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L70" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Merger</code>()</p>
-</blockquote>
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>.. note::
+    As per the example above, an <code>__init__()</code> call to the parent class
+    must be made before assignment on the child.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool</p>
 
 </div>
 
@@ -271,14 +195,27 @@ nb_path: "nbs/07_tta.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">imgs</span> <span class="o">=</span> <span class="n">TensorImage</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="s1">&#39;uncertainty&#39;</span><span class="p">,</span> <span class="s1">&#39;entropy&#39;</span><span class="p">,</span> <span class="s1">&#39;aleatoric_uncertainty&#39;</span><span class="p">,</span> <span class="s1">&#39;epistemic_uncertainty&#39;</span><span class="p">]:</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">Merger</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span> <span class="n">m</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>    
-    <span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst_base</span> <span class="o">=</span> <span class="n">BaseTransform</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">tst_base</span><span class="p">)</span>
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>RecursiveScriptModule(original_name=BaseTransform)</pre>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -302,7 +239,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="HorizontalFlip" class="doc_header"><code>class</code> <code>HorizontalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L108" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>HorizontalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
+<h2 id="HorizontalFlip" class="doc_header"><code>class</code> <code>HorizontalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L36" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>HorizontalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
 </blockquote>
 <p>Flip images horizontally (left-&gt;right)</p>
 
@@ -330,9 +267,10 @@ nb_path: "nbs/07_tta.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">HorizontalFlip</span><span class="p">()</span>
-<span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">apply_aug_image</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-<span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">apply_deaug_mask</span><span class="p">(</span><span class="n">aug</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">imgs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">356</span><span class="p">,</span> <span class="mi">356</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">HorizontalFlip</span><span class="p">())</span>
+<span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">aug</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 <span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">deaug</span><span class="p">)</span>
 </pre></div>
 
@@ -354,7 +292,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="VerticalFlip" class="doc_header"><code>class</code> <code>VerticalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L123" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>VerticalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
+<h2 id="VerticalFlip" class="doc_header"><code>class</code> <code>VerticalFlip</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L47" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>VerticalFlip</code>() :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
 </blockquote>
 <p>Flip images vertically (up-&gt;down)</p>
 
@@ -382,9 +320,9 @@ nb_path: "nbs/07_tta.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">VerticalFlip</span><span class="p">()</span>
-<span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">apply_aug_image</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-<span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">apply_deaug_mask</span><span class="p">(</span><span class="n">aug</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">VerticalFlip</span><span class="p">())</span>
+<span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">aug</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 <span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">deaug</span><span class="p">)</span>
 </pre></div>
 
@@ -406,7 +344,7 @@ nb_path: "nbs/07_tta.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Rotate90" class="doc_header"><code>class</code> <code>Rotate90</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L138" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Rotate90</code>(<strong><code>angles</code></strong>:<code>List</code>[<code>int</code>]) :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
+<h2 id="Rotate90" class="doc_header"><code>class</code> <code>Rotate90</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L59" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Rotate90</code>(<strong><code>angles</code></strong>:<code>List</code>[<code>int</code>]) :: <a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a></p>
 </blockquote>
 <p>Rotate images 0/90/180/270 degrees (<code>angles</code>)</p>
 
@@ -434,9 +372,9 @@ nb_path: "nbs/07_tta.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">Rotate90</span><span class="p">([</span><span class="mi">180</span><span class="p">])</span>
-<span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">apply_aug_image</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-<span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">apply_deaug_mask</span><span class="p">(</span><span class="n">aug</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">Rotate90</span><span class="p">([</span><span class="mi">180</span><span class="p">]))</span>
+<span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="p">(</span><span class="n">aug</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 <span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">deaug</span><span class="p">)</span>
 </pre></div>
 
@@ -449,11 +387,68 @@ nb_path: "nbs/07_tta.ipynb"
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Pipeline Test</p>
+<h2 id="Pipeline-Classes">Pipeline Classes<a class="anchor-link" href="#Pipeline-Classes"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="Chain" class="doc_header"><code>class</code> <code>Chain</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L77" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Chain</code>(<strong><code>transforms</code></strong>:<code>List</code>[<a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a>]) :: <code>Module</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>.. note::
+    As per the example above, an <code>__init__()</code> call to the parent class
+    must be made before assignment on the child.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool</p>
+
+</div>
+
+</div>
 
 </div>
 </div>
+
 </div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -462,14 +457,177 @@ nb_path: "nbs/07_tta.ipynb"
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">tfms</span><span class="o">=</span><span class="p">[</span><span class="n">HorizontalFlip</span><span class="p">(),</span><span class="n">VerticalFlip</span><span class="p">(),</span> <span class="n">Rotate90</span><span class="p">(</span><span class="n">angles</span><span class="o">=</span><span class="p">[</span><span class="mi">90</span><span class="p">,</span><span class="mi">180</span><span class="p">,</span><span class="mi">270</span><span class="p">])]</span>
-<span class="n">c</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">(</span><span class="n">tfms</span><span class="p">)</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">Merger</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
-    <span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">augment_image</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-    <span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">deaugment_mask</span><span class="p">(</span><span class="n">aug</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span>
+
+<span class="n">tst_chain</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">Chain</span><span class="p">(</span><span class="n">tfms</span><span class="p">))</span>
+<span class="n">tst_chain_deaug</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">Chain</span><span class="p">(</span><span class="n">tfms</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">aug</span> <span class="o">=</span> <span class="n">tst_chain</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">deaug</span> <span class="o">=</span> <span class="n">tst_chain_deaug</span><span class="p">(</span><span class="n">aug</span><span class="p">,</span> <span class="n">args</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">deaug</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="Transformer" class="doc_header"><code>class</code> <code>Transformer</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L88" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Transformer</code>(<strong><code>transforms</code></strong>:<code>List</code>[<a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a>], <strong><code>args</code></strong>:<code>List</code>[<code>int</code>]) :: <code>Module</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>.. note::
+    As per the example above, an <code>__init__()</code> call to the parent class
+    must be made before assignment on the child.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tst_tfm</span> <span class="o">=</span> <span class="n">Transformer</span><span class="p">(</span><span class="n">tfms</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">tst_tfm</span><span class="p">)</span>
+<span class="n">aug</span> <span class="o">=</span> <span class="n">tst_tfm</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+<span class="n">deaug</span> <span class="o">=</span> <span class="n">tst_tfm</span><span class="o">.</span><span class="n">deaugment</span><span class="p">(</span><span class="n">aug</span><span class="p">)</span>
+<span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">deaug</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h2 id="Compose" class="doc_header"><code>class</code> <code>Compose</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/tta.py#L104" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Compose</code>(<strong><code>aug_transforms</code></strong>:<code>List</code>[<a href="/deepflash2/tta.html#BaseTransform"><code>BaseTransform</code></a>]) :: <code>Module</code></p>
+</blockquote>
+<p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>.. note::
+    As per the example above, an <code>__init__()</code> call to the parent class
+    must be made before assignment on the child.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+                evaluation mode.
+:vartype training: bool</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">Compose</span><span class="p">(</span><span class="n">tfms</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+    <span class="n">aug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+    <span class="n">deaug</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">deaugment</span><span class="p">(</span><span class="n">aug</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deaug</span><span class="p">)</span>
     <span class="n">test_eq</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">deaug</span><span class="p">)</span>
-    <span class="n">m</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deaug</span><span class="p">)</span>
-<span class="n">test_close</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">result</span><span class="p">())</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="n">test_close</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -480,5 +638,5 @@ nb_path: "nbs/07_tta.ipynb"
     {% endraw %}
 
 </div>
- 
+
 
