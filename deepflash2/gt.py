@@ -61,7 +61,7 @@ def msk_show(ax, msk, title, cmap, cbar=None, ticks=None, **kwargs):
             scale = ticks/(ticks)
             bounds = [i for i in range(ticks+1)]
             cmap = plt.cm.get_cmap(cmap)
-            norm = mpl.colors.BoundaryNorm(bounds, cmap.N, extend='neither')
+            norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
             cbr = plt.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),
                                cax=cax, ticks=[i*(scale)+(scale/2) for i in range(ticks)])
             cbr.set_ticklabels([i for i in range(ticks)])
