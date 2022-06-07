@@ -1164,36 +1164,36 @@ class PredSB(BaseParamWidget, GetAttr):
     hints = w.Label(txt)
 
     params = {
-        'use_tta': w.ToggleButtons(options=[('Yes', True), ('No', False)],
-                                    tooltips=['Enable Test-Time Augmentation','Disable Test-Time Augmentation']),
+        #'use_tta': w.ToggleButtons(options=[('Yes', True), ('No', False)],
+        #                            tooltips=['Enable Test-Time Augmentation','Disable Test-Time Augmentation']),
         'min_pixel_export' : w.IntText(layout= w.Layout(width='auto')),
     }
-    params['use_tta'].style.button_width = '50px'
+    #params['use_tta'].style.button_width = '50px'
 
     #Grid
-    grid = w.GridspecLayout(7, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(6, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #grid[0, 0] = w.HTML(_html_wrap(*_dpred['s_pred']))
-    grid[0, 0] = w.HTML(_html_wrap(*_dtrain['use_tta']))
-    grid[0, 1:] = params['use_tta']
-    grid[2, :] = w.HTML('<hr>')
-    grid[3, 0] = w.HTML(_html_wrap(*_dpred['min_pixel_export']))
-    grid[3, 1:] = params['min_pixel_export']
-    grid[4, 0] = w.HTML(_html_wrap(*_dpred['imagej']))
-    grid[5, 0] = w.HTML('Results Table')
-    grid[6, 0] = w.HTML('Downloads')
+    #grid[0, 0] = w.HTML(_html_wrap(*_dtrain['use_tta']))
+    #grid[0, 1:] = params['use_tta']
+    grid[1, :] = w.HTML('<hr>')
+    grid[2, 0] = w.HTML(_html_wrap(*_dpred['min_pixel_export']))
+    grid[2, 1:] = params['min_pixel_export']
+    grid[3, 0] = w.HTML(_html_wrap(*_dpred['imagej']))
+    grid[4, 0] = w.HTML('Results Table')
+    grid[5, 0] = w.HTML('Downloads')
     #grid[6, 0] = w.HTML(_html_wrap(*_dpred['cache']))
 
     #Res
     run = w.Button(description='Run Prediction*', layout=w.Layout(width='auto'))
-    grid[1, 1:] = run
+    grid[0, 1:] = run
 
     #Res
     rois = w.Button(description='Export ROIs', layout=w.Layout(width='auto'))
-    grid[4, 1:] = rois
+    grid[3, 1:] = rois
 
     # Result Widget
     open_results = w.Button(description='Open', layout=w.Layout(width='auto'))
-    grid[5, 1:] = open_results
+    grid[4, 1:] = open_results
 
     #Final Widget
     widget = w.VBox([hints,grid])
@@ -1202,7 +1202,7 @@ class PredSB(BaseParamWidget, GetAttr):
         super().__init__(**kwargs)
         path = path or Path('.')
         self.down  = PathDownloads(path, 'Select', tooltip='Click to download')
-        self.grid[6, 1:] = self.down.button
+        self.grid[5, 1:] = self.down.button
 
 # Cell
 class CellposeSB(BaseParamWidget, GetAttr):
@@ -1472,9 +1472,11 @@ class GUI(GetAttr):
     def gt_data_run_clicked(self, b):
         out = self.gt.main['data']
         out.clear_output()
+        tout = colab.output.temporary() if COLAB else self.tmp
         exp_folder = self.gt.sb['data'].msk.path.relative_to(self.proj_path)
-        with out:
+        with tout:
             self.gt_est = GTEstimator(exp_folder, config=self.config, path=self.proj_path)
+        with out:
             items = {x:x for x in self.gt_est.masks.keys()}
             ipp = ItemsPerPage(self.proj_path, self.gt_est.show_data, items=items)
             display(ipp.widget)
@@ -1663,14 +1665,16 @@ class GUI(GetAttr):
 
     def pred_data_run_clicked(self, b):
         out = self.pred.main['data']
+        tout = colab.output.temporary() if COLAB else self.tmp
         out.clear_output()
         with out: display(w.HTML('Loading data. Please wait'))
         image_dir = self.pred.sb['data'].img.path.relative_to(self.proj_path)
         ensemble_path = self.pred.sb['data'].ens.path
         mask_dir = self.pred.sb['data'].msk.path.relative_to(self.proj_path) if self.test_masks_provided else None
         out.clear_output()
-        with out:
+        with tout:
             self.el_pred = EnsemblePredictor(image_dir, mask_dir=mask_dir, config=self.config, path=self.proj_path, ensemble_path=ensemble_path)
+        with out:
             items = {x:x for x in self.el_pred.files}
             ipp = ItemsPerPage(self.proj_path, self.el_pred.ds.show_data, items=items)
             display(ipp.widget)
@@ -1706,7 +1710,7 @@ class GUI(GetAttr):
         export_dir = self.pred.sb['pred'].down.path
 
         with out:
-            assert type(self.el_pred)==EnsembleLearner, 'Please load data first!'
+            assert type(self.el_pred)==EnsemblePredictor, 'Please load data first!'
             display(w.HTML('Predicting segmentation masks. Please wait...'))
 
         with tout:
