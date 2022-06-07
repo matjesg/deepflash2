@@ -61,6 +61,8 @@ class EnsembleBase(GetAttr):
 
         self.config = config or Config()
         self.path = Path(path) if path is not None else Path('.')
+        self.label_fn = None
+        self.files = L()
 
         store = str(zarr_store) if zarr_store else zarr.storage.TempStore()
         root = zarr.group(store=store, overwrite=False)
@@ -70,10 +72,10 @@ class EnsembleBase(GetAttr):
         if any(v is not None for v in (image_dir, files)):
             self.files = L(files) or self.get_images(image_dir)
 
-        if any(v is not None for v in (mask_dir, label_fn)):
-            assert hasattr(self, 'files'), 'image_dir or files must be provided'
-            self.label_fn = label_fn or self.get_label_fn(mask_dir)
-            self.check_label_fn()
+            if any(v is not None for v in (mask_dir, label_fn)):
+                assert hasattr(self, 'files'), 'image_dir or files must be provided'
+                self.label_fn = label_fn or self.get_label_fn(mask_dir)
+                self.check_label_fn()
 
     def get_images(self, img_dir:str='images', img_path:Path=None) -> List[Path]:
         'Returns list of image paths'
@@ -91,7 +93,7 @@ class EnsembleBase(GetAttr):
     def check_label_fn(self):
         'Checks label function'
         mask_check = [self.label_fn(x).exists() for x in self.files]
-        chk_str = f'Found {sum(mask_check)} corresponding masks".'
+        chk_str = f'Found {sum(mask_check)} corresponding masks.'
         print(chk_str)
         if len(self.files)!=sum(mask_check):
             warnings.warn(f'Please check your images and masks (and folders).')
@@ -315,10 +317,10 @@ class EnsembleLearner(EnsembleBase):
                         'uncertainty_path': f'{self.store}/{self.g_std.path}/{f.name}'})
                 res_list.append(df_tmp)
                 if export_dir:
-                    save_mask(pred, pred_path/f'{df_tmp.file}_{df_tmp.model}_mask', filetype)
-                    save_unc(std, unc_path/f'{df_tmp.file}_{df_tmp.model}_uncertainty', filetype)
+                    save_mask(pred, pred_path/f'{df_tmp.file}_{df_tmp.model_no}_mask', filetype)
+                    save_unc(std, unc_path/f'{df_tmp.file}_model{df_tmp.model_no}_uncertainty', filetype)
 
-        del model
+        del self.inference_ensemble
         torch.cuda.empty_cache()
 
         self.df_val = pd.DataFrame(res_list)

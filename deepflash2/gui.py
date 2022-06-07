@@ -51,7 +51,7 @@ log_dir = Path.home()/'.deepflash2'/'logs'
 log_dir.mkdir(exist_ok=True, parents=True)
 today = datetime.date.today().strftime("%Y-%m-%d")
 logging.basicConfig(filename=log_dir/f'{today}.log',
-                    level=logging.DEBUG,
+                    level=logging.WARNING,
                     format='%(asctime)s %(levelname)s %(name)s %(message)s')
 logger=logging.getLogger(__name__)
 
@@ -1545,7 +1545,7 @@ class GUI(GetAttr):
         ensemble_path = self.proj_path/self.train_dir/self.ens_dir
 
         with out:
-            self.el = EnsembleLearner(image_folder, mask_folder, self.config, self.proj_path, ensemble_path=ensemble_path)
+            self.el = EnsembleLearner(image_folder, mask_folder, config=self.config, path=self.proj_path, ensemble_path=ensemble_path)
             items = {x:x for x in self.el.files}
             ipp = ItemsPerPage(self.proj_path, self.el.ds.show_data, items=items, overlay=True if self.num_classes==2 else False)
             display(ipp.widget)
@@ -1601,6 +1601,8 @@ class GUI(GetAttr):
                 display(w.HTML(f'Metrics for model {i} of {self.n_models}'))
                 self.el.recorder[i].plot_metrics()
 
+        self.el.save_inference_ensemble()
+
     def train_valid_run_clicked(self, b):
         out = self.train.main['valid']
         out.clear_output()
@@ -1627,7 +1629,7 @@ class GUI(GetAttr):
 
     def train_valid_ens_save_clicked(self, b):
         path = self.train.sb['valid'].ens.path
-        with self.train.main['valid']: self.el.load_ensemble(path)
+        with self.train.main['valid']: self.el.load_models(path)
 
 
     def train_valid_cache_clicked(self, b):
@@ -1668,7 +1670,7 @@ class GUI(GetAttr):
         mask_dir = self.pred.sb['data'].msk.path.relative_to(self.proj_path) if self.test_masks_provided else None
         out.clear_output()
         with out:
-            self.el_pred = EnsemblePredictor(image_dir, mask_dir=mask_dir, config=self.config, path=self.proj_path, stats=(0,0), ensemble_path=ensemble_path)
+            self.el_pred = EnsemblePredictor(image_dir, mask_dir=mask_dir, config=self.config, path=self.proj_path, ensemble_path=ensemble_path)
             items = {x:x for x in self.el_pred.files}
             ipp = ItemsPerPage(self.proj_path, self.el_pred.ds.show_data, items=items)
             display(ipp.widget)
