@@ -8,7 +8,10 @@ from pathlib import Path
 from fastcore.basics import GetAttr
 from fastprogress import progress_bar
 from fastai.data.transforms import get_image_files
+
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from .data import _read_msk
 from .config import Config
@@ -44,17 +47,25 @@ def m_voting(segmentations, labelForUndecidedPixels = 0):
     return sitk.GetArrayFromImage(mv_segmentation)
 
 # Cell
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-def msk_show(ax, msk, title, cbar=None, ticks=None, **kwargs):
-    img = ax.imshow(msk, **kwargs)
+def msk_show(ax, msk, title, cmap, cbar=None, ticks=None, **kwargs):
+    img = ax.imshow(msk, cmap=cmap, **kwargs)
     if cbar is not None:
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         if cbar=='plot':
             scale = ticks/(ticks+1)
-            cbr = plt.colorbar(img, cax=cax, ticks=[i*(scale)+(scale/2) for i in range(0, ticks+1)])
-            cbr.set_ticklabels([i for i in range(0, ticks+1)])
+            cbr = plt.colorbar(img, cax=cax, ticks=[i*(scale)+(scale/2) for i in range(ticks+1)])
+            cbr.set_ticklabels([i for i in range(ticks+1)])
             cbr.set_label('# of experts', rotation=270, labelpad=+15, fontsize="larger")
+        elif cbar=='classes':
+            scale = ticks/(ticks)
+            bounds = [i for i in range(ticks+1)]
+            cmap = plt.cm.get_cmap(cmap)
+            norm = mpl.colors.BoundaryNorm(bounds, cmap.N, extend='neither')
+            cbr = plt.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),
+                               cax=cax, ticks=[i*(scale)+(scale/2) for i in range(ticks)])
+            cbr.set_ticklabels([i for i in range(ticks)])
+            cbr.set_label('Classes', rotation=270, labelpad=+15, fontsize="larger")
         else: cax.set_axis_off()
     ax.set_axis_off()
     ax.set_title(title)
@@ -98,9 +109,13 @@ class GTEstimator(GetAttr):
         if not figsize: figsize = (len(self.experts)*3,3)
         for m, exps in files:
             fig, axs = plt.subplots(nrows=1, ncols=len(exps), figsize=figsize, **kwargs)
+            vkwargs = {'vmin':0, 'vmax':self.num_classes-1}
             for i, exp in enumerate(exps):
                 msk = _read_msk(self.mask_fn(exp,m), num_classes=self.num_classes, instance_labels=self.instance_labels)
-                msk_show(axs[i], msk, exp, cmap=self.cmap)
+                if i == len(exps) - 1:
+                    msk_show(axs[i], msk, exp, self.cmap, cbar='classes', ticks=self.num_classes, **vkwargs)
+                else:
+                    msk_show(axs[i], msk, exp, self.cmap, **vkwargs)
             fig.text(0, .5, m, ha='center', va='center', rotation=90)
             plt.tight_layout()
             plt.show()
@@ -119,7 +134,7 @@ class GTEstimator(GetAttr):
                 ref = m_voting(masks, self.vote_undec)
             refs[m] = ref
             #assert ref.mean() > 0, 'Please try again!'
-            df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'dice_score': [dice_score(ref, msk) for msk in masks]})
+            df_tmp = pd.DataFrame({'method': method, 'file' : m, 'exp' : exps, 'dice_score': [dice_score(ref, msk, num_classes=self.num_classes) for msk in masks]})
             if self.instance_segmentation_metrics:
                 mAP, AP = [],[]
                 for msk in masks:
@@ -154,22 +169,21 @@ class GTEstimator(GetAttr):
         from IPython.display import Markdown, display
         if not files: files = list(self.masks.keys())[:max_n]
         for f in files:
-            fig, ax = plt.subplots(ncols=2, figsize=figsize, **kwargs)
-            # GT
-            msk_show(ax[0], self.gt[method][f], f'{method} (binary mask)', cbar='', cmap=self.cmap)
-            # Experts
-            masks = [_read_msk(self.mask_fn(exp,f), num_classes=self.num_classes, instance_labels=self.instance_labels) for exp in self.masks[f]]
-            masks_av = np.array(masks).sum(axis=0)#/len(masks)
-            msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)+1))
+            if self.num_classes==2:
+                fig, ax = plt.subplots(ncols=2, figsize=figsize, **kwargs)
+                # GT
+                msk_show(ax[0], self.gt[method][f], f'{method} (binary mask)', cbar='', cmap=self.cmap)
+                # Experts
+                masks = [_read_msk(self.mask_fn(exp,f), num_classes=self.num_classes, instance_labels=self.instance_labels) for exp in self.masks[f]]
+                masks_av = np.array(masks).sum(axis=0)#/len(masks)
+                msk_show(ax[1], masks_av, 'Expert Overlay', cbar='plot', ticks=len(masks), cmap=plt.cm.get_cmap(self.cmap, len(masks)+1))
+            else:
+                fig, ax = plt.subplots(ncols=1, figsize=figsize, **kwargs)
+                msk_show(ax, self.gt[method][f], f'{method}', cbar='classes', cmap=self.cmap, ticks=self.num_classes)
             # Results
             metrics = ['dice_score', 'mean_average_precision', 'average_precision_at_iou_50'] if self.instance_segmentation_metrics else ['dice_score']
             av_df = pd.DataFrame([self.df_res[self.df_res.file==f][metrics].mean()], index=['average'], columns=metrics)
             plt_df = self.df_res[self.df_res.file==f].set_index('exp')[metrics].append(av_df)
-            #plt_df.columns = [f'Similarity (Dice Score)']
-            #tbl = pd.plotting.table(ax[2], np.round(plt_df,3), loc='center', colWidths=[.5])
-            #tbl.set_fontsize(14)
-            #tbl.scale(1, 2)
-            #ax[2].set_axis_off()
             fig.text(0, .5, f, ha='center', va='center', rotation=90)
             plt.tight_layout()
             plt.show()

@@ -119,7 +119,7 @@ def plot_results(*args, df, hastarget=False, num_classes=2, model=None, instance
     axs[0].set_title(f'File {df.file}')
     unc_title = f'Uncertainty \n {unc_metric}: {df[unc_metric]:.3f}' if unc_metric else 'Uncertainty'
     pred_title = 'Prediction' if model is None else f'Prediction {model}'
-    vkwargs = {'vmin':0, 'vmax':num_classes} if instance_labels else {}
+    vkwargs = {'vmin':0, 'vmax':num_classes} if not instance_labels else {}
     if len(args)==4:
         axs[1].imshow(msk, **vkwargs)
         axs[1].set_axis_off()

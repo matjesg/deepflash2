@@ -469,6 +469,7 @@ class ResultWidget:
 # Cell
 _dgt = {
     'exp' : ('Expert Masks*', 'The parent folder containing sub-folders with segmentation masks, one folder per expert.', 'https://matjesg.github.io/deepflash2/add_information.html#Ground-Truth-Estimation'),
+    'num_classes': ('No. of Classes', 'Number of classes: e.g., 2 for binary segmentation (foreground and background class).'),
     'instance_labels'  : ('Instance Labels', 'Are you providing instance labels (class-aware and instance-aware)?'),
     'up_gt': ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain sub-folders with segmentation masks, one folder per expert.'),
     'sd'  : ('Sample Data', 'Sample data for demonstration and testing.'),
@@ -488,27 +489,30 @@ class GTDataSB(BaseParamWidget, GetAttr):
     hints = w.Label(txt)
 
     params = {
+        'num_classes': w.IntSlider(value=2, min=2, max=10, step=1, layout=w.Layout(width='auto', min_width='1px')),
         'instance_labels':w.ToggleButtons(options=[('Yes', True), ('No', False)],tooltips=
                                           ['You are providing instance labels (class-aware and instance-aware)',
                                            'You are not providing only class-aware labels']),
     }
     params['instance_labels'].style.button_width = '50px'
     #Grid
-    grid = w.GridspecLayout(6, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
+    grid = w.GridspecLayout(7, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     grid[0, 0] = w.HTML(_html_wrap(*_dgt['exp']))
-    grid[1, 0] = w.HTML(_html_wrap(*_dgt['instance_labels']))
-    grid[1, 1:]= params['instance_labels']
-    grid[3, :] = w.HTML('<hr>')
-    grid[4, 0] = w.HTML(_html_wrap(*_dgt['up_gt']))
-    grid[5, 0] = w.HTML(_html_wrap(*_dgt['sd']))
+    grid[1, 0] = w.HTML(_html_wrap(*_dgt['num_classes']))
+    grid[1, 1:]= params['num_classes']
+    grid[2, 0] = w.HTML(_html_wrap(*_dgt['instance_labels']))
+    grid[2, 1:]= params['instance_labels']
+    grid[4, :] = w.HTML('<hr>')
+    grid[5, 0] = w.HTML(_html_wrap(*_dgt['up_gt']))
+    grid[6, 0] = w.HTML(_html_wrap(*_dgt['sd']))
 
     #Data Upload
     sd = w.Button(description='Load Sample Data',layout=w.Layout(width='auto'),tooltip='Click to download sample data')
-    grid[5, 1:] = sd
+    grid[6, 1:] = sd
 
     #Load Data
     run = w.Button(description='Load Data*', layout=w.Layout(width='auto'))
-    grid[2, 1:] = run
+    grid[3, 1:] = run
 
     #Final Widget
     widget = w.VBox([hints, grid])
@@ -519,7 +523,7 @@ class GTDataSB(BaseParamWidget, GetAttr):
         self.msk  = PathSelector(path, 'Select Parent Folder')
         self.grid[0, 1:] = self.msk.button
         self.du =  ZipUpload(path)
-        self.grid[4, 1:] = self.du.widget
+        self.grid[5, 1:] = self.du.widget
 
 # Cell
 class GTEstSB(BaseParamWidget, GetAttr):
