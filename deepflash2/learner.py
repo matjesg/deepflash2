@@ -301,7 +301,7 @@ class EnsembleLearner(EnsembleBase):
                 pred, smx, std = self.predict(self.ds.data[f.name][:])
                 self.save_preds_zarr(f.name, pred, smx, std)
                 msk = self.ds.labels[f.name][:] #.get_data(f, mask=True)[0])
-                m_dice = dice_score(msk, pred)
+                m_dice = dice_score(msk, pred, num_classes=self.num_classes)
 
                 df_tmp = pd.Series({'file' : f.name,
                         'model' :  model_path,
@@ -441,7 +441,7 @@ class EnsemblePredictor(EnsembleBase):
         for i, r in self.df_ens.iterrows():
             msk = self.ds.labels[r.file]
             pred = self.g_pred[r.file]
-            self.df_ens.loc[i, 'dice_score'] = dice_score(msk, pred)
+            self.df_ens.loc[i, 'dice_score'] = dice_score(msk, pred, num_classes=self.num_classes)
         return self.df_ens
 
     def show_ensemble_results(self, files=None, unc=True, unc_metric=None, metric_name='dice_score'):

@@ -203,13 +203,14 @@ def binary_dice_score(y_true, y_pred):
     iou_score = np.divide(np.count_nonzero(overlap),np.count_nonzero(union)) #
     return 2*iou_score/(iou_score+1)
 
-def dice_score(y_true, y_pred, average='macro', labels=None, **kwargs):
+def dice_score(y_true, y_pred, average='macro', num_classes=2, **kwargs):
     '''Computes the Sørensen–Dice coefficient.'''
 
     y_true = np.array(y_true).flatten()
     y_pred = np.array(y_pred).flatten()
 
-    if y_true.max()>1 or y_pred.max()>1 or labels is not None:
+    if y_true.max()>1 or y_pred.max()>1 or num_classes>2:
+        labels = [i for i in range(num_classes)]
         return multiclass_dice_score(y_true, y_pred, average=average, labels=labels, **kwargs)
     else:
         return binary_dice_score(y_true, y_pred)
