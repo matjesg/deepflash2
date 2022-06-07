@@ -379,7 +379,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="dice_score" class="doc_header"><code>dice_score</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L206" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>dice_score</code>(<strong><code>y_true</code></strong>, <strong><code>y_pred</code></strong>, <strong><code>average</code></strong>=<em><code>'macro'</code></em>, <strong><code>labels</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="dice_score" class="doc_header"><code>dice_score</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L206" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>dice_score</code>(<strong><code>y_true</code></strong>, <strong><code>y_pred</code></strong>, <strong><code>average</code></strong>=<em><code>'macro'</code></em>, <strong><code>num_classes</code></strong>=<em><code>2</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Computes the Sørensen–Dice coefficient.</p>
 
@@ -437,7 +437,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="label_mask" class="doc_header"><code>label_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L218" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>label_mask</code>(<strong><code>mask</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>, <strong><code>connectivity</code></strong>=<em><code>4</code></em>, <strong><code>min_pixel</code></strong>=<em><code>0</code></em>, <strong><code>do_watershed</code></strong>=<em><code>False</code></em>, <strong><code>exclude_border</code></strong>=<em><code>False</code></em>)</p>
+<h4 id="label_mask" class="doc_header"><code>label_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L219" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>label_mask</code>(<strong><code>mask</code></strong>, <strong><code>threshold</code></strong>=<em><code>0.5</code></em>, <strong><code>connectivity</code></strong>=<em><code>4</code></em>, <strong><code>min_pixel</code></strong>=<em><code>0</code></em>, <strong><code>do_watershed</code></strong>=<em><code>False</code></em>, <strong><code>exclude_border</code></strong>=<em><code>False</code></em>)</p>
 </blockquote>
 <p>Analyze regions and return labels</p>
 
@@ -544,7 +544,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_instance_segmentation_metrics" class="doc_header"><code>get_instance_segmentation_metrics</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L257" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_instance_segmentation_metrics</code>(<strong><code>a</code></strong>, <strong><code>b</code></strong>, <strong><code>is_binary</code></strong>=<em><code>False</code></em>, <strong><code>thresholds</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
+<h4 id="get_instance_segmentation_metrics" class="doc_header"><code>get_instance_segmentation_metrics</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L258" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_instance_segmentation_metrics</code>(<strong><code>a</code></strong>, <strong><code>b</code></strong>, <strong><code>is_binary</code></strong>=<em><code>False</code></em>, <strong><code>thresholds</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
 </blockquote>
 <p>Computes instance segmentation metric based on cellpose/stardist implementation.
 <a href="https://cellpose.readthedocs.io/en/latest/api.html#cellpose.metrics.average_precision">https://cellpose.readthedocs.io/en/latest/api.html#cellpose.metrics.average_precision</a></p>
@@ -591,7 +591,7 @@ nb_path: "nbs/06_utils.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>2022-06-07 08:12:28,319 [INFO] WRITING LOG OUTPUT TO /home/magr/.cellpose/run.log
+<pre>2022-06-07 08:55:23,514 [INFO] WRITING LOG OUTPUT TO /home/magr/.cellpose/run.log
 </pre>
 </div>
 </div>
@@ -619,7 +619,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="export_roi_set" class="doc_header"><code>export_roi_set</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L282" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>export_roi_set</code>(<strong><code>mask</code></strong>, <strong><code>intensity_image</code></strong>=<em><code>None</code></em>, <strong><code>instance_labels</code></strong>=<em><code>False</code></em>, <strong><code>name</code></strong>=<em><code>'RoiSet'</code></em>, <strong><code>path</code></strong>=<em><code>Path('.')</code></em>, <strong><code>ascending</code></strong>=<em><code>True</code></em>, <strong><code>min_pixel</code></strong>=<em><code>0</code></em>)</p>
+<h4 id="export_roi_set" class="doc_header"><code>export_roi_set</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L283" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>export_roi_set</code>(<strong><code>mask</code></strong>, <strong><code>intensity_image</code></strong>=<em><code>None</code></em>, <strong><code>instance_labels</code></strong>=<em><code>False</code></em>, <strong><code>name</code></strong>=<em><code>'RoiSet'</code></em>, <strong><code>path</code></strong>=<em><code>Path('.')</code></em>, <strong><code>ascending</code></strong>=<em><code>True</code></em>, <strong><code>min_pixel</code></strong>=<em><code>0</code></em>)</p>
 </blockquote>
 <p>EXPERIMENTAL: Export mask regions to imageJ ROI Set</p>
 
@@ -675,7 +675,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="calc_iterations" class="doc_header"><code>calc_iterations</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L313" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>calc_iterations</code>(<strong><code>n_iter</code></strong>, <strong><code>ds_length</code></strong>, <strong><code>bs</code></strong>)</p>
+<h4 id="calc_iterations" class="doc_header"><code>calc_iterations</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L314" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>calc_iterations</code>(<strong><code>n_iter</code></strong>, <strong><code>ds_length</code></strong>, <strong><code>bs</code></strong>)</p>
 </blockquote>
 <p>Calculate the number of required epochs for 'n_iter' iterations.</p>
 
@@ -724,7 +724,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="get_label_fn" class="doc_header"><code>get_label_fn</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L319" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_label_fn</code>(<strong><code>img_path</code></strong>, <strong><code>msk_dir_path</code></strong>)</p>
+<h4 id="get_label_fn" class="doc_header"><code>get_label_fn</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L320" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>get_label_fn</code>(<strong><code>img_path</code></strong>, <strong><code>msk_dir_path</code></strong>)</p>
 </blockquote>
 <p>Infers suffix from mask name and return label_fn</p>
 
@@ -756,7 +756,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_mask" class="doc_header"><code>save_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L326" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_mask</code>(<strong><code>mask</code></strong>, <strong><code>path</code></strong>, <strong><code>filetype</code></strong>=<em><code>'.png'</code></em>)</p>
+<h4 id="save_mask" class="doc_header"><code>save_mask</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L327" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_mask</code>(<strong><code>mask</code></strong>, <strong><code>path</code></strong>, <strong><code>filetype</code></strong>=<em><code>'.png'</code></em>)</p>
 </blockquote>
 
 </div>
@@ -799,7 +799,7 @@ nb_path: "nbs/06_utils.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="save_unc" class="doc_header"><code>save_unc</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L331" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_unc</code>(<strong><code>unc</code></strong>, <strong><code>path</code></strong>, <strong><code>filetype</code></strong>=<em><code>'.png'</code></em>)</p>
+<h4 id="save_unc" class="doc_header"><code>save_unc</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/utils.py#L332" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>save_unc</code>(<strong><code>unc</code></strong>, <strong><code>path</code></strong>, <strong><code>filetype</code></strong>=<em><code>'.png'</code></em>)</p>
 </blockquote>
 
 </div>

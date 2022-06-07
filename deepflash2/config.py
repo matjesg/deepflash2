@@ -16,9 +16,9 @@ class Config:
     project_dir:str = '.'
 
     # GT Estimation Settings
-    staple_thres:float = 0.5
-    staple_fval:int= 1
-    vote_undec:int = 1
+    # staple_thres:float = 0.5
+    # staple_fval:int= 1
+    vote_undec:int = 0
 
     # Train General Settings
     n_models:int = 5
