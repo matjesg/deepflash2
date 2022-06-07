@@ -26,8 +26,9 @@ from fastai.data.transforms import get_files
 import segmentation_models_pytorch as smp
 import matplotlib.pyplot as plt
 
+from .config import Config
 from .utils import unzip, get_label_fn, download_sample_data
-from .learner import EnsembleLearner, Config, _optim_dict
+from .learner import EnsembleLearner, EnsemblePredictor, _optim_dict
 from .gt import GTEstimator
 from .models import ARCHITECTURES, ENCODERS, get_pretrained_options
 from .losses import LOSSES
@@ -474,7 +475,7 @@ _dgt = {
     'staple': ("STAPLE", "Simultaneous truth and performance level estimation (STAPLE)", "https://pubmed.ncbi.nlm.nih.gov/15250643/"),
     'mv'  :("Majority Voting", "Pixelwise majority voting to obtain the reference segmentation.", "https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1LabelVotingImageFilter.html"),
     'instance_segmentation_metrics': ("Instance Metrics", "Compute instance segmentation metrics: mean Average Precision (mAP) and Average Precsion (AP) at IoU 0.5.", "https://cellpose.readthedocs.io/en/latest/api.html#cellpose.metrics.average_precision"),
-    'majority_vote_undec': ("MV undecided", "If majority voting is undecided, set pixels to this class label.", "https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1LabelVotingImageFilter.html"),
+    'vote_undec': ("Undecided Pixels", "For undecided pixels, set pixels to this class label.", "https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1LabelVotingImageFilter.html"),
 }
 
 # Cell
@@ -530,7 +531,7 @@ class GTEstSB(BaseParamWidget, GetAttr):
     hints = w.HTML(txt)
 
     params = {
-        'majority_vote_undec': w.IntText(layout= w.Layout(width='auto')),
+        'vote_undec': w.IntText(layout= w.Layout(width='auto')),
         'instance_segmentation_metrics':w.ToggleButtons(options=[('Yes', True), ('No', False)]),
     }
     params['instance_segmentation_metrics'].style.button_width = '50px'
@@ -542,8 +543,8 @@ class GTEstSB(BaseParamWidget, GetAttr):
     grid[2, :] = w.HTML('<hr>')
     grid[3, 1:]= params['instance_segmentation_metrics']
     grid[3, 0] = w.HTML(_html_wrap(*_dgt['instance_segmentation_metrics']))
-    grid[4, 1:]= params['majority_vote_undec']
-    grid[4, 0] = w.HTML(_html_wrap(*_dgt['majority_vote_undec']))
+    grid[4, 1:]= params['vote_undec']
+    grid[4, 0] = w.HTML(_html_wrap(*_dgt['vote_undec']))
     grid[5, 0] = w.HTML('Results Table')
     grid[6, 0] = w.HTML('Downloads')
 
@@ -618,21 +619,21 @@ class GTEstUI(BaseUI):
 _dtrain = {
     'img' : ('Image Folder*', 'One folder containing all training images.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'msk' : ('Mask Folder*', 'One folder containing all segmentation masks. We highly recommend using ground truth estimation from multiple experts.'),
-    'n_classes': ('No. of Classes', 'Number of classes: e.g., 2 for binary segmentation (foreground and background class).'),
+    'num_classes': ('No. of Classes', 'Number of classes: e.g., 2 for binary segmentation (foreground and background class).'),
     'instance_labels'  : ('Instance Labels', 'Are you providing instance labels (class-aware and instance-aware)?'),
     'up'  : ('Upload Data', 'Upload a zip file. It will be extracted automatically and must contain the correct folder structure.', 'https://matjesg.github.io/deepflash2/add_information.html#Training'),
     'sd'  : ('Sample Data', 'Get sample data for demonstration and testing.'),
     'pretrained': ('Pretrained*', 'Select pretrained weights from the model libray or "new" to use an untrained model (random initialization).', 'https://matjesg.github.io/deepflash2/model_library.html'),
     'n_models'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
     's'   : ('Select', 'Train all models (ensemble) or (re-)train specific model.'),
-    #'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
+    #'n_epochs': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
     #'base_lr': ('Learning Rate', '''Base learning rate for fine-tuning the model. The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset''', 'https://docs.fast.ai/callback.schedule.html#Learner.fine_tune'),
     'lrf' : ('LR Finder', 'Click Open to get more information.'),
     'mw'  : ('Loss Function', 'Click "Customize" to get more information.'),
     'ts'  : ('Train Settings', 'Click "Customize" to get more information.'),
     'cfg_load' : ('Configuration', 'Select configuration file (.json) from previous experiments.'),
     'cfg_save' : ('Configuration', 'Save current configuration to file (.json).'),
-    'tta' : ('Use TTA', 'Enable test-time augmentation for prediction (more reliable and accurate, but slow).'),
+    'use_tta' : ('Use TTA', 'Enable test-time augmentation for prediction (more reliable and accurate, but slow).'),
     's_val': ('Select', 'Select model for validation. Select "Ensemble" to validate all models.'),
     'mdl' : ('Model Folder', '(Optional) One folder containing the all models of the ensemble. If not selected, latest models from Training will be selected.'),
     #'ood' : ('OOD Detection', '(Optional) For inference/prediction: Train a support-vector machine (SVM) for the detection of out-of-distribution (OOD) or anomalous data.'),
@@ -649,7 +650,7 @@ class TrainDataSB(BaseParamWidget, GetAttr):
     hints = w.Label(txt)
 
     params = {
-        'n_classes': w.IntSlider(value=2, min=2, max=10, step=1, layout=w.Layout(width='auto', min_width='1px')),
+        'num_classes': w.IntSlider(value=2, min=2, max=10, step=1, layout=w.Layout(width='auto', min_width='1px')),
         'instance_labels':w.ToggleButtons(options=[('Yes', True), ('No', False)],tooltips=['You are providing instance labels (class-aware and instance-aware)',
                                                                                'You are not providing only class-aware labels']),
     }
@@ -660,8 +661,8 @@ class TrainDataSB(BaseParamWidget, GetAttr):
     #Labels
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['img']))
     grid[1, 0] = w.HTML(_html_wrap(*_dtrain['msk']))
-    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['n_classes']))
-    grid[2, 1:]= params['n_classes']
+    grid[2, 0] = w.HTML(_html_wrap(*_dtrain['num_classes']))
+    grid[2, 1:]= params['num_classes']
     grid[3, 0] = w.HTML(_html_wrap(*_dtrain['instance_labels']))
     grid[3, 1:]= params['instance_labels']
     grid[5, :] = w.HTML('<hr>')
@@ -705,7 +706,7 @@ class TrainModelSB(BaseParamWidget, GetAttr):
     params = {
         #'pretrained': w.Dropdown(options=_pretrained, continuous_update=True, layout=w.Layout(width='auto', min_width='1px')),
         'n_models': w.IntSlider(min=1, max=5, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
-        #'n_iter':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
+        #'n_epochs':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
         #'base_lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px'))
     }
 
@@ -718,8 +719,8 @@ class TrainModelSB(BaseParamWidget, GetAttr):
     #grid[0, 1:]= params['pretrained']
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['n_models']))
     grid[0, 1:]= params['n_models']
-    #grid[1, 0] = w.HTML(_html_wrap(*_dtrain['n_iter']))
-    #grid[1, 1:]= params['n_iter']
+    #grid[1, 0] = w.HTML(_html_wrap(*_dtrain['n_epochs']))
+    #grid[1, 1:]= params['n_epochs']
     grid[1, 0] = w.HTML(_html_wrap(*_dtrain['s']))
     grid[1, 1:]= sel
     #grid[4, 0] = w.Label('MAY TAKE SOME HOURS')
@@ -772,17 +773,17 @@ class TrainValidSB(BaseParamWidget, GetAttr):
     hints = w.Label(txt)
 
     params = {
-        'tta': w.ToggleButtons(options=[('Yes', True), ('No', False)],
+        'use_tta': w.ToggleButtons(options=[('Yes', True), ('No', False)],
                                tooltips=['Enable Test-Time Augmentation','Disable Test-Time Augmentation'])
     }
 
-    params['tta'].style.button_width = '50px'
+    params['use_tta'].style.button_width = '50px'
 
     #Grid
     grid = w.GridspecLayout(9, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     grid[0, 0] = w.HTML(_html_wrap(*_dtrain['s_val']))
-    grid[1, 0] = w.HTML(_html_wrap(*_dtrain['tta']))
-    grid[1, 1:]= params['tta']
+    grid[1, 0] = w.HTML(_html_wrap(*_dtrain['use_tta']))
+    grid[1, 1:]= params['use_tta']
     grid[3, :] = w.HTML('<hr>')
     grid[4, :] = w.Label('Load exisiting models')
     grid[5, 0] = w.HTML(_html_wrap(*_dtrain['mdl']))
@@ -872,7 +873,7 @@ class BasePopUpParamWidget(BaseParamWidget):
 # Cell
 _dparam= {
     'n_models'   : ('No. of Models', "Number of models within an ensemble; If you're experimenting with parameters, try only one model first; Depending on the data, ensembles should at least comprise 3-5 models"),
-    'n_iter': ('Train Iterations', 'How many times a single model is trained on a mini-batch of the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
+    'n_epochs': ('Train Epochs', 'How many epochts a single model is trained on the training data.', 'https://matjesg.github.io/deepflash2/add_information.html#Training-Epochs-and-Iterations'),
     'base_lr': ('Learning Rate', '''Base learning rate for fine-tuning the model. The learning rate controls how quickly or slowly a neural network model learns. &#013; - Best learning rate depend on your data and other settings, e.g., the optimize \n - Use the learning rate finder to find the best learning rate for your dataset''', 'https://docs.fast.ai/callback.schedule.html#Learner.fine_tune'),
     'arch' : ('Model Architecture', 'The architecture of the deep learning model.', 'https://matjesg.github.io/deepflash2/models.html'),
     'encoder_name' : ('Encoder', 'Encoders for architectures from Segmentation Models Pytorch.', 'https://github.com/qubvel/segmentation_models.pytorch#encoders-'),
@@ -899,10 +900,11 @@ class ParamWidget(BasePopUpParamWidget, GetAttr):
     _default = 'config'
     params = {
         #'n_models': w.IntSlider(min=1, max=5, step=1, continuous_update=True, orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
-        'n_iter':w.IntSlider(min=100, max=1e4, step=100, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
+        'n_epochs':w.IntSlider(min=1, max=100, step=1, continuous_update=True,orientation='horizontal', layout=w.Layout(width='auto', min_width='1px')),
         'base_lr': w.FloatText(description='', layout=w.Layout(width='auto', min_width='1px')),
         'arch' : w.Dropdown(options=ARCHITECTURES, layout=w.Layout(width='auto', min_width='1px')),
-        'encoder_name' : w.Dropdown(options=ENCODERS, layout=w.Layout(width='auto', min_width='1px')),
+        #'encoder_name' : w.Dropdown(options=ENCODERS, layout=w.Layout(width='auto', min_width='1px')),
+        'encoder_name' : w.Text(layout=w.Layout(width='auto', min_width='1px')),
         'encoder_weights' : w.Dropdown(options=['imagenet'],layout=w.Layout(width='auto', min_width='1px'), continuous_update=True),
         'batch_size':w.IntSlider(min=2, max=32, step=2,layout=w.Layout(width='auto', min_width='1px')),
         'mixed_precision_training': w.ToggleButtons(options=[('Yes', True), ('No', False)],
@@ -1158,17 +1160,17 @@ class PredSB(BaseParamWidget, GetAttr):
     hints = w.Label(txt)
 
     params = {
-        'pred_tta': w.ToggleButtons(options=[('Yes', True), ('No', False)],
+        'use_tta': w.ToggleButtons(options=[('Yes', True), ('No', False)],
                                     tooltips=['Enable Test-Time Augmentation','Disable Test-Time Augmentation']),
         'min_pixel_export' : w.IntText(layout= w.Layout(width='auto')),
     }
-    params['pred_tta'].style.button_width = '50px'
+    params['use_tta'].style.button_width = '50px'
 
     #Grid
     grid = w.GridspecLayout(7, GRID_COLS, width='100%',  grid_gap="0px", align_items='center')
     #grid[0, 0] = w.HTML(_html_wrap(*_dpred['s_pred']))
-    grid[0, 0] = w.HTML(_html_wrap(*_dtrain['tta']))
-    grid[0, 1:] = params['pred_tta']
+    grid[0, 0] = w.HTML(_html_wrap(*_dtrain['use_tta']))
+    grid[0, 1:] = params['use_tta']
     grid[2, :] = w.HTML('<hr>')
     grid[3, 0] = w.HTML(_html_wrap(*_dpred['min_pixel_export']))
     grid[3, 1:] = params['min_pixel_export']
@@ -1541,7 +1543,7 @@ class GUI(GetAttr):
         with out:
             self.el = EnsembleLearner(image_folder, mask_folder, self.config, self.proj_path, ensemble_path=ensemble_path)
             items = {x:x for x in self.el.files}
-            ipp = ItemsPerPage(self.proj_path, self.el.ds.show_data, items=items, overlay=True if self.n_classes==2 else False)
+            ipp = ItemsPerPage(self.proj_path, self.el.ds.show_data, items=items, overlay=True if self.num_classes==2 else False)
             display(ipp.widget)
 
     def train_data_sd_clicked(self, b):
@@ -1610,7 +1612,7 @@ class GUI(GetAttr):
 
         with tout:
             display(w.HTML('Temporary Logs:'))
-            df_val = self.el.get_valid_results(model_no, export_dir=export_dir, use_tta=self.tta)
+            df_val = self.el.get_valid_results(model_no, export_dir=export_dir, use_tta=self.use_tta)
             if not COLAB: self.tmp.clear_output()
 
         out.clear_output()
@@ -1662,7 +1664,7 @@ class GUI(GetAttr):
         mask_dir = self.pred.sb['data'].msk.path.relative_to(self.proj_path) if self.test_masks_provided else None
         out.clear_output()
         with out:
-            self.el_pred = EnsembleLearner(image_dir, mask_dir=mask_dir, config=self.config, path=self.proj_path, stats=(0,0), ensemble_path=ensemble_path)
+            self.el_pred = EnsemblePredictor(image_dir, mask_dir=mask_dir, config=self.config, path=self.proj_path, stats=(0,0), ensemble_path=ensemble_path)
             items = {x:x for x in self.el_pred.files}
             ipp = ItemsPerPage(self.proj_path, self.el_pred.ds.show_data, items=items)
             display(ipp.widget)
@@ -1691,7 +1693,7 @@ class GUI(GetAttr):
 
 
     def pred_run_clicked(self, b, use_tta=None, show=True):
-        use_tta = use_tta or self.pred_tta
+        use_tta = use_tta or self.use_tta
         out = self.pred.main['pred']
         out.clear_output()
         tout = colab.output.temporary() if COLAB else self.tmp

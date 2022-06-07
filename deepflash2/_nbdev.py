@@ -105,7 +105,7 @@ index = {"Config": "00_config.ipynb",
          "PredUI": "08_gui.ipynb",
          "GUI": "08_gui.ipynb",
          "import_sitk": "09_gt.ipynb",
-         "staple": "09_gt.ipynb",
+         "staple_multi_label": "09_gt.ipynb",
          "m_voting": "09_gt.ipynb",
          "msk_show": "09_gt.ipynb",
          "GTEstimator": "09_gt.ipynb"}

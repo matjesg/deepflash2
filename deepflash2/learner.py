@@ -37,7 +37,9 @@ from fastai.metrics import Dice, DiceMulti
 import matplotlib.pyplot as plt
 import warnings
 
-torch._C._jit_set_fusion_strategy([('STATIC', 0)])
+#https://discuss.pytorch.org/t/slow-forward-on-traced-graph-on-cuda-2nd-iteration/118445/7
+try: torch._C._jit_set_fusion_strategy([('STATIC', 0)])
+except: torch._C._jit_set_bailout_depth(0)
 
 # Cell
 _optim_dict = {
@@ -337,7 +339,7 @@ class EnsembleLearner(EnsembleBase):
             pred = self.g_pred[r.file][:]
             std = self.g_std[r.file][:]
             _d_model = f'Model {r.model_no}'
-            plot_results(img, msk, pred, std, df=r, model=_d_model)
+            plot_results(img, msk, pred, std, df=r, num_classes=self.num_classes, model=_d_model)
 
     def load_models(self, path=None):
         "Get models saved at `path`"
@@ -457,7 +459,7 @@ class EnsemblePredictor(EnsembleBase):
                 hastarget=False
             imgs.append(self.g_pred[r.file])
             if unc: imgs.append(self.g_std[r.file])
-            plot_results(*imgs, df=r, hastarget=hastarget, metric_name=metric_name, unc_metric=unc_metric)
+            plot_results(*imgs, df=r, hastarget=hastarget, num_classes=self.num_classes, metric_name=metric_name, unc_metric=unc_metric)
 
 
     def get_cellpose_results(self, export_dir=None):
@@ -506,7 +508,7 @@ class EnsemblePredictor(EnsembleBase):
         return self.df_ens
 
 
-    def show_cellpose_results(self, files=None, unc=True, unc_metric=None, metric_name='mean_average_precision'):
+    def show_cellpose_results(self, files=None, unc_metric=None, metric_name='mean_average_precision'):
         'Show instance segmentation results from cellpose predictions.'
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
         df = self.df_ens.reset_index()
@@ -523,8 +525,8 @@ class EnsemblePredictor(EnsembleBase):
                 hastarget=False
 
             imgs.append(label2rgb(self.cellpose_masks[r['index']], bg_label=0))
-            if unc: imgs.append(self.g_std[r.file])
-            plot_results(*imgs, df=r, hastarget=hastarget, metric_name=metric_name, unc_metric=unc_metric)
+            imgs.append(self.g_std[r.file])
+            plot_results(*imgs, df=r, hastarget=hastarget, num_classes=self.num_classes, instance_labels=True, metric_name=metric_name, unc_metric=unc_metric)
 
     def export_imagej_rois(self, output_folder='ROI_sets', **kwargs):
         'Export ImageJ ROI Sets to `ouput_folder`'

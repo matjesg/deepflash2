@@ -98,7 +98,8 @@ def ensemble_results(res_dict, file, std=False):
     return a
 
 # Cell
-def plot_results(*args, df, hastarget=False, model=None, metric_name='dice_score', unc_metric=None, figsize=(20, 20), **kwargs):
+def plot_results(*args, df, hastarget=False, num_classes=2, model=None, instance_labels=False,
+                 metric_name='dice_score', unc_metric=None, figsize=(20, 20), **kwargs):
     "Plot images, (masks), predictions and uncertainties side-by-side."
     if len(args)==4:
         img, msk, pred, pred_std = args
@@ -118,32 +119,33 @@ def plot_results(*args, df, hastarget=False, model=None, metric_name='dice_score
     axs[0].set_title(f'File {df.file}')
     unc_title = f'Uncertainty \n {unc_metric}: {df[unc_metric]:.3f}' if unc_metric else 'Uncertainty'
     pred_title = 'Prediction' if model is None else f'Prediction {model}'
+    vkwargs = {'vmin':0, 'vmax':num_classes} if instance_labels else {}
     if len(args)==4:
-        axs[1].imshow(msk)
+        axs[1].imshow(msk, **vkwargs)
         axs[1].set_axis_off()
         axs[1].set_title('Target')
-        axs[2].imshow(pred)
+        axs[2].imshow(pred, **vkwargs)
         axs[2].set_axis_off()
         axs[2].set_title(f'{pred_title} \n {metric_name}: {df[metric_name]:.2f}')
         axs[3].imshow(pred_std)
         axs[3].set_axis_off()
         axs[3].set_title(unc_title)
     elif len(args)==3 and not hastarget:
-        axs[1].imshow(pred)
+        axs[1].imshow(pred, **vkwargs)
         axs[1].set_axis_off()
         axs[1].set_title(pred_title)
         axs[2].imshow(pred_std)
         axs[2].set_axis_off()
         axs[2].set_title(unc_title)
     elif len(args)==3:
-        axs[1].imshow(msk)
+        axs[1].imshow(msk, **vkwargs)
         axs[1].set_axis_off()
         axs[1].set_title('Target')
-        axs[2].imshow(pred)
+        axs[2].imshow(pred, **vkwargs)
         axs[2].set_axis_off()
         axs[2].set_title(f'{pred_title} \n {metric_name}: {df[metric_name]:.2f}')
     elif len(args)==2:
-        axs[1].imshow(pred)
+        axs[1].imshow(pred, **vkwargs)
         axs[1].set_axis_off()
         axs[1].set_title(pred_title)
     plt.show()
