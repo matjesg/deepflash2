@@ -256,13 +256,15 @@ class EnsembleLearner(EnsembleBase):
     def get_inference_ensemble(self, model_path=None):
         model_paths = [model_path] if model_path is not None else self.models.values()
         models = [load_smp_model(p)[0] for p in model_paths]
-        ensemble = InferenceEnsemble(models,
-                                     num_classes=self.num_classes,
-                                     in_channels=self.in_channels,
-                                     channel_means=self.stats['channel_means'].tolist(),
-                                     channel_stds=self.stats['channel_stds'].tolist(),
-                                     tile_shape=(self.tile_shape,)*2,
-                                     **self.inference_kwargs).to(self.device)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            ensemble = InferenceEnsemble(models,
+                                         num_classes=self.num_classes,
+                                         in_channels=self.in_channels,
+                                         channel_means=self.stats['channel_means'].tolist(),
+                                         channel_stds=self.stats['channel_stds'].tolist(),
+                                         tile_shape=(self.tile_shape,)*2,
+                                         **self.inference_kwargs).to(self.device)
         return torch.jit.script(ensemble)
 
     def save_inference_ensemble(self):
