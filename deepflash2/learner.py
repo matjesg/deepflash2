@@ -9,6 +9,7 @@ import zarr
 import pandas as pd
 import numpy as np
 import cv2
+import tifffile
 from pathlib import Path
 from typing import List, Union, Tuple
 
@@ -380,14 +381,21 @@ class EnsembleLearner(EnsembleBase):
 # Cell
 class EnsemblePredictor(EnsembleBase):
     def __init__(self, *args, ensemble_path:Path=None, **kwargs):
+        if ensemble_path is not None:
+            self.load_inference_ensemble(ensemble_path)
+
         super().__init__(*args, **kwargs)
+
+        if hasattr(self, 'inference_ensemble'):
+            self.config.num_classes = self.inference_ensemble.num_classes
 
         if hasattr(self, 'files'):
             self._create_ds(stats={}, use_zarr_data = False, verbose=1)
 
         self.ensemble_dir = self.path/self.ens_dir
-        if ensemble_path is not None:
-            self.load_inference_ensemble(ensemble_path)
+
+        #if ensemble_path is not None:
+        #    self.load_inference_ensemble(ensemble_path)
 
     def load_inference_ensemble(self, ensemble_path:Path=None):
         "Load inference_ensemble from `self.ensemle_dir` or from `path`"
@@ -395,12 +403,14 @@ class EnsemblePredictor(EnsembleBase):
         if path.is_dir():
             path_list = get_files(path, extensions='.pt', recurse=False)
             if len(path_list)==0:
-                warnings.warn(f'No inference ensemble available at {self.ensemble_dir}. Did you train your ensemble correctly?')
+                warnings.warn(f'No inference ensemble available at {path}. Did you train your ensemble correctly?')
                 return
             path = path_list[0]
         self.inference_ensemble_name = path.name
-        self.inference_ensemble = torch.jit.load(path).to(self.device)
+        if hasattr(self, 'device'): self.inference_ensemble = torch.jit.load(path).to(self.device)
+        else: self.inference_ensemble = torch.jit.load(path)
         print(f'Successfully loaded InferenceEnsemble from {path}')
+
 
     def get_ensemble_results(self, file_list=None, export_dir=None, filetype='.png', **kwargs):
         'Predict files in file_list using InferenceEnsemble'
