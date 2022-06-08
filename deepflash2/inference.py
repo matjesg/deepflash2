@@ -155,7 +155,7 @@ class InferenceEnsemble(torch.nn.Module):
                  border_padding_factor:float = 0.25,
                  max_tile_shift:float = 0.9,
                  scale:float = 1.,
-                 device:str='cuda:0'):
+                 device:str='cpu'):
 
         super().__init__()
         self.num_classes = num_classes

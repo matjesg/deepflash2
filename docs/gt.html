@@ -113,7 +113,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="import_sitk" class="doc_header"><code>import_sitk</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L21" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>import_sitk</code>()</p>
+<h4 id="import_sitk" class="doc_header"><code>import_sitk</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L19" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>import_sitk</code>()</p>
 </blockquote>
 
 </div>
@@ -199,7 +199,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="staple_multi_label" class="doc_header"><code>staple_multi_label</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L32" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>staple_multi_label</code>(<strong><code>segmentations</code></strong>, <strong><code>label_undecided_pixel</code></strong>=<em><code>1</code></em>)</p>
+<h4 id="staple_multi_label" class="doc_header"><code>staple_multi_label</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L30" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>staple_multi_label</code>(<strong><code>segmentations</code></strong>, <strong><code>label_undecided_pixel</code></strong>=<em><code>1</code></em>)</p>
 </blockquote>
 <p>STAPLE: Simultaneous Truth and Performance Level Estimation with simple ITK</p>
 
@@ -261,7 +261,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="m_voting" class="doc_header"><code>m_voting</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L42" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>m_voting</code>(<strong><code>segmentations</code></strong>, <strong><code>labelForUndecidedPixels</code></strong>=<em><code>0</code></em>)</p>
+<h4 id="m_voting" class="doc_header"><code>m_voting</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L40" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>m_voting</code>(<strong><code>segmentations</code></strong>, <strong><code>labelForUndecidedPixels</code></strong>=<em><code>0</code></em>)</p>
 </blockquote>
 <p>Majority Voting from  simple ITK Label Voting</p>
 
@@ -300,38 +300,7 @@ nb_path: "nbs/09_gt.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="msk_show" class="doc_header"><code>msk_show</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L50" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>msk_show</code>(<strong><code>ax</code></strong>, <strong><code>msk</code></strong>, <strong><code>title</code></strong>, <strong><code>cmap</code></strong>, <strong><code>cbar</code></strong>=<em><code>None</code></em>, <strong><code>ticks</code></strong>=<em><code>None</code></em>, <strong>**<code>kwargs</code></strong>)</p>
-</blockquote>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-</div>
-    {% endraw %}
-
-    {% raw %}
-    
-<div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h2 id="GTEstimator" class="doc_header"><code>class</code> <code>GTEstimator</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L74" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GTEstimator</code>(<strong><code>exp_dir</code></strong>=<em><code>'expert_segmentations'</code></em>, <strong><code>config</code></strong>=<em><code>None</code></em>, <strong><code>path</code></strong>=<em><code>None</code></em>, <strong><code>cmap</code></strong>=<em><code>'viridis'</code></em>, <strong><code>verbose</code></strong>=<em><code>1</code></em>) :: <code>GetAttr</code></p>
+<h2 id="GTEstimator" class="doc_header"><code>class</code> <code>GTEstimator</code><a href="https://github.com/matjesg/deepflash2/tree/master/deepflash2/gt.py#L48" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>GTEstimator</code>(<strong><code>exp_dir</code></strong>=<em><code>'expert_segmentations'</code></em>, <strong><code>config</code></strong>=<em><code>None</code></em>, <strong><code>path</code></strong>=<em><code>None</code></em>, <strong><code>cmap</code></strong>=<em><code>'viridis'</code></em>, <strong><code>verbose</code></strong>=<em><code>1</code></em>) :: <code>GetAttr</code></p>
 </blockquote>
 <p>Class for ground truth estimation</p>
 
@@ -485,7 +454,7 @@ nb_path: "nbs/09_gt.ipynb"
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>2022-06-07 16:25:25,473 [INFO] WRITING LOG OUTPUT TO /home/magr/.cellpose/run.log
+<pre>2022-06-08 08:31:38,730 [INFO] WRITING LOG OUTPUT TO /home/magr/.cellpose/run.log
 </pre>
 </div>
 </div>

@@ -23,9 +23,11 @@ from fastai.vision.all import *
 from fastcore.all import *
 from fastprogress import progress_bar
 
+from .utils import clean_show
+
 # Cell
 def show(*obj, file_name=None, overlay=False, pred=False, num_classes=2,
-         show_bbox=True, figsize=(10,10), cmap='binary_r', **kwargs):
+         show_bbox=False, figsize=(10,10), cmap='viridis', **kwargs):
     "Show image, mask, and weight (optional)"
     if len(obj)==3:
         img,msk,weight = obj
@@ -61,9 +63,6 @@ def show(*obj, file_name=None, overlay=False, pred=False, num_classes=2,
         # Padding mask and weights
         msk = np.pad(msk, pad, 'constant', constant_values=(0))
 
-        if cmap is None:
-            cmap = 'binary_r' if msk.max()==1 else cmap
-
     # Weights preprocessing
     if weight is not None:
         weight = np.array(weight)
@@ -75,24 +74,19 @@ def show(*obj, file_name=None, overlay=False, pred=False, num_classes=2,
     img_ax = ax[0] if ncol>1 else ax
 
     # Plot img
-    img_ax.imshow(img, cmap=cmap)
-    if file_name is not None:
-        img_ax.set_title('Image {}'.format(file_name))
-    else:
-        img_ax.set_title('Image')
-    img_ax.set_axis_off()
+    img_title = f'Image {file_name}' if file_name is not None else 'Image'
+    clean_show(img_ax, img, img_title, cmap)
 
     # Plot img and mask
     if msk is not None:
         if overlay:
             label_image = label(msk)
             img_l2o = label2rgb(label_image, image=img, bg_label=0, alpha=.8, image_alpha=1)
-            ax[1].set_title('Image + Mask (#ROIs: {})'.format(label_image.max()))
-            ax[1].imshow(img_l2o)
+            pred_title = 'Image + Mask (#ROIs: {})'.format(label_image.max())
+            clean_show(ax[1], img_l2o, pred_title, None)
         else:
-            vkwargs = {'vmin':0, 'vmax':num_classes-1} if not instance_labels else {}
-            ax[1].imshow(msk, cmap=cmap, **vkwargs)
-            ax[1].set_title('Mask')
+            vkwargs = {'vmin':0, 'vmax':num_classes-1}
+            clean_show(ax[1], msk, 'Mask', cmap, cbar='classes', ticks=num_classes, **vkwargs)
         if show_bbox: ax[1].add_patch(copy(bbox))
 
         ax[1].set_axis_off()

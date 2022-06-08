@@ -1540,14 +1540,20 @@ class GUI(GetAttr):
     # Train
     def train_data_run_clicked(self, b):
         out = self.train.main['data']
+        tout = colab.output.temporary() if COLAB else self.tmp
         out.clear_output()
-        with out: display(w.HTML('Loading data. Please wait'))
+
         image_folder = self.train.sb['data'].img.path.relative_to(self.proj_path)
         mask_folder = self.train.sb['data'].msk.path.relative_to(self.proj_path)
         ensemble_path = self.proj_path/self.train_dir/self.ens_dir
 
         with out:
+            display(w.HTML('Loading data. Please wait'))
+
+        with tout:
             self.el = EnsembleLearner(image_folder, mask_folder, config=self.config, path=self.proj_path, ensemble_path=ensemble_path)
+
+        with out:
             items = {x:x for x in self.el.files}
             ipp = ItemsPerPage(self.proj_path, self.el.ds.show_data, items=items, overlay=True if self.num_classes==2 else False)
             display(ipp.widget)
