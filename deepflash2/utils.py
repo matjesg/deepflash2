@@ -126,6 +126,7 @@ def plot_results(*args, df, hastarget=False, num_classes=2, model=None, instance
 
     vkwargs = {'vmin':0, 'vmax':num_classes-1} if not instance_labels else {}
     unc_vkwargs = {'vmin':0, 'vmax':1}
+    class_kwargs = {'cbar':'classes', 'ticks':num_classes} if not instance_labels else {}
 
     if len(args)==4:
         img, msk, pred, pred_std = args
@@ -145,19 +146,19 @@ def plot_results(*args, df, hastarget=False, num_classes=2, model=None, instance
     pred_title = 'Prediction' if model is None else f'Prediction {model}'
 
     if len(args)==4:
-        clean_show(axs[1], msk, 'Target',  msk_cmap, cbar='classes', ticks=num_classes,**kwargs)
+        clean_show(axs[1], msk, 'Target',  msk_cmap, cbar='classes', ticks=num_classes, **vkwargs, **kwargs)
         pred_title = f'{pred_title} \n {metric_name}: {df[metric_name]:.2f}'
-        clean_show(axs[2], pred, pred_title,  msk_cmap, cbar='classes', ticks=num_classes, **kwargs)
+        clean_show(axs[2], pred, pred_title,  msk_cmap, **class_kwargs, **vkwargs, **kwargs)
         clean_show(axs[3], pred_std, unc_title,  'hot', cbar='uncertainty', **unc_vkwargs, **kwargs)
     elif len(args)==3 and not hastarget:
-        clean_show(axs[1], pred, pred_title, msk_cmap, cbar='classes', ticks=num_classes, **vkwargs, **kwargs)
+        clean_show(axs[1], pred, pred_title,  msk_cmap, **class_kwargs, **vkwargs, **kwargs)
         clean_show(axs[2], pred_std, unc_title,  'hot', cbar='uncertainty', **unc_vkwargs, **kwargs)
     elif len(args)==3:
         clean_show(axs[1], msk, 'Target',  msk_cmap, cbar='classes', ticks=num_classes,**vkwargs, **kwargs)
         pred_title = f'{pred_title} \n {metric_name}: {df[metric_name]:.2f}'
-        clean_show(axs[2], pred, pred_title,  msk_cmap, cbar='classes', ticks=num_classes, **kwargs)
+        clean_show(axs[2], pred, pred_title,  msk_cmap, **class_kwargs, **vkwargs, **kwargs)
     elif len(args)==2:
-        clean_show(axs[1], pred, pred_title, msk_cmap, cbar='classes', ticks=num_classes, **vkwargs, **kwargs)
+        clean_show(axs[2], pred, pred_title,  msk_cmap, **class_kwargs, **vkwargs, **kwargs)
     plt.show()
 
 # Cell

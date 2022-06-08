@@ -240,9 +240,9 @@ class InferenceEnsemble(torch.nn.Module):
 
         # Rescale results
         if self.tiler.scale!=1.:
-            softmax = F.interpolate(softmax.unsqueeze_(0), scale_factor=self.tiler.scale, mode="bilinear", align_corners=True)[0]
+            softmax = F.interpolate(softmax.unsqueeze_(0), size=sh, mode="bilinear", align_corners=True)[0]
             stdeviation = stdeviation.view(1, 1, stdeviation.shape[0], stdeviation.shape[1])
-            stdeviation = F.interpolate(stdeviation, scale_factor=self.tiler.scale, mode="bilinear", align_corners=True)[0][0]
+            stdeviation = F.interpolate(stdeviation, size=sh, mode="bilinear", align_corners=True)[0][0]
 
         argmax = torch.argmax(softmax, dim=0).to(torch.uint8)
 
