@@ -6,6 +6,7 @@ __all__ = ['Config']
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import json
+import torch
 
 # Cell
 @dataclass
@@ -88,6 +89,15 @@ class Config:
     pred_dir:str = 'Prediction'
     ens_dir:str = 'models'
     val_dir:str = 'valid'
+
+    def __post_init__(self):
+        self.set_device()
+
+    def set_device(self, device:str=None):
+        if device is None:
+            self.device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        else:
+            self.device = device
 
     @property
     def albumentation_kwargs(self):

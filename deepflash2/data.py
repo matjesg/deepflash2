@@ -24,7 +24,7 @@ from fastcore.all import *
 from fastprogress import progress_bar
 
 # Cell
-def show(*obj, file_name=None, overlay=False, pred=False,
+def show(*obj, file_name=None, overlay=False, pred=False, num_classes=2,
          show_bbox=True, figsize=(10,10), cmap='binary_r', **kwargs):
     "Show image, mask, and weight (optional)"
     if len(obj)==3:
@@ -90,7 +90,8 @@ def show(*obj, file_name=None, overlay=False, pred=False,
             ax[1].set_title('Image + Mask (#ROIs: {})'.format(label_image.max()))
             ax[1].imshow(img_l2o)
         else:
-            ax[1].imshow(msk, cmap=cmap)
+            vkwargs = {'vmin':0, 'vmax':num_classes-1} if not instance_labels else {}
+            ax[1].imshow(msk, cmap=cmap, **vkwargs)
             ax[1].set_title('Mask')
         if show_bbox: ax[1].add_patch(copy(bbox))
 
@@ -434,7 +435,7 @@ class BaseDataset(Dataset):
             img = self.read_img(f)
             if self.label_fn is not None:
                 lbl = self.labels[f.name]
-                show(img, lbl, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
+                show(img, lbl, file_name=f.name, figsize=figsize, show_bbox=False, num_classes=self.num_classes, **kwargs)
             else:
                 show(img, file_name=f.name, figsize=figsize, show_bbox=False, **kwargs)
 

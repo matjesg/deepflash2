@@ -7,6 +7,7 @@ __all__ = ['torch_gaussian', 'gaussian_kernel_2d', 'epistemic_uncertainty', 'ale
 from typing import Tuple, List
 import torch
 import torch.nn.functional as F
+from torchvision.transforms import Normalize
 import deepflash2.tta as tta
 
 # Cell
@@ -142,16 +143,19 @@ class TileModule(torch.nn.Module):
 class InferenceEnsemble(torch.nn.Module):
     'Class for model ensemble inference'
     def __init__(self,
-                 models,
-                 num_classes,
-                 model_stats,
-                 tile_shape=(512,512),
+                 models:List[torch.nn.Module],
+                 num_classes:int,
+                 in_channels:int,
+                 channel_means:List[float],
+                 channel_stds:List[float],
+                 tile_shape:Tuple[int,int]=(512,512),
                  use_gaussian: bool = True,
                  gaussian_kernel_sigma_scale:float = 1./8,
                  use_tta:bool=True,
                  border_padding_factor:float = 0.25,
                  max_tile_shift:float = 0.9,
-                 scale:float = 1.):
+                 scale:float = 1.,
+                 device:str='cuda:0'):
 
         super().__init__()
         self.num_classes = num_classes
@@ -159,12 +163,10 @@ class InferenceEnsemble(torch.nn.Module):
         self.use_gaussian = use_gaussian
         self.gaussian_kernel_sigma_scale = gaussian_kernel_sigma_scale
         self.tile_shape = tile_shape
+        self.norm = Normalize(channel_means, channel_stds)
 
-        self.register_buffer('channel_means', torch.tensor(model_stats['channel_means'], dtype=torch.float32))
-        self.register_buffer('channel_stds', torch.tensor(model_stats['channel_stds'], dtype=torch.float32))
-
-        dummy_input = torch.rand(1, 1, *self.tile_shape)
-        self.models = torch.nn.ModuleList([torch.jit.trace(m.eval(), dummy_input) for m in models])
+        dummy_input = torch.rand(1, in_channels, *self.tile_shape).to(device)
+        self.models = torch.nn.ModuleList([torch.jit.trace(m.to(device).eval(), dummy_input) for m in models])
 
         self.tiler = torch.jit.script(TileModule(tile_shape=tile_shape,
                                                  scale=scale,
@@ -194,13 +196,16 @@ class InferenceEnsemble(torch.nn.Module):
         # Get slices for tiling
         in_slices, out_slices, center_points = self.tiler.get_slices_and_centers(sh)
 
+        #
+        self.mw.to(x)
+
         # Loop over tiles
         for i, cp in enumerate(center_points):
 
-            tile = self.tiler(x, cp).to(self.channel_means)
+            tile = self.tiler(x, cp)
 
             # Normalize
-            tile = (tile - self.channel_means)/self.channel_stds
+            tile = self.norm(tile)
 
             smxs = []
             # Loop over tt-augmentations

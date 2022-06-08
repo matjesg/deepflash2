@@ -100,7 +100,7 @@ class EnsembleBase(GetAttr):
 
     def predict(self, arr:Union[np.ndarray, torch.Tensor]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         'Get prediction for arr using inference_ensemble'
-        inp = torch.tensor(arr).float()
+        inp = torch.tensor(arr).float().to(self.device)
         with torch.inference_mode():
             preds = self.inference_ensemble(inp)
         preds = [x.cpu().numpy() for x in preds]
@@ -208,8 +208,7 @@ class EnsembleLearner(EnsembleBase):
             ds.append(TileDataset(files_val, label_fn=self.label_fn, **self.train_ds_kwargs, verbose=0))
         else:
             ds.append(ds[0])
-        dls = DataLoaders.from_dsets(*ds, bs=self.batch_size, pin_memory=True, **self.dl_kwargs)
-        if torch.cuda.is_available(): dls.cuda()
+        dls = DataLoaders.from_dsets(*ds, bs=self.batch_size, pin_memory=True, **self.dl_kwargs).to(self.device)
         return dls
 
     def _create_model(self):
@@ -218,8 +217,7 @@ class EnsembleLearner(EnsembleBase):
                                  encoder_weights=self.encoder_weights,
                                  in_channels=self.in_channels,
                                  classes=self.num_classes,
-                                 **self.model_kwargs)
-        if torch.cuda.is_available(): model.cuda()
+                                 **self.model_kwargs).to(self.device)
         return model
 
 
@@ -253,14 +251,18 @@ class EnsembleLearner(EnsembleBase):
         self.recorder[i]=self.learn.recorder
 
         del model
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available(): torch.cuda.empty_cache()
 
-    def get_inference_ensemble(self, model_path=None, use_gpu=True):
+    def get_inference_ensemble(self, model_path=None):
         model_paths = [model_path] if model_path is not None else self.models.values()
         models = [load_smp_model(p)[0] for p in model_paths]
-        ensemble = InferenceEnsemble(models, self.num_classes, self.ds.stats,
-                                     tile_shape=(self.tile_shape,)*2, **self.inference_kwargs)
-        if use_gpu and torch.cuda.is_available(): ensemble.cuda()
+        ensemble = InferenceEnsemble(models,
+                                     num_classes=self.num_classes,
+                                     in_channels=self.in_channels,
+                                     channel_means=self.stats['channel_means'].tolist(),
+                                     channel_stds=self.stats['channel_stds'].tolist(),
+                                     tile_shape=(self.tile_shape,)*2,
+                                     **self.inference_kwargs).to(self.device)
         return torch.jit.script(ensemble)
 
     def save_inference_ensemble(self):
@@ -317,11 +319,11 @@ class EnsembleLearner(EnsembleBase):
                         'uncertainty_path': f'{self.store}/{self.g_std.path}/{f.name}'})
                 res_list.append(df_tmp)
                 if export_dir:
-                    save_mask(pred, pred_path/f'{df_tmp.file}_{df_tmp.model_no}_mask', filetype)
+                    save_mask(pred, pred_path/f'{df_tmp.file}_model{df_tmp.model_no}_mask', filetype)
                     save_unc(std, unc_path/f'{df_tmp.file}_model{df_tmp.model_no}_uncertainty', filetype)
 
         del self.inference_ensemble
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available(): torch.cuda.empty_cache()
 
         self.df_val = pd.DataFrame(res_list)
         if export_dir:
@@ -395,8 +397,7 @@ class EnsemblePredictor(EnsembleBase):
                 return
             path = path_list[0]
         self.inference_ensemble_name = path.name
-        self.inference_ensemble = torch.jit.load(path)
-        if self.use_gpu and torch.cuda.is_available(): self.inference_ensemble.cuda()
+        self.inference_ensemble = torch.jit.load(path).to(self.device)
         print(f'Successfully loaded InferenceEnsemble from {path}')
 
     def get_ensemble_results(self, file_list=None, export_dir=None, filetype='.png', **kwargs):
