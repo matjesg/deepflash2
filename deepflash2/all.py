@@ -1,3 +1,4 @@
+from .config import *
 from .learner import *
 from .data import *
 from .models import *
