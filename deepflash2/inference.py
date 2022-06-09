@@ -135,7 +135,7 @@ class TileModule(torch.nn.Module):
         x = x.permute(2,0,1).unsqueeze_(0)
 
         # Remap
-        x = torch.nn.functional.grid_sample(x, vgrid, mode='bilinear', padding_mode='reflection', align_corners=True)
+        x = torch.nn.functional.grid_sample(x, vgrid, mode='nearest', padding_mode='reflection', align_corners=False)
 
         return x
 
@@ -240,9 +240,10 @@ class InferenceEnsemble(torch.nn.Module):
 
         # Rescale results
         if self.tiler.scale!=1.:
-            softmax = F.interpolate(softmax.unsqueeze_(0), size=sh, mode="bilinear", align_corners=True)[0]
+            # Needs checking if these are the best options
+            softmax = F.interpolate(softmax.unsqueeze_(0), size=sh, mode="bilinear", align_corners=False)[0]
             stdeviation = stdeviation.view(1, 1, stdeviation.shape[0], stdeviation.shape[1])
-            stdeviation = F.interpolate(stdeviation, size=sh, mode="bilinear", align_corners=True)[0][0]
+            stdeviation = F.interpolate(stdeviation, size=sh, mode="bilinear", align_corners=False)[0][0]
 
         argmax = torch.argmax(softmax, dim=0).to(torch.uint8)
 

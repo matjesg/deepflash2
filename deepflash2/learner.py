@@ -183,6 +183,9 @@ class EnsembleLearner(EnsembleBase):
         ds_kwargs['num_classes']= self.num_classes
         ds_kwargs['scale']= self.scale
         ds_kwargs['flip'] = self.flip
+        ds_kwargs['max_tile_shift']= 1.
+        ds_kwargs['border_padding_factor']= 0.
+        ds_kwargs['scale']= self.scale
         ds_kwargs['albumentations_tfms'] = self._compose_albumentations(**self.albumentation_kwargs)
         ds_kwargs['sample_mult'] = self.sample_mult if self.sample_mult>0 else None
         return ds_kwargs

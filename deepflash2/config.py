@@ -67,8 +67,8 @@ class Config:
 
     # Pred/Val Settings
     use_tta:bool = True
-    max_tile_shift: float = 0.9
-    border_padding_factor:float = 0.1
+    max_tile_shift: float = 0.5
+    border_padding_factor:float = 0.25
     use_gaussian: bool = True
     gaussian_kernel_sigma_scale: float = 0.125
     min_pixel_export:int = 0
