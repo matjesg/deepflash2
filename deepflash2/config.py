@@ -48,11 +48,6 @@ class Config:
     n_epochs:int = 25
     sample_mult:int = 0
 
-    # Validation and Prediction Settings
-    # tta:bool = True
-    border_padding_factor:float = 0.1
-    shift:float = 0.9
-
     # Train Data Augmentation
     gamma_limit_lower:int = 80
     gamma_limit_upper:int = 120
@@ -70,9 +65,10 @@ class Config:
     loss_gamma:float = 2.0 # Focal loss
     loss_smooth_factor:float = 0. #SoftCrossEntropyLoss
 
-    # Pred Settings
+    # Pred/Val Settings
     use_tta:bool = True
     max_tile_shift: float = 0.9
+    border_padding_factor:float = 0.1
     use_gaussian: bool = True
     gaussian_kernel_sigma_scale: float = 0.125
     min_pixel_export:int = 0

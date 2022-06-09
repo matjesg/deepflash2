@@ -165,7 +165,8 @@ class EnsembleLearner(EnsembleBase):
         ds_kwargs['instance_labels']= self.instance_labels
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
         ds_kwargs['num_classes']= self.num_classes
-        ds_kwargs['shift']= self.shift
+        ds_kwargs['max_tile_shift']= self.max_tile_shift
+        ds_kwargs['scale']= self.scale
         ds_kwargs['border_padding_factor']= self.border_padding_factor
         return ds_kwargs
 
@@ -180,8 +181,7 @@ class EnsembleLearner(EnsembleBase):
         ds_kwargs['stats']= self.stats
         ds_kwargs['tile_shape']= (self.tile_shape,)*2
         ds_kwargs['num_classes']= self.num_classes
-        ds_kwargs['shift']= 1.
-        ds_kwargs['border_padding_factor']= 0.
+        ds_kwargs['scale']= self.scale
         ds_kwargs['flip'] = self.flip
         ds_kwargs['albumentations_tfms'] = self._compose_albumentations(**self.albumentation_kwargs)
         ds_kwargs['sample_mult'] = self.sample_mult if self.sample_mult>0 else None
