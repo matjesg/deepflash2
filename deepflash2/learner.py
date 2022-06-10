@@ -32,7 +32,7 @@ from .models import create_smp_model, save_smp_model, load_smp_model, run_cellpo
 from .inference import InferenceEnsemble
 from .losses import get_loss
 from .utils import compose_albumentations as _compose_albumentations
-from .utils import dice_score, plot_results, get_label_fn, save_mask, save_unc, export_roi_set, get_instance_segmentation_metrics
+from .utils import dice_score, binary_dice_score, plot_results, get_label_fn, save_mask, save_unc, export_roi_set, get_instance_segmentation_metrics
 from fastai.metrics import Dice, DiceMulti
 
 import matplotlib.pyplot as plt
@@ -294,6 +294,8 @@ class EnsembleLearner(EnsembleBase):
         "Validate models on validation data and save results"
         res_list = []
         model_dict = self.models if not model_no else {k:v for k,v in self.models.items() if k==model_no}
+        metric_name = 'dice_score' if self.num_classes==2 else 'average_dice_score'
+
         if export_dir:
             export_dir = Path(export_dir)
             pred_path = export_dir/'masks'
@@ -312,11 +314,10 @@ class EnsembleLearner(EnsembleBase):
                 self.save_preds_zarr(f.name, pred, smx, std)
                 msk = self.ds.labels[f.name][:] #.get_data(f, mask=True)[0])
                 m_dice = dice_score(msk, pred, num_classes=self.num_classes)
-
                 df_tmp = pd.Series({'file' : f.name,
                         'model' :  model_path,
                         'model_no' : i,
-                        'dice_score': m_dice,
+                        metric_name: m_dice,
                         'uncertainty_score': np.mean(std[pred>0]),
                         'image_path': f,
                         'mask_path': self.label_fn(f),
@@ -337,19 +338,20 @@ class EnsembleLearner(EnsembleBase):
             self.df_val.to_excel(export_dir/f'val_results.xlsx')
         return self.df_val
 
-    def show_valid_results(self, model_no=None, files=None, **kwargs):
+    def show_valid_results(self, model_no=None, files=None, metric_name='auto', **kwargs):
         "Plot results of all or `file` validation images",
         if self.df_val is None: self.get_valid_results(**kwargs)
         df = self.df_val
         if files is not None: df = df.set_index('file', drop=False).loc[files]
         if model_no is not None: df = df[df.model_no==model_no]
+        if metric_name=='auto': metric_name = 'dice_score' if self.num_classes==2 else 'average_dice_score'
         for _, r in df.iterrows():
             img = self.ds.data[r.file][:]
             msk = self.ds.labels[r.file][:]
             pred = self.g_pred[r.file][:]
             std = self.g_std[r.file][:]
             _d_model = f'Model {r.model_no}'
-            plot_results(img, msk, pred, std, df=r, num_classes=self.num_classes, model=_d_model)
+            plot_results(img, msk, pred, std, df=r, num_classes=self.num_classes, metric_name=metric_name, model=_d_model)
 
     def load_models(self, path=None):
         "Get models saved at `path`"
@@ -456,17 +458,31 @@ class EnsemblePredictor(EnsembleBase):
             self.label_fn = label_fn or self.get_label_fn(mask_dir)
             self._create_ds(stats={}, use_zarr_data = False, verbose=1)
 
-        for i, r in self.df_ens.iterrows():
-            msk = self.ds.labels[r.file]
-            pred = self.g_pred[r.file]
-            self.df_ens.loc[i, 'dice_score'] = dice_score(msk, pred, num_classes=self.num_classes)
+        print('Calculating metrics')
+        for i, r in progress_bar(self.df_ens.iterrows(), total=len(self.df_ens)):
+            msk = self.ds.labels[r.file][:]
+            pred = self.g_pred[r.file][:]
+
+            if self.num_classes==2:
+                self.df_ens.loc[i, f'dice_score'] = binary_dice_score(msk, pred)
+            else:
+                for cl in range(self.num_classes):
+                    msk_bin = msk==cl
+                    pred_bin = pred==cl
+                    if np.any([msk_bin, pred_bin]):
+                        self.df_ens.loc[i, f'dice_score_class{cl}'] = binary_dice_score(msk_bin, pred_bin)
+
+        if self.num_classes>2:
+            self.df_ens['average_dice_score'] = self.df_ens[[col for col in self.df_ens if col.startswith('dice_score_class')]].mean(axis=1)
+
         return self.df_ens
 
-    def show_ensemble_results(self, files=None, unc=True, unc_metric=None, metric_name='dice_score'):
+    def show_ensemble_results(self, files=None, unc=True, unc_metric=None, metric_name='auto'):
         "Show result of ensemble or `model_no`"
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
         df = self.df_ens
         if files is not None: df = df.reset_index().set_index('file', drop=False).loc[files]
+        if metric_name=='auto': metric_name = 'dice_score' if self.num_classes==2 else 'average_dice_score'
         for _, r in df.iterrows():
             imgs = []
             imgs.append(self.ds.read_img(r.image_path))
