@@ -532,21 +532,23 @@ class EnsemblePredictor(EnsembleBase):
             self.label_fn = label_fn or self.get_label_fn(mask_dir)
             self._create_ds(stats={}, use_zarr_data = False, verbose=1)
 
+        cl = self.cellpose_export_class
         for i, r in self.df_ens.iterrows():
-            msk = self.ds.labels[r.file][:]
-            _, msk = cv2.connectedComponents(msk, connectivity=4)
+            msk = self.ds.labels[r.file][:]==cl
+            _, msk = cv2.connectedComponents(msk.astype('uint8'), connectivity=4)
             pred = self.cellpose_masks[i]
             ap, tp, fp, fn = get_instance_segmentation_metrics(msk, pred, is_binary=False, min_pixel=self.min_pixel_export)
-            self.df_ens.loc[i, 'mean_average_precision'] = ap.mean()
-            self.df_ens.loc[i, 'average_precision_at_iou_50'] = ap[0]
+            self.df_ens.loc[i, f'mAP_class{cl}'] = ap.mean()
+            self.df_ens.loc[i, f'mAP_iou50_class{cl}'] = ap[0]
         return self.df_ens
 
 
-    def show_cellpose_results(self, files=None, unc_metric=None, metric_name='mean_average_precision'):
+    def show_cellpose_results(self, files=None, unc_metric=None, metric_name='auto'):
         'Show instance segmentation results from cellpose predictions.'
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
         df = self.df_ens.reset_index()
         if files is not None: df = df.set_index('file', drop=False).loc[files]
+        if metric_name=='auto': metric_name=f'mAP_class{self.cellpose_export_class}'
         for _, r in df.iterrows():
             imgs = [self.ds.read_img(r.image_path)]
             if metric_name in r.index:
