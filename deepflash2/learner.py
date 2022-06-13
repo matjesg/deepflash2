@@ -445,8 +445,8 @@ class EnsemblePredictor(EnsembleBase):
                                 'uncertainty_path': f'{self.store}/{self.g_std.path}/{f.name}'})
             res_list.append(df_tmp)
             if export_dir:
-                save_mask(pred, pred_path/f'{df_tmp.file}_{df_tmp.ensemble}_mask', filetype)
-                save_unc(std, unc_path/f'{df_tmp.file}_{df_tmp.ensemble}_unc', filetype)
+                save_mask(pred, pred_path/f'{df_tmp.file}_mask', filetype)
+                save_unc(std, unc_path/f'{df_tmp.file}_unc', filetype)
 
         self.df_ens  = pd.DataFrame(res_list)
         return self.g_pred, self.g_smx, self.g_std
@@ -516,11 +516,10 @@ class EnsemblePredictor(EnsembleBase):
                                 gpu=torch.cuda.is_available())
 
         if export_dir:
-            export_dir = Path(export_dir)
-            cp_path = export_dir/'cellpose_masks'
-            cp_path.mkdir(parents=True, exist_ok=True)
+            export_dir = Path(export_dir)/'instance_labels'
+            export_dir.mkdir(parents=True, exist_ok=True)
             for idx, r in self.df_ens.iterrows():
-                tifffile.imwrite(cp_path/f'{r.file}_class{cl}.tif', cp_masks[idx], compress=6)
+                tifffile.imwrite(export_dir/f'{r.file}_ilabels_class{cl}.tif', cp_masks[idx], compress=6)
 
         self.cellpose_masks = cp_masks
         return cp_masks
