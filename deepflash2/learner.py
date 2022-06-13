@@ -519,7 +519,7 @@ class EnsemblePredictor(EnsembleBase):
             export_dir = Path(export_dir)/'instance_labels'
             export_dir.mkdir(parents=True, exist_ok=True)
             for idx, r in self.df_ens.iterrows():
-                tifffile.imwrite(export_dir/f'{r.file}_ilabels_class{cl}.tif', cp_masks[idx], compress=6)
+                tifffile.imwrite(export_dir/f'{r.file}_class{cl}.tif', cp_masks[idx], compress=6)
 
         self.cellpose_masks = cp_masks
         return cp_masks
