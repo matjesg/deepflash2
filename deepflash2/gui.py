@@ -1699,12 +1699,11 @@ class GUI(GetAttr):
             path = self.proj_path/'deepflash2_sample_data'
             display(f'Dowloading sample data into {path.relative_to(self.proj_path)}')
             download_sample_data(SAMPLE_DATA_URL, 'wue1_cFOS_small.zip', path, extract=True)
-            display(f'Dowloading trained models for sample data into {path.relative_to(self.proj_path)}')
-            for fold in [1,2]:
-                download_sample_data(SAMPLE_DATA_URL, f'Unet_resnet34_2classes-fold{fold}.pth', path/'models')
+            display(f'Dowloading model ensemble for sample data into {path.relative_to(self.proj_path)}')
+            download_sample_data(SAMPLE_DATA_URL, f'wue1_cFOS_ensemble.pt', path/'ensembles')
             self.pred.sb['data'].img.path = path/'images'
             self.pred.sb['data'].msk.path = path/'masks'
-            self.pred.sb['data'].ens.path = path/'models'
+            self.pred.sb['data'].ens.path = path/'ensembles'
             self.test_masks_provided = True
             self.pred_data_run_clicked(b)
             if not COLAB: self.tmp.clear_output()
