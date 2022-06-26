@@ -2,6 +2,25 @@
 
 <!-- do not remove -->
 
+## 0.2.0
+
+### New Features
+
+- new features ([#42](https://github.com/matjesg/deepflash2/pull/42)), thanks to [@matjesg](https://github.com/matjesg)
+    - Multiclass GT Estimation, closes #34 
+    - Torchscript ensemble class for inference / tta adjusted
+    - ONNX export possible
+
+
+- Major changes
+    - Different classes for training (EnsembleLearner) and Inference (EnsemblePredictor)
+    - Normalization based on uin8 images (0...255)
+
+- Instance segmentation metrics ([#32](https://github.com/matjesg/deepflash2/pull/32)), thanks to [@matjesg](https://github.com/matjesg)
+  - Instance segmentation metrics for GT estimation and prediction
+
+
+
 ## 0.1.8
 
 - Dependency fix (opencv-python-headless>=4.1.1,<4.5.5)
