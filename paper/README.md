@@ -1,8 +1,9 @@
 # Reproducing the results of our paper
 
 - **Paper**: The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.06693).
-- **Data and Models**: Data and trained models are available on [Google Drive](https://drive.google.com/drive/folders/1r9AqP9qW9JThbMIvT0jhoA5mPxWEeIjs?usp=sharing). 
-- **Benchmark Models**: Trained benchmark models are also available on [Google Drive](https://drive.google.com/drive/folders/1BZRrRTDuJw5EoBqz1RWoFKZ7eq2kEwxm?usp=sharing). 
+- **Data**: Data is available on [Google Drive](https://drive.google.com/drive/folders/1r9AqP9qW9JThbMIvT0jhoA5mPxWEeIjs?usp=sharing). 
+- **Models**: Trained models are available in the model libary on [github](https://github.com/matjesg/deepflash2/releases/tag/model_library). 
+- **Benchmark Models**: Trained benchmark models are available on [Google Drive](https://drive.google.com/drive/folders/1BZRrRTDuJw5EoBqz1RWoFKZ7eq2kEwxm?usp=sharing). 
 
 ## deepflash2 notebooks
 
@@ -12,7 +13,9 @@ Notebooks reproduce the results of our paper:
 
 2. Ensemble training and prediction [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/paper/2_train_and_predict.ipynb) 
 
-3. Performance comparion between deepflash2, experts, and benchmark methods [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/paper/3_performance_comparison.ipynb) 
+3. Performance comparison between deepflash2, experts, and benchmark methods [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/paper/3_performance_comparison.ipynb) 
+  - 3.1 Performance comparion for the reliabiliy of results [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/paper/3-1_performance_comparison_reliability.ipynb) 
+  - 3.2 Performance comparion for challenge data [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/paper/3-2_performance_challenge_data.ipynb) 
 
 4. Relationship between uncertainty and expert agreement [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/paper/4_experts_vs_uncertainties.ipynb) 
 
