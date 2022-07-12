@@ -496,7 +496,7 @@ class EnsemblePredictor(EnsembleBase):
             plot_results(*imgs, df=r, hastarget=hastarget, num_classes=self.num_classes, metric_name=metric_name, unc_metric=unc_metric)
 
 
-    def get_cellpose_results(self, export_dir=None):
+    def get_cellpose_results(self, export_dir=None, check_missing=True):
         'Get instance segmentation results using the cellpose integration'
         assert self.df_ens is not None, "Please run `get_ensemble_results` first."
         cl = self.cellpose_export_class
@@ -513,7 +513,15 @@ class EnsemblePredictor(EnsembleBase):
                                 model_type=self.cellpose_model,
                                 diameter=self.cellpose_diameter,
                                 min_size=self.min_pixel_export,
+                                flow_threshold=self.cellpose_flow_threshold,
                                 gpu=torch.cuda.is_available())
+
+        # Check for missing pixels in cellpose masks
+        if check_missing:
+            for i, _ in self.df_ens.iterrows():
+                cp_mask_bin = (cp_masks[i]>0).astype('uint8')
+                n_diff = np.sum(masks[i]!=cp_mask_bin, dtype='uint8')
+                self.df_ens.at[i,f'cellpose_removed_pixels_class{cl}'] = n_diff
 
         if export_dir:
             export_dir = Path(export_dir)/'instance_labels'

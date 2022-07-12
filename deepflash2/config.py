@@ -77,6 +77,7 @@ class Config:
     cellpose_model:str='nuclei'
     cellpose_diameter:int=0
     cellpose_export_class:int=1
+    cellpose_flow_threshold:float=0.4
     instance_segmentation_metrics:bool=False
 
     # Folder Structure

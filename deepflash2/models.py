@@ -129,7 +129,7 @@ def get_diameters(masks):
     return int(np.array(diameters).mean())
 
 # Cell
-def run_cellpose(probs, masks, model_type='nuclei', diameter=0, min_size=-1, gpu=True):
+def run_cellpose(probs, masks, model_type='nuclei', diameter=0, min_size=-1, gpu=True, flow_threshold=0.4):
     'Run cellpose on deepflash2 predictions'
     check_cellpose_installation()
 
@@ -144,11 +144,15 @@ def run_cellpose(probs, masks, model_type='nuclei', diameter=0, min_size=-1, gpu
         """ compute masks using dynamics from dP and cellprob """
         if p is None:
             p = dynamics.follow_flows(-1 * dP * mask / 5., niter=niter, interp=interp, use_gpu=self.gpu)
-        maski = dynamics.get_masks(p, iscell=mask, flows=dP, threshold=flow_threshold if not do_3D else None)
+        maski = dynamics.get_masks(p, iscell=mask, flows=dP, threshold=flow_threshold)
+
+        # remove postpreocessing?
         maski = utils.fill_holes_and_remove_small_masks(maski, min_size=min_size)
-        if resize is not None:
-            maski = transforms.resize_image(maski, resize[0], resize[1],
-                                            interpolation=cv2.INTER_NEAREST)
+
+        # resizing does not work
+        #if resize is not None:
+        #    maski = transforms.resize_image(maski, resize[0], resize[1], interpolation=cv2.INTER_NEAREST)
+
         return maski, p
 
     model = models.Cellpose(gpu=gpu, model_type=model_type)
@@ -160,6 +164,7 @@ def run_cellpose(probs, masks, model_type='nuclei', diameter=0, min_size=-1, gpu
                                        diameter=diameter,
                                        normalize=False,
                                        min_size=min_size,
+                                       flow_threshold=flow_threshold,
                                        resample=True,
                                        channels=[0,0])
         cp_masks.append(cp_pred)
