@@ -8,6 +8,7 @@ import os, zarr, cv2, imageio, shutil, random
 
 import numpy as np
 
+import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from skimage.measure import label
 from skimage.color import label2rgb
@@ -19,7 +20,8 @@ from albumentations.pytorch.transforms import ToTensorV2
 import torch, torch.nn as nn, torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
-from fastai.vision.all import *
+#from fastai.vision.all import *
+from fastai.data.transforms import get_image_files
 from fastcore.all import *
 from fastprogress import progress_bar
 
@@ -106,22 +108,6 @@ def show(*obj, file_name=None, overlay=False, pred=False, num_classes=2,
     #ax.set_axis_off()
     plt.tight_layout()
     plt.show()
-
-# Cell
-@typedispatch
-def show_batch(x:TensorImage, y:tuple, samples, max_n=6, figsize=None, **kwargs):
-    "Show one batch (image, mask, and weights) from a `DataLoader`"
-    max_n = np.min((max_n, len(x)))
-    if figsize is None: figsize = (12, max_n * 5)
-    for i in range(max_n): show(x[i], y[0][i], y[1][i], figsize=figsize, **kwargs)
-
-# Cell
-@typedispatch
-def show_results(x:TensorImage, y:tuple, samples, outs, max_n=4, figsize=None, **kwargs):
-    "Show image, mask, and weights from `max_n` items"
-    max_n = np.min((max_n, len(x)))
-    if figsize is None: figsize = (12, max_n * 5)
-    for i in range(max_n): show(x[i], y[0][i], outs[i][0], pred=True, figsize=figsize, **kwargs)
 
 # Cell
 # adapted from Falk, Thorsten, et al. "U-Net: deep learning for cell counting, detection, and morphometry." Nature methods 16.1 (2019): 67-70.
