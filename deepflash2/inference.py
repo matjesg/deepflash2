@@ -226,7 +226,7 @@ class InferenceEnsemble(torch.nn.Module):
             # Apply weigthing
             batch_smx = torch.mean(smxs, dim=0)*self.mw.view(1,1,self.mw.shape[0],self.mw.shape[1])
             #softmax[ox0:ox1, oy0:oy1] += batch_smx.permute(0,2,3,1)[0][ix0:ix1, iy0:iy1].to(softmax)
-            softmax[..., ox0:ox1, oy0:oy1] += batch_smx[0, ..., ix0:ix1, iy0:iy1].to(softmax)
+            softmax[0:self.num_classes, ox0:ox1, oy0:oy1] += batch_smx[0, 0:self.num_classes, ix0:ix1, iy0:iy1].to(softmax)
             merge_map[ox0:ox1, oy0:oy1] += self.mw[ix0:ix1, iy0:iy1].to(merge_map)
 
             # Encertainty_estimates

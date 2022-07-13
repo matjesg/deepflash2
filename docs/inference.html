@@ -54,7 +54,7 @@ nb_path: "nbs/04_inference.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ScriptFunction object at 0x7ff360954040>" class="doc_header"><code>ScriptFunction object at 0x7ff360954040></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7ff360954040></code>()</p>
+<h4 id="ScriptFunction object at 0x7faa8f2e2950>" class="doc_header"><code>ScriptFunction object at 0x7faa8f2e2950></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7faa8f2e2950></code>()</p>
 </blockquote>
 <p>Returns a Gaussian window</p>
 
@@ -86,7 +86,7 @@ nb_path: "nbs/04_inference.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ScriptFunction object at 0x7ff358af9b80>" class="doc_header"><code>ScriptFunction object at 0x7ff358af9b80></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7ff358af9b80></code>()</p>
+<h4 id="ScriptFunction object at 0x7faa8f2e2900>" class="doc_header"><code>ScriptFunction object at 0x7faa8f2e2900></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7faa8f2e2900></code>()</p>
 </blockquote>
 <p>Returns a 2D Gaussian kernel tensor.</p>
 
@@ -162,7 +162,7 @@ nb_path: "nbs/04_inference.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ScriptFunction object at 0x7ff358b00db0>" class="doc_header"><code>ScriptFunction object at 0x7ff358b00db0></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7ff358b00db0></code>()</p>
+<h4 id="ScriptFunction object at 0x7faa8f2dccc0>" class="doc_header"><code>ScriptFunction object at 0x7faa8f2dccc0></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7faa8f2dccc0></code>()</p>
 </blockquote>
 
 </div>
@@ -186,7 +186,7 @@ nb_path: "nbs/04_inference.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ScriptFunction object at 0x7ff358b00770>" class="doc_header"><code>ScriptFunction object at 0x7ff358b00770></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7ff358b00770></code>()</p>
+<h4 id="ScriptFunction object at 0x7faa8f2dc270>" class="doc_header"><code>ScriptFunction object at 0x7faa8f2dc270></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7faa8f2dc270></code>()</p>
 </blockquote>
 
 </div>
@@ -210,7 +210,7 @@ nb_path: "nbs/04_inference.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="ScriptFunction object at 0x7ff358b00bd0>" class="doc_header"><code>ScriptFunction object at 0x7ff358b00bd0></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7ff358b00bd0></code>()</p>
+<h4 id="ScriptFunction object at 0x7faa8f2dcea0>" class="doc_header"><code>ScriptFunction object at 0x7faa8f2dcea0></code><a href="" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>ScriptFunction object at 0x7faa8f2dcea0></code>()</p>
 </blockquote>
 
 </div>
@@ -417,33 +417,33 @@ Exported graph: graph(%x.1 : Float(540, 540, 1, strides=[540, 1, 1], requires_gr
       %center.1 : Float(2, strides=[1], requires_grad=0, device=cpu)):
   %onnx::Gather_2 : Long(device=cpu) = onnx::Constant[value={0}, onnx_name=&#34;Constant_0&#34;]()
   %onnx::Gather_3 : Long(device=cpu) = onnx::Constant[value={1}, onnx_name=&#34;Constant_1&#34;]()
-  %onnx::Sub_4 : Float(device=cpu) = onnx::Gather[axis=0, onnx_name=&#34;Gather_2&#34;](%center.1, %onnx::Gather_2) # /tmp/ipykernel_1914661/628550723.py:55:31
-  %onnx::Sub_5 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_3&#34;]() # /tmp/ipykernel_1914661/628550723.py:55:41
-  %onnx::Div_6 : Float(device=cpu) = onnx::Sub[onnx_name=&#34;Sub_4&#34;](%onnx::Sub_4, %onnx::Sub_5) # /tmp/ipykernel_1914661/628550723.py:55:31
-  %onnx::Div_7 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_5&#34;]() # /tmp/ipykernel_1914661/628550723.py:55:41
-  %relative_center : Float(device=cpu) = onnx::Div[onnx_name=&#34;Div_6&#34;](%onnx::Div_6, %onnx::Div_7) # /tmp/ipykernel_1914661/628550723.py:55:31
-  %onnx::Add_9 : Float(1024, 1024, strides=[1024, 1], requires_grad=0, device=cpu) = onnx::Constant[value=&lt;Tensor&gt;, onnx_name=&#34;Constant_7&#34;]() # /tmp/ipykernel_1914661/628550723.py:56:22
-  %coords : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Add[onnx_name=&#34;Add_8&#34;](%onnx::Add_9, %relative_center) # /tmp/ipykernel_1914661/628550723.py:56:22
-  %onnx::Unsqueeze_11 : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Cast[to=1, onnx_name=&#34;Cast_9&#34;](%coords) # /tmp/ipykernel_1914661/628550723.py:57:25
-  %onnx::Sub_12 : Float(device=cpu) = onnx::Gather[axis=0, onnx_name=&#34;Gather_10&#34;](%center.1, %onnx::Gather_3) # /tmp/ipykernel_1914661/628550723.py:55:31
-  %onnx::Sub_13 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_11&#34;]() # /tmp/ipykernel_1914661/628550723.py:55:41
-  %onnx::Div_14 : Float(device=cpu) = onnx::Sub[onnx_name=&#34;Sub_12&#34;](%onnx::Sub_12, %onnx::Sub_13) # /tmp/ipykernel_1914661/628550723.py:55:31
-  %onnx::Div_15 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_13&#34;]() # /tmp/ipykernel_1914661/628550723.py:55:41
-  %relative_center.3 : Float(device=cpu) = onnx::Div[onnx_name=&#34;Div_14&#34;](%onnx::Div_14, %onnx::Div_15) # /tmp/ipykernel_1914661/628550723.py:55:31
-  %onnx::Add_17 : Float(1024, 1024, strides=[1024, 1], requires_grad=0, device=cpu) = onnx::Constant[value=&lt;Tensor&gt;, onnx_name=&#34;Constant_15&#34;]() # /tmp/ipykernel_1914661/628550723.py:56:22
-  %coords.3 : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Add[onnx_name=&#34;Add_16&#34;](%onnx::Add_17, %relative_center.3) # /tmp/ipykernel_1914661/628550723.py:56:22
-  %onnx::Unsqueeze_19 : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Cast[to=1, onnx_name=&#34;Cast_17&#34;](%coords.3) # /tmp/ipykernel_1914661/628550723.py:57:25
-  %onnx::Unsqueeze_20 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={-1}, onnx_name=&#34;Constant_18&#34;]() # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::Concat_21 : Float(1024, 1024, 1, strides=[1024, 1, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_19&#34;](%onnx::Unsqueeze_19, %onnx::Unsqueeze_20) # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::Unsqueeze_22 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={-1}, onnx_name=&#34;Constant_20&#34;]() # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::Concat_23 : Float(1024, 1024, 1, strides=[1024, 1, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_21&#34;](%onnx::Unsqueeze_11, %onnx::Unsqueeze_22) # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::Cast_24 : Float(1024, 1024, 2, strides=[2048, 2, 1], device=cpu) = onnx::Concat[axis=-1, onnx_name=&#34;Concat_22&#34;](%onnx::Concat_21, %onnx::Concat_23) # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::Unsqueeze_25 : Float(1024, 1024, 2, strides=[2048, 2, 1], device=cpu) = onnx::Cast[to=1, onnx_name=&#34;Cast_23&#34;](%onnx::Cast_24) # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::Unsqueeze_26 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={0}, onnx_name=&#34;Constant_24&#34;]() # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::GridSample_27 : Float(1, 1024, 1024, 2, strides=[2097152, 2048, 2, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_25&#34;](%onnx::Unsqueeze_25, %onnx::Unsqueeze_26) # /tmp/ipykernel_1914661/628550723.py:60:16
-  %onnx::Unsqueeze_28 : Float(1, 540, 540, strides=[291600, 540, 1], device=cpu) = onnx::Transpose[perm=[2, 0, 1], onnx_name=&#34;Transpose_26&#34;](%x.1) # /tmp/ipykernel_1914661/628550723.py:63:12
-  %onnx::Unsqueeze_29 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={0}, onnx_name=&#34;Constant_27&#34;]() # /tmp/ipykernel_1914661/628550723.py:63:12
-  %onnx::GridSample_30 : Float(1, 1, 540, 540, strides=[291600, 291600, 540, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_28&#34;](%onnx::Unsqueeze_28, %onnx::Unsqueeze_29) # /tmp/ipykernel_1914661/628550723.py:63:12
+  %onnx::Sub_4 : Float(device=cpu) = onnx::Gather[axis=0, onnx_name=&#34;Gather_2&#34;](%center.1, %onnx::Gather_2) # /tmp/ipykernel_2119845/628550723.py:55:31
+  %onnx::Sub_5 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_3&#34;]() # /tmp/ipykernel_2119845/628550723.py:55:41
+  %onnx::Div_6 : Float(device=cpu) = onnx::Sub[onnx_name=&#34;Sub_4&#34;](%onnx::Sub_4, %onnx::Sub_5) # /tmp/ipykernel_2119845/628550723.py:55:31
+  %onnx::Div_7 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_5&#34;]() # /tmp/ipykernel_2119845/628550723.py:55:41
+  %relative_center : Float(device=cpu) = onnx::Div[onnx_name=&#34;Div_6&#34;](%onnx::Div_6, %onnx::Div_7) # /tmp/ipykernel_2119845/628550723.py:55:31
+  %onnx::Add_9 : Float(1024, 1024, strides=[1024, 1], requires_grad=0, device=cpu) = onnx::Constant[value=&lt;Tensor&gt;, onnx_name=&#34;Constant_7&#34;]() # /tmp/ipykernel_2119845/628550723.py:56:22
+  %coords : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Add[onnx_name=&#34;Add_8&#34;](%onnx::Add_9, %relative_center) # /tmp/ipykernel_2119845/628550723.py:56:22
+  %onnx::Unsqueeze_11 : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Cast[to=1, onnx_name=&#34;Cast_9&#34;](%coords) # /tmp/ipykernel_2119845/628550723.py:57:25
+  %onnx::Sub_12 : Float(device=cpu) = onnx::Gather[axis=0, onnx_name=&#34;Gather_10&#34;](%center.1, %onnx::Gather_3) # /tmp/ipykernel_2119845/628550723.py:55:31
+  %onnx::Sub_13 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_11&#34;]() # /tmp/ipykernel_2119845/628550723.py:55:41
+  %onnx::Div_14 : Float(device=cpu) = onnx::Sub[onnx_name=&#34;Sub_12&#34;](%onnx::Sub_12, %onnx::Sub_13) # /tmp/ipykernel_2119845/628550723.py:55:31
+  %onnx::Div_15 : Float(requires_grad=0, device=cpu) = onnx::Constant[value={270}, onnx_name=&#34;Constant_13&#34;]() # /tmp/ipykernel_2119845/628550723.py:55:41
+  %relative_center.3 : Float(device=cpu) = onnx::Div[onnx_name=&#34;Div_14&#34;](%onnx::Div_14, %onnx::Div_15) # /tmp/ipykernel_2119845/628550723.py:55:31
+  %onnx::Add_17 : Float(1024, 1024, strides=[1024, 1], requires_grad=0, device=cpu) = onnx::Constant[value=&lt;Tensor&gt;, onnx_name=&#34;Constant_15&#34;]() # /tmp/ipykernel_2119845/628550723.py:56:22
+  %coords.3 : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Add[onnx_name=&#34;Add_16&#34;](%onnx::Add_17, %relative_center.3) # /tmp/ipykernel_2119845/628550723.py:56:22
+  %onnx::Unsqueeze_19 : Float(1024, 1024, strides=[1024, 1], device=cpu) = onnx::Cast[to=1, onnx_name=&#34;Cast_17&#34;](%coords.3) # /tmp/ipykernel_2119845/628550723.py:57:25
+  %onnx::Unsqueeze_20 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={-1}, onnx_name=&#34;Constant_18&#34;]() # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::Concat_21 : Float(1024, 1024, 1, strides=[1024, 1, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_19&#34;](%onnx::Unsqueeze_19, %onnx::Unsqueeze_20) # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::Unsqueeze_22 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={-1}, onnx_name=&#34;Constant_20&#34;]() # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::Concat_23 : Float(1024, 1024, 1, strides=[1024, 1, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_21&#34;](%onnx::Unsqueeze_11, %onnx::Unsqueeze_22) # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::Cast_24 : Float(1024, 1024, 2, strides=[2048, 2, 1], device=cpu) = onnx::Concat[axis=-1, onnx_name=&#34;Concat_22&#34;](%onnx::Concat_21, %onnx::Concat_23) # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::Unsqueeze_25 : Float(1024, 1024, 2, strides=[2048, 2, 1], device=cpu) = onnx::Cast[to=1, onnx_name=&#34;Cast_23&#34;](%onnx::Cast_24) # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::Unsqueeze_26 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={0}, onnx_name=&#34;Constant_24&#34;]() # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::GridSample_27 : Float(1, 1024, 1024, 2, strides=[2097152, 2048, 2, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_25&#34;](%onnx::Unsqueeze_25, %onnx::Unsqueeze_26) # /tmp/ipykernel_2119845/628550723.py:60:16
+  %onnx::Unsqueeze_28 : Float(1, 540, 540, strides=[291600, 540, 1], device=cpu) = onnx::Transpose[perm=[2, 0, 1], onnx_name=&#34;Transpose_26&#34;](%x.1) # /tmp/ipykernel_2119845/628550723.py:63:12
+  %onnx::Unsqueeze_29 : Long(1, strides=[1], device=cpu) = onnx::Constant[value={0}, onnx_name=&#34;Constant_27&#34;]() # /tmp/ipykernel_2119845/628550723.py:63:12
+  %onnx::GridSample_30 : Float(1, 1, 540, 540, strides=[291600, 291600, 540, 1], device=cpu) = onnx::Unsqueeze[onnx_name=&#34;Unsqueeze_28&#34;](%onnx::Unsqueeze_28, %onnx::Unsqueeze_29) # /tmp/ipykernel_2119845/628550723.py:63:12
   %x : Float(1, 1, 1024, 1024, strides=[1048576, 1048576, 1024, 1], requires_grad=0, device=cpu) = onnx::GridSample[align_corners=0, mode=&#34;nearest&#34;, padding_mode=&#34;reflection&#34;, onnx_name=&#34;GridSample_29&#34;](%onnx::GridSample_30, %onnx::GridSample_27) # /home/magr/.conda/envs/fastai2/lib/python3.9/site-packages/torch/nn/functional.py:4223:11
   return (%x)
 
@@ -536,7 +536,7 @@ Exported graph: graph(%x.1 : Float(540, 540, 1, strides=[540, 1, 1], requires_gr
     <span class="n">channel_means</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span><span class="o">*</span><span class="n">ch</span>
     <span class="n">channel_stds</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">]</span><span class="o">*</span><span class="n">ch</span>
     <span class="k">for</span> <span class="n">num_classes</span> <span class="ow">in</span> <span class="n">NUM_CLASSES</span><span class="p">:</span>
-        <span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">DummyModule</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="p">[</span><span class="n">DummyModule</span><span class="p">(</span><span class="n">num_classes</span><span class="o">=</span><span class="n">num_classes</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
         <span class="k">for</span> <span class="n">sx</span> <span class="ow">in</span> <span class="n">IMG_SHAPES</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">sy</span> <span class="ow">in</span> <span class="n">IMG_SHAPES</span><span class="p">:</span>
                 <span class="n">inp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span><span class="n">sy</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span>
@@ -582,6 +582,13 @@ Exported graph: graph(%x.1 : Float(540, 540, 1, strides=[540, 1, 1], requires_gr
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="ONNX-Export-(experimental)">ONNX Export (experimental)<a class="anchor-link" href="#ONNX-Export-(experimental)"> </a></h1><p>Not supported yet, needs further testing</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -589,65 +596,45 @@ Exported graph: graph(%x.1 : Float(540, 540, 1, strides=[540, 1, 1], requires_gr
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;12&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-    <span class="n">input_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inp&quot;</span><span class="p">]</span>
-    <span class="n">output_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;argmax&quot;</span><span class="p">,</span> <span class="s2">&quot;softmax&quot;</span><span class="p">,</span> <span class="s2">&quot;stdeviation&quot;</span><span class="p">]</span>
-    <span class="n">dynamic_axes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;inp&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;argmax&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;softmax&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;stdeviation&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}</span>
-    <span class="n">path_onnx</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;ensemble.onnx&#39;</span><span class="p">)</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">scripted_ensemble</span><span class="p">,</span> <span class="n">inp</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">path_onnx</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">opset_version</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> 
-                      <span class="n">input_names</span><span class="o">=</span><span class="n">input_names</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">,</span> <span class="n">dynamic_axes</span><span class="o">=</span><span class="n">dynamic_axes</span><span class="p">)</span>
-    
-    <span class="c1">#import onnxruntime</span>
-    <span class="c1">#ort_session = onnxruntime.InferenceSession(path_onnx.as_posix())</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">onnx_export</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">example_input</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="s1">&#39;Export model to onnx format&#39;</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;12&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">]:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="n">input_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inp&quot;</span><span class="p">]</span>
+        <span class="n">output_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;argmax&quot;</span><span class="p">,</span> <span class="s2">&quot;softmax&quot;</span><span class="p">,</span> <span class="s2">&quot;stdeviation&quot;</span><span class="p">]</span>
+        <span class="n">dynamic_axes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;inp&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;heigth&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;width&quot;</span><span class="p">},</span> 
+                        <span class="s2">&quot;argmax&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;heigth&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;width&quot;</span><span class="p">},</span> 
+                        <span class="s2">&quot;softmax&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;num_classes&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;heigth&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;width&quot;</span><span class="p">},</span> 
+                        <span class="s2">&quot;stdeviation&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;heigth&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;width&quot;</span><span class="p">}}</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">onnx</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">example_input</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">f</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">opset_version</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">do_constant_folding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">input_names</span><span class="o">=</span><span class="n">input_names</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">output_names</span><span class="p">,</span> <span class="n">dynamic_axes</span><span class="o">=</span><span class="n">dynamic_axes</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Require pytorch version &gt;= 1.12.0&#39;</span><span class="p">)</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>1.12.0
-</pre>
 </div>
-</div>
+    {% endraw %}
 
-<div class="output_area">
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-WARNING: The shape inference of prim::Constant type is missing, so it may result in wrong shape inference for the exported graph. Please consider adding it in symbolic function.
-</pre>
-</div>
-</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># inp = torch.rand(1024,1024,3).float()</span>
+<span class="c1"># path_onnx = Path(&#39;ensemble.onnx&#39;)</span>
+<span class="c1"># onnx_export(scripted_ensemble, inp, path_onnx)</span>
 
+<span class="c1">#import onnxruntime</span>
+<span class="c1">#ort_session = onnxruntime.InferenceSession(path_onnx.as_posix())</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 

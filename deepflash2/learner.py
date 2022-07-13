@@ -21,6 +21,7 @@ from fastcore.basics import GetAttr
 from fastcore.foundation import L
 from fastai import optimizer
 from fastai.learner import Learner
+from fastai.callback.all import *
 from fastai.callback.tracker import SaveModelCallback
 from fastai.callback.progress import CSVLogger
 from fastai.data.core import DataLoaders
