@@ -2,6 +2,12 @@
 
 <!-- do not remove -->
 
+## 0.2.1
+
+-- Bug fixes
+-- Adding Code-based Tutorial (https://matjesg.github.io/deepflash2/tutorial_monuseg.html)
+
+
 ## 0.2.0
 
 ### New Features
