@@ -7,7 +7,8 @@
              "Overview": "tutorial.html",
              "Ground Truth Estimation": "tutorial_gt.html",
              "Model Training": "tutorial_train.html",
-             "Prediction on new Data": "tutorial_pred.html"
+             "Prediction on new Data": "tutorial_pred.html",
+             "Code-based Tutorial": "tutorial_monuseg.html"
             }
     }
   },

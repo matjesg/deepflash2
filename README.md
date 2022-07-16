@@ -33,14 +33,17 @@ Have a look at our [solution](https://www.kaggle.com/matjes/hubmap-deepflash2-ju
 
 ## Quick Start and Demo
 > Get started in less than a minute. Watch the <a href="https://matjesg.github.io/deepflash2/tutorial.html" target="_blank">tutorials</a> for help.
+#### Demo on Hugging Face Spaces
+
+Go to the [demo space](https://huggingface.co/spaces/matjesg/deepflash2) -- inference only (no training possible).
+
+#### Demo usage with Google Colab
 
 For a quick start, run *deepflash2* in Google Colaboratory (Google account required).
 
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb) 
 <video src="https://user-images.githubusercontent.com/13711052/139751414-acf737db-2d8a-4203-8a34-7a38e5326b5e.mov" controls width="100%"></video>
 
-
-#### Demo usage
 The GUI provides a build-in use for our [sample data](https://github.com/matjesg/deepflash2/releases/tag/sample_data).
 
 1. Starting the GUI (in <a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/master/deepflash2_GUI.ipynb" target="_blank">Colab</a> or follow the installation instructions below)

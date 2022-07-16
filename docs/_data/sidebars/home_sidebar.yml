@@ -27,6 +27,9 @@ entries:
         - output: web,pdf
           title: Prediction on new Data
           url: tutorial_pred.html
+        - output: web,pdf
+          title: Code-based Tutorial
+          url: tutorial_monuseg.html
         title: Tutorials
     output: web
     title: deepflash2
