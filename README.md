@@ -6,7 +6,6 @@
 
 Official repository of deepflash2 - a deep-learning pipeline for segmentation of ambiguous microscopic images.
 
-![CI](https://github.com/matjesg/deepflash2/workflows/CI/badge.svg) 
 [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) 
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/deepflash2)](https://pypistats.org/packages/deepflash2)
 [![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2)
