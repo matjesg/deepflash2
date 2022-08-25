@@ -237,13 +237,13 @@ class EnsembleLearner(EnsembleBase):
         log_name = f'{name.name}_{time.strftime("%Y%m%d-%H%M%S")}.csv'
         log_dir = self.ensemble_dir/'logs'
         log_dir.mkdir(exist_ok=True, parents=True)
-        cbs = self.cbs.append(CSVLogger(fname=log_dir/log_name))
+        cbs = self.cbs + [CSVLogger(fname=log_dir/log_name)]
         self.learn = Learner(dls, model,
                              metrics=self.metrics,
                              wd=self.weight_decay,
                              loss_func=self.loss_fn,
                              opt_func=_optim_dict[self.optim],
-                             cbs=self.cbs)
+                             cbs=cbs)
         self.learn.model_dir = self.ensemble_dir.parent/'.tmp'
         if self.mixed_precision_training: self.learn.to_fp16()
         print(f'Starting training for {name.name}')
