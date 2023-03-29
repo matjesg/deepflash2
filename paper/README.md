@@ -1,6 +1,6 @@
 # Reproducing the results of our paper
 
-- **Paper**: The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.06693).
+- **Paper**: The Nature Communications article is available at [here](https://www.nature.com/articles/s41467-023-36960-9).
 - **Data**: Data is available on [Google Drive](https://drive.google.com/drive/folders/1r9AqP9qW9JThbMIvT0jhoA5mPxWEeIjs?usp=sharing). 
 - **Models**: Trained models are available in the model libary on [github](https://github.com/matjesg/deepflash2/releases/tag/model_library). 
 - **Benchmark Models**: Trained benchmark models are available on [Google Drive](https://drive.google.com/drive/folders/1BZRrRTDuJw5EoBqz1RWoFKZ7eq2kEwxm?usp=sharing). 
