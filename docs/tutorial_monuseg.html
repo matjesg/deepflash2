@@ -65,7 +65,7 @@ google.com/file/d/1ZgqFJomqQGNnsx7w7QBzQQMVA16lbVCA/view</li>
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pip install -Uqq deepflash2
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>-Uqq<span class="w"> </span>deepflash2
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">deepflash2.all</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -400,7 +400,7 @@ Preprocessing data
 <span class="n">ensemble_trained_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/content/trained_models&quot;</span><span class="p">)</span><span class="o">/</span><span class="n">DATASET</span>
 <span class="n">ensemble_trained_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ensemble_trained_path</span> <span class="o">=</span> <span class="n">ensemble_trained_dir</span><span class="o">/</span><span class="n">ensemble_name</span>
-<span class="o">!</span>wget -O <span class="o">{</span>ensemble_trained_path.as_posix<span class="o">()}</span> https://github.com/matjesg/deepflash2/releases/download/model_library/<span class="o">{</span>ensemble_name<span class="o">}</span>
+<span class="o">!</span>wget<span class="w"> </span>-O<span class="w"> </span><span class="o">{</span>ensemble_trained_path.as_posix<span class="o">()}</span><span class="w"> </span>https://github.com/matjesg/deepflash2/releases/download/model_library/<span class="o">{</span>ensemble_name<span class="o">}</span>
 
 <span class="c1"># Uncomment to use your own trained model from the section above</span>
 <span class="c1"># ensemble_trained_path = ensemble_path</span>

@@ -64,15 +64,20 @@ Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU).
 
 We provide a complete guide to reproduce our experiments using the *deepflash2 Python API* [here](https://github.com/matjesg/deepflash2/tree/master/paper). The data is currently available on [Google Drive](https://drive.google.com/drive/folders/1r9AqP9qW9JThbMIvT0jhoA5mPxWEeIjs?usp=sharing) and [Zenodo](https://doi.org/10.5281/zenodo.7653312).
 
-The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.06693). Please cite
+Our Nature Communications article is available [here](https://www.nature.com/articles/s41467-023-36960-9). Please cite
 
 ```
-@misc{griebel2021deepflash2,
-    title={Deep-learning in the bioimaging wild: Handling ambiguous data with deepflash2}, 
-    author={Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
-    year={2021},
-    eprint={2111.06693},
-    archivePrefix={arXiv}
+@article{Griebel2023,
+  doi = {10.1038/s41467-023-36960-9},
+  url = {https://doi.org/10.1038/s41467-023-36960-9},
+  year = {2023},
+  month = mar,
+  publisher = {Springer Science and Business Media {LLC}},
+  volume = {14},
+  number = {1},
+  author = {Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
+  title = {Deep learning-enabled segmentation of ambiguous bioimages with deepflash2},
+  journal = {Nature Communications}
 }
 ```
 
