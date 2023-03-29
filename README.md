@@ -9,8 +9,7 @@ Official repository of deepflash2 - a deep-learning pipeline for segmentation of
 [![PyPI](https://img.shields.io/pypi/v/deepflash2?color=blue&label=pypi%20version)](https://pypi.org/project/deepflash2/#description) 
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/deepflash2)](https://pypistats.org/packages/deepflash2)
 [![Conda (channel only)](https://img.shields.io/conda/vn/matjesg/deepflash2?color=seagreen&label=conda%20version)](https://anaconda.org/matjesg/deepflash2)
-[![GitHub stars](https://img.shields.io/github/stars/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
-[![GitHub forks](https://img.shields.io/github/forks/matjesg/deepflash2?style=social)](https://github.com/matjesg/deepflash2/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7653312.svg)](https://doi.org/10.5281/zenodo.7653312)
 ***
 
 __The best of two worlds:__
@@ -63,17 +62,22 @@ Times are estimated for Google Colab (with free NVIDIA Tesla K80 GPU).
 
 ## Paper and Experiments 
 
-We provide a complete guide to reproduce our experiments using the *deepflash2 Python API* [here](https://github.com/matjesg/deepflash2/tree/master/paper). The data is currently available on [Google Drive](https://drive.google.com/drive/folders/1r9AqP9qW9JThbMIvT0jhoA5mPxWEeIjs?usp=sharing).
+We provide a complete guide to reproduce our experiments using the *deepflash2 Python API* [here](https://github.com/matjesg/deepflash2/tree/master/paper). The data is currently available on [Google Drive](https://drive.google.com/drive/folders/1r9AqP9qW9JThbMIvT0jhoA5mPxWEeIjs?usp=sharing) and [Zenodo](https://doi.org/10.5281/zenodo.7653312).
 
-The preprint of our paper is available on [arXiv](https://arxiv.org/abs/2111.06693). Please cite
+Our Nature Communications article is available [here](https://www.nature.com/articles/s41467-023-36960-9). Please cite
 
 ```
-@misc{griebel2021deepflash2,
-    title={Deep-learning in the bioimaging wild: Handling ambiguous data with deepflash2}, 
-    author={Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
-    year={2021},
-    eprint={2111.06693},
-    archivePrefix={arXiv}
+@article{Griebel2023,
+  doi = {10.1038/s41467-023-36960-9},
+  url = {https://doi.org/10.1038/s41467-023-36960-9},
+  year = {2023},
+  month = mar,
+  publisher = {Springer Science and Business Media {LLC}},
+  volume = {14},
+  number = {1},
+  author = {Matthias Griebel and Dennis Segebarth and Nikolai Stein and Nina Schukraft and Philip Tovote and Robert Blum and Christoph M. Flath},
+  title = {Deep learning-enabled segmentation of ambiguous bioimages with deepflash2},
+  journal = {Nature Communications}
 }
 ```
 
