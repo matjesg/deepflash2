@@ -17,7 +17,7 @@ authors:
   - family-names: Flath
     name-particle: M.
     given-names: Christoph
-title: "Deep-learning in the bioimaging wild: Handling ambiguous data with deepflash2"
-version: 0.1.4
+title: "Deep learning-enabled segmentation of ambiguous bioimages with deepflash2"
+version: 0.2.2
 license: "Apache-2.0"
 date-released: 2021-03-29
