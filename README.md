@@ -14,7 +14,7 @@ Official repository of deepflash2 - a deep-learning pipeline for segmentation of
 
 __The best of two worlds:__
 Combining state-of-the-art deep learning with a barrier free environment for life science researchers. 
-> Read the [paper](https://arxiv.org/abs/2111.06693), watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html), or read the [docs](https://matjesg.github.io/deepflash2/).    
+> Read the [paper](https://www.nature.com/articles/s41467-023-36960-9), watch the [tutorials](https://matjesg.github.io/deepflash2/tutorial.html), or read the [docs](https://matjesg.github.io/deepflash2/).    
 - **No coding skills required** (graphical user interface)
 - **Ground truth estimation** from the annotations of multiple experts for model training and validation
 - **Quality assurance and out-of-distribution detection** for reliable prediction on new data 
