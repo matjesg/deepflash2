@@ -22,7 +22,7 @@ def import_sitk():
         assert SimpleITK.Version_MajorVersion()==2
     except:
         print('Installing SimpleITK. Please wait.')
-        install_package("SimpleITK==2.0.2")
+        install_package("SimpleITK==2.1.1.1")
     import SimpleITK
     return SimpleITK
 
