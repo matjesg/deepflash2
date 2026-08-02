@@ -14,7 +14,6 @@ from skimage.measure import label
 from skimage.color import label2rgb
 
 import albumentations as A
-import albumentations.augmentations.functional as AF
 from albumentations.pytorch.transforms import ToTensorV2
 
 import torch, torch.nn as nn, torch.nn.functional as F
@@ -229,10 +228,19 @@ class DeformationField:
             sl.append(slice(cmin, cmax))
 
 
-        remap_fn = A.augmentations.functional._maybe_process_in_chunks(
-            cv2.remap, map1=coords[1],map2=coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT
-        )
-        return remap_fn(data[tuple(sl)])
+        img = data[tuple(sl)]
+        num_channels = img.shape[2] if img.ndim == 3 else 1
+        def remap(x): return cv2.remap(x, map1=coords[1], map2=coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+        if num_channels > 4:
+            chunks = []
+            for index in range(0, num_channels, 4):
+                if num_channels - index == 2:
+                    for i in range(2):
+                        chunks.append(np.expand_dims(remap(img[:, :, index+i:index+i+1]), -1))
+                else:
+                    chunks.append(remap(img[:, :, index:index+4]))
+            return np.dstack(chunks)
+        return remap(img)
 
 # Cell
 def _read_img(path, **kwargs):

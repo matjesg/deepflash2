@@ -157,7 +157,7 @@ class GTEstimator(GetAttr):
             # Results
             metrics = ['dice_score', 'mean_average_precision', 'average_precision_at_iou_50'] if self.instance_segmentation_metrics else ['dice_score']
             av_df = pd.DataFrame([self.df_res[self.df_res.file==f][metrics].mean()], index=['average'], columns=metrics)
-            plt_df = self.df_res[self.df_res.file==f].set_index('exp')[metrics].append(av_df)
+            plt_df = pd.concat([self.df_res[self.df_res.file==f].set_index('exp')[metrics], av_df])
             fig.text(0, .5, f, ha='center', va='center', rotation=90)
             plt.tight_layout()
             plt.show()
