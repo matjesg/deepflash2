@@ -426,8 +426,9 @@ class RandomTileDataset(BaseDataset):
     """
     n_inp = 1
     def __init__(self, *args, sample_mult=None, flip=True, rotation_range_deg=(0, 360), scale_range=(0, 0),
-                 albumentations_tfms=[A.RandomGamma()], min_length=400, **kwargs):
+                 albumentations_tfms=None, min_length=400, **kwargs):
         super().__init__(*args, **kwargs)
+        if albumentations_tfms is None: albumentations_tfms = [A.RandomGamma()]
         store_attr('sample_mult, flip, rotation_range_deg, scale_range, albumentations_tfms')
 
         # Sample mulutiplier: Number of random samplings from augmented image
@@ -437,7 +438,7 @@ class RandomTileDataset(BaseDataset):
             self.sample_mult = max(int(self.stats['max_tiles_per_image']/self.scale**2),
                                    min_length//len(self.files))
 
-        tfms = self.albumentations_tfms
+        tfms = list(self.albumentations_tfms)
         if self.normalize:
             tfms += [
                 A.Normalize(mean=self.stats['channel_means'],
