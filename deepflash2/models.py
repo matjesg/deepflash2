@@ -69,7 +69,8 @@ def load_smp_model(path, device=None, strict=True, **kwargs):
     path = Path(path)
     if isinstance(device, int): device = torch.device('cuda', device)
     elif device is None: device = 'cpu'
-    model_dict = torch.load(path, map_location=device)
+    # weights_only=False: our checkpoints embed numpy stats; torch>=2.6 defaults weights_only=True (trusted source)
+    model_dict = torch.load(path, map_location=device, weights_only=False)
     state = model_dict.pop('model')
     stats = model_dict.pop('stats')
     # Ensure that no pretrained encoder weights are loaded

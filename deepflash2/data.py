@@ -170,7 +170,8 @@ class DeformationField:
             self.scale = random.uniform(*np.array(scale_range)*scale)
 
         grid_range = [np.linspace(-(d*self.scale)/2, ((d*self.scale)/2)-1, d) for d in shape]
-        self.deformationField = np.meshgrid(*grid_range)[::-1]
+        # list(...) needed: np.meshgrid returns a tuple in numpy>=2 (was a list), and mirror() assigns to items
+        self.deformationField = list(np.meshgrid(*grid_range))[::-1]
 
     def rotate(self, theta=0):
         "Rotate deformation field"
