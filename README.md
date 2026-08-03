@@ -109,21 +109,15 @@ Open <a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/m
 
 We recommend installation into a clean Python 3.9, 3.10, 3.11, or 3.12 environment (e.g., using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 
-#### [mamba](https://github.com/mamba-org/mamba)/[conda](https://docs.conda.io/en/latest/)
-
-Installation with mamba (installaton [instructions](https://github.com/mamba-org/mamba)) allows a fast and realiable installation process (you can replace `mamba` with `conda` and add the `--update-all` flag to do the installation with conda).
-
-```bash
-mamba install -c fastchan -c conda-forge -c matjesg deepflash2 
-```
-
 #### [pip](https://pip.pypa.io/en/stable/)
 
-If you want to use your GPU and install with pip, we recommend installing PyTorch first by following the [installation instructions](https://pytorch.org/get-started/locally/).
+If you want to use your GPU, we recommend installing PyTorch first by following the [installation instructions](https://pytorch.org/get-started/locally/), then:
 
 ```bash
 pip install -U deepflash2
 ```
+
+**conda / mamba users:** deepflash2 is distributed via PyPI (the conda package is no longer maintained). Create your conda/mamba environment as usual, then install deepflash2 with pip inside it: `pip install -U deepflash2`.
 
 #### Using the GUI
 

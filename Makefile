@@ -20,11 +20,7 @@ test:
 	nbdev_test_nbs
 
 release: pypi
-	fastrelease_conda_package --upload_user matjesg
 	nbdev_bump_version
-
-conda_release:
-	fastrelease_conda_package --upload_user matjesg
 
 pypi: dist
 	twine upload --repository pypi dist/*
