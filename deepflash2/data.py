@@ -13,8 +13,6 @@ from matplotlib.patches import Rectangle
 from skimage.measure import label
 from skimage.color import label2rgb
 
-import albumentations as A
-import albumentations.augmentations.functional as AF
 from albumentations.pytorch.transforms import ToTensorV2
 
 import torch, torch.nn as nn, torch.nn.functional as F
@@ -23,6 +21,9 @@ from torch.utils.data import Dataset, DataLoader
 #from fastai.vision.all import *
 from fastai.data.transforms import get_image_files
 from fastcore.all import *
+# NB: import albumentations AFTER `from fastcore.all import *` — fastcore exports `A`
+# (a functools.partial) that would otherwise shadow the albumentations module.
+import albumentations as A
 from fastprogress import progress_bar
 
 from .utils import clean_show
@@ -169,7 +170,8 @@ class DeformationField:
             self.scale = random.uniform(*np.array(scale_range)*scale)
 
         grid_range = [np.linspace(-(d*self.scale)/2, ((d*self.scale)/2)-1, d) for d in shape]
-        self.deformationField = np.meshgrid(*grid_range)[::-1]
+        # list(...) needed: np.meshgrid returns a tuple in numpy>=2 (was a list), and mirror() assigns to items
+        self.deformationField = list(np.meshgrid(*grid_range))[::-1]
 
     def rotate(self, theta=0):
         "Rotate deformation field"
@@ -229,10 +231,19 @@ class DeformationField:
             sl.append(slice(cmin, cmax))
 
 
-        remap_fn = A.augmentations.functional._maybe_process_in_chunks(
-            cv2.remap, map1=coords[1],map2=coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT
-        )
-        return remap_fn(data[tuple(sl)])
+        img = data[tuple(sl)]
+        num_channels = img.shape[2] if img.ndim == 3 else 1
+        def remap(x): return cv2.remap(x, map1=coords[1], map2=coords[0], interpolation=order, borderMode=cv2.BORDER_REFLECT)
+        if num_channels > 4:
+            chunks = []
+            for index in range(0, num_channels, 4):
+                if num_channels - index == 2:
+                    for i in range(2):
+                        chunks.append(np.expand_dims(remap(img[:, :, index+i:index+i+1]), -1))
+                else:
+                    chunks.append(remap(img[:, :, index:index+4]))
+            return np.dstack(chunks)
+        return remap(img)
 
 # Cell
 def _read_img(path, **kwargs):
