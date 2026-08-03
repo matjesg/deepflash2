@@ -22,7 +22,7 @@ def import_sitk():
         assert SimpleITK.Version_MajorVersion()==2
     except:
         print('Installing SimpleITK. Please wait.')
-        install_package("SimpleITK==2.1.1.1")
+        install_package("SimpleITK>=2.1")  # unpinned patch: 2.1.1.1 has no py>=3.11 wheel; any 2.x satisfies the assert above
     import SimpleITK
     return SimpleITK
 
