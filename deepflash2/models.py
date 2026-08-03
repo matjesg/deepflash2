@@ -32,11 +32,12 @@ def create_smp_model(arch, **kwargs):
     'Create segmentation_models_pytorch model'
 
     assert arch in ARCHITECTURES, f'Select one of {ARCHITECTURES}'
-    is_convnext_encoder = kwargs['encoder_name'].startswith('tu-convnext')
-    assert not all((arch!="Unet", is_convnext_encoder)), 'ConvNeXt encoder can only be used with Unet'
+    # 4-stage timm-universal encoders (transformer-style: 4 feature maps, stride 4->32)
+    is_4stage_encoder = kwargs['encoder_name'].startswith(('tu-convnext', 'tu-swin', 'tu-maxvit'))
+    assert not all((arch!="Unet", is_4stage_encoder)), '4-stage encoders (convnext/swin/maxvit) can only be used with Unet'
 
     if arch=="Unet":
-        if is_convnext_encoder:
+        if is_4stage_encoder:
             kwargs['encoder_depth'] = 4
             kwargs['decoder_channels'] = (256, 128, 64, 16)
         model =  smp.Unet(**kwargs)
