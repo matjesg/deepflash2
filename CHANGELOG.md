@@ -8,6 +8,7 @@
 
 - Modern dependency stack (Python >=3.9, PyTorch 2.x, NumPy 2, pandas 2/3): installs and runs on current Google Colab again.
 - Replaced the unmaintained `segmentation-models-pytorch-deepflash2` fork with upstream `segmentation-models-pytorch` (>=0.5) and `timm` (>=1.0); removed the obsolete UNet-decoder monkey-patch (upstream handles ConvNeXt natively).
+- New **default encoder**: ConvNeXt V2 (`tu-convnextv2_tiny.fcmae_ft_in22k_in1k`), a drop-in upgrade from `convnext_tiny` (equal-or-better + more stable validation Dice on the sample data).
 - Fixed #51 (GUI not shown on ipywidgets 8; pinned `ipywidgets<8`).
 - Fixed #57 (albumentations `A` shadowed by the fastcore wildcard import - root cause of the `RandomGamma`/`Normalize` errors).
 - Fixed #66 (relaxed the `opencv-python-headless` upper pin).

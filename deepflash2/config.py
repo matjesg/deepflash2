@@ -29,7 +29,7 @@ class Config:
 
     # Pytorch Segmentation Model Settings
     arch:str = 'Unet'
-    encoder_name:str = 'tu-convnext_tiny'
+    encoder_name:str = 'tu-convnextv2_tiny.fcmae_ft_in22k_in1k'
     encoder_weights:str = 'imagenet'
 
     # Train Data Settings
