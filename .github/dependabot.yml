@@ -1,0 +1,11 @@
+# The documentation site under /docs is built with Jekyll via the `github-pages`
+# gem, which deliberately pins an old, frozen dependency set to match GitHub's
+# Pages runtime. Those gems are build-only and are NOT shipped in the pip package,
+# so their advisories don't affect deepflash2 users. Don't open update PRs for them.
+version: 2
+updates:
+  - package-ecosystem: "bundler"
+    directory: "/docs"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 0
