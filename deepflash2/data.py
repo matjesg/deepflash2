@@ -13,7 +13,6 @@ from matplotlib.patches import Rectangle
 from skimage.measure import label
 from skimage.color import label2rgb
 
-import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 
 import torch, torch.nn as nn, torch.nn.functional as F
@@ -22,6 +21,9 @@ from torch.utils.data import Dataset, DataLoader
 #from fastai.vision.all import *
 from fastai.data.transforms import get_image_files
 from fastcore.all import *
+# NB: import albumentations AFTER `from fastcore.all import *` — fastcore exports `A`
+# (a functools.partial) that would otherwise shadow the albumentations module.
+import albumentations as A
 from fastprogress import progress_bar
 
 from .utils import clean_show
@@ -168,7 +170,8 @@ class DeformationField:
             self.scale = random.uniform(*np.array(scale_range)*scale)
 
         grid_range = [np.linspace(-(d*self.scale)/2, ((d*self.scale)/2)-1, d) for d in shape]
-        self.deformationField = np.meshgrid(*grid_range)[::-1]
+        # list(...) needed: np.meshgrid returns a tuple in numpy>=2 (was a list), and mirror() assigns to items
+        self.deformationField = list(np.meshgrid(*grid_range))[::-1]
 
     def rotate(self, theta=0):
         "Rotate deformation field"

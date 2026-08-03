@@ -2,6 +2,19 @@
 
 <!-- do not remove -->
 
+## 0.3.0
+
+### Modernization & fixes
+
+- Modern dependency stack (Python >=3.9, PyTorch 2.x, NumPy 2, pandas 2/3): installs and runs on current Google Colab again.
+- Replaced the unmaintained `segmentation-models-pytorch-deepflash2` fork with upstream `segmentation-models-pytorch` (>=0.5) and `timm` (>=1.0); removed the obsolete UNet-decoder monkey-patch (upstream handles ConvNeXt natively).
+- Fixed #51 (GUI not shown on ipywidgets 8; pinned `ipywidgets<8`).
+- Fixed #57 (albumentations `A` shadowed by the fastcore wildcard import - root cause of the `RandomGamma`/`Normalize` errors).
+- Fixed #66 (relaxed the `opencv-python-headless` upper pin).
+- Additional modern-stack fixes: setup.py build on setuptools>=81, NumPy 2 `meshgrid`, torch>=2.6 `weights_only` model loading, and the SimpleITK install pin.
+
+
+
 ## 0.2.1
 
 -- Bug fixes

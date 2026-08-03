@@ -18,6 +18,6 @@ authors:
     name-particle: M.
     given-names: Christoph
 title: "Deep learning-enabled segmentation of ambiguous bioimages with deepflash2"
-version: 0.2.2
+version: 0.3.0
 license: "Apache-2.0"
-date-released: 2021-03-29
+date-released: 2026-08-03
