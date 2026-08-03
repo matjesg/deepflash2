@@ -90,7 +90,7 @@ Our Nature Communications article is available [here](https://www.nature.com/art
 We generally recommend using Google Colab as it only requires a Google Account and a device with a web browser. 
 To run *deepflash2* locally, we recommend using a system with a GPU (e.g., 2 CPUs, 8 GB RAM, NVIDIA GPU with 8GB VRAM or better).
 
-*deepflash2* requires Python>3.6 and the software dependencies are defined in the [settings.ini](https://github.com/matjesg/deepflash2/blob/master/settings.ini) file. Additionally, the ground truth estimation functionalities are based on simpleITK>=2.0 and the instance segmentation capabilities are complemented using cellpose v0.6.6.dev13+g316927e.
+*deepflash2* requires Python>=3.9 and the software dependencies are defined in the [settings.ini](https://github.com/matjesg/deepflash2/blob/master/settings.ini) file. Additionally, the ground truth estimation functionalities are based on simpleITK>=2.0 and the instance segmentation capabilities are complemented using cellpose v0.6.6.dev13+g316927e.
 
 *deepflash2* is tested on Google Colab (Ubuntu 18.04.5 LTS) and locally (Ubuntu 20.04 LTS, Windows 10, MacOS 12.0.1).
 
@@ -107,7 +107,7 @@ Open <a href="https://colab.research.google.com/github/matjesg/deepflash2/blob/m
 
 ### Other systems
 
-We recommend installation into a clean Python 3.7, 3.8, or 3.9 environment (e.g., using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
+We recommend installation into a clean Python 3.9, 3.10, 3.11, or 3.12 environment (e.g., using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 
 #### [mamba](https://github.com/mamba-org/mamba)/[conda](https://docs.conda.io/en/latest/)
 
